@@ -1188,12 +1188,16 @@
       transition: opacity 0.3s, transform 0.3s;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
     }
     .skill-terminal-line.typed { opacity: 0.85; transform: translateX(0); }
-    .skill-terminal-line .s-name { color: var(--white); }
-    .skill-terminal-line .s-dots { color: var(--muted); }
-    .skill-terminal-line .s-bar { color: var(--green); text-shadow: 0 0 6px var(--green); }
-    .skill-terminal-line .s-pct { color: var(--muted); margin-left: 0.5rem; }
+    .skill-terminal-line .s-name { color: var(--white); flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .skill-terminal-line .s-dots { color: var(--muted); flex-shrink: 1; overflow: hidden; }
+    .skill-terminal-line .s-bar { color: var(--green); text-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+    .skill-terminal-line .s-pct { color: var(--muted); flex-shrink: 0; }
     .skill-terminal-tags {
       margin-top: 1rem;
       display: flex;
@@ -1646,11 +1650,14 @@
           const lines = entry.target.querySelectorAll('.skill-terminal-line');
           lines.forEach((line, idx) => {
             const pct = parseInt(line.dataset.pct);
-            const filled = Math.round(pct / 10);
-            const empty = 10 - filled;
+            const barSize = window.innerWidth < 500 ? 6 : 10;
+            const filled = Math.round(pct / 100 * barSize);
+            const empty = barSize - filled;
             const dotsEl = line.querySelector('.s-dots');
             const barEl = line.querySelector('.s-bar');
-            if (dotsEl) dotsEl.textContent = ' ' + '.'.repeat(Math.max(1, 22 - line.querySelector('.s-name').textContent.length)) + ' ';
+            const nameLen = line.querySelector('.s-name').textContent.length;
+            const dotCount = window.innerWidth < 500 ? Math.max(1, 10 - nameLen) : Math.max(1, 22 - nameLen);
+            if (dotsEl) dotsEl.textContent = '.'.repeat(dotCount);
             if (barEl) barEl.textContent = '[' + '█'.repeat(filled) + '░'.repeat(empty) + ']';
             setTimeout(() => line.classList.add('typed'), 300 + idx * 250);
           });
