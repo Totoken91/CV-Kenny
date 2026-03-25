@@ -1320,35 +1320,59 @@
     <p class="section-label reveal-left">// 02</p>
     <h2 class="section-title reveal-left">Compétences</h2>
     <div class="skills-grid">
-      <div class="skill-terminal reveal-scale">
-        <p class="skill-terminal-header">Infrastructure & Réseaux</p>
-        <p class="skill-terminal-cmd">$ scan --module "infra_network"</p>
-        <div class="skill-terminal-line" data-pct="85"><span class="s-name">Réseaux informatiques</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">85%</span></div>
-        <div class="skill-terminal-line" data-pct="80"><span class="s-name">Administration réseau</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">80%</span></div>
-        <div class="skill-terminal-line" data-pct="78"><span class="s-name">VPN / Sécurité réseau</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">78%</span></div>
-        <div class="skill-terminal-tags">
+      <div class="skill-category reveal-scale">
+        <p class="skill-cat-title">Infrastructure & Réseaux</p>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Réseaux informatiques</span><span>85%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Administration réseau</span><span>80%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="80"></div></div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>VPN / Sécurité réseau</span><span>78%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="78"></div></div>
+        </div>
+        <div class="skill-tags">
           <span class="tag">Logiciel de chiffrement</span><span class="tag">Bases de données</span>
         </div>
       </div>
 
-      <div class="skill-terminal reveal-scale">
-        <p class="skill-terminal-header">Support & Systèmes</p>
-        <p class="skill-terminal-cmd">$ scan --module "support_sys"</p>
-        <div class="skill-terminal-line" data-pct="90"><span class="s-name">Support technique</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">90%</span></div>
-        <div class="skill-terminal-line" data-pct="92"><span class="s-name">Installation de logiciel</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">92%</span></div>
-        <div class="skill-terminal-line" data-pct="85"><span class="s-name">Réparation informatique</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">85%</span></div>
-        <div class="skill-terminal-tags">
+      <div class="skill-category reveal-scale">
+        <p class="skill-cat-title">Support & Systèmes</p>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Support technique</span><span>90%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="90"></div></div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Installation de logiciel</span><span>92%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="92"></div></div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Réparation informatique</span><span>85%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
+        </div>
+        <div class="skill-tags">
           <span class="tag">Résolution de problèmes</span><span class="tag">Technologies IT</span>
         </div>
       </div>
 
-      <div class="skill-terminal reveal-scale">
-        <p class="skill-terminal-header">Soft Skills & Gestion</p>
-        <p class="skill-terminal-cmd">$ scan --module "soft_skills"</p>
-        <div class="skill-terminal-line" data-pct="88"><span class="s-name">Gestion des comptes</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">88%</span></div>
-        <div class="skill-terminal-line" data-pct="90"><span class="s-name">Travail d'équipe</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">90%</span></div>
-        <div class="skill-terminal-line" data-pct="85"><span class="s-name">Sens de l'organisation</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">85%</span></div>
-        <div class="skill-terminal-tags">
+      <div class="skill-category reveal-scale">
+        <p class="skill-cat-title">Soft Skills & Gestion</p>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Gestion des comptes</span><span>88%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="88"></div></div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Travail d'équipe</span><span>90%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="90"></div></div>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar-header"><span>Sens de l'organisation</span><span>85%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
+        </div>
+        <div class="skill-tags">
           <span class="tag">Communication</span><span class="tag">Adaptation</span><span class="tag">Autonomie</span>
         </div>
       </div>
@@ -1637,36 +1661,15 @@
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
+          // Trigger skill bar fill animations
+          entry.target.querySelectorAll('.skill-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width + '%';
+          });
           revealObs.unobserve(entry.target);
         }
       });
     }, { threshold: 0 });
     allReveals.forEach(el => revealObs.observe(el));
-
-    // ── 6. SKILL TERMINAL TYPING ──
-    const skillTerminals = document.querySelectorAll('.skill-terminal');
-    const skillObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          skillObs.unobserve(entry.target);
-          const lines = entry.target.querySelectorAll('.skill-terminal-line');
-          lines.forEach((line, idx) => {
-            const pct = parseInt(line.dataset.pct);
-            const barSize = window.innerWidth < 500 ? 6 : 10;
-            const filled = Math.round(pct / 100 * barSize);
-            const empty = barSize - filled;
-            const dotsEl = line.querySelector('.s-dots');
-            const barEl = line.querySelector('.s-bar');
-            const nameLen = line.querySelector('.s-name').textContent.length;
-            const dotCount = window.innerWidth < 500 ? Math.max(1, 10 - nameLen) : Math.max(1, 22 - nameLen);
-            if (dotsEl) dotsEl.textContent = '.'.repeat(dotCount);
-            if (barEl) barEl.textContent = '[' + '█'.repeat(filled) + '░'.repeat(empty) + ']';
-            setTimeout(() => line.classList.add('typed'), 300 + idx * 250);
-          });
-        }
-      });
-    }, { threshold: 0.05 });
-    skillTerminals.forEach(t => skillObs.observe(t));
 
     // ── 7. TYPEWRITER HERO ──
     const title = document.querySelector('.hero-title');
