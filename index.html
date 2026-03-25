@@ -884,7 +884,20 @@
         z-index: 9990;
         padding-top: 60px;
       }
-      .nav-links.open { display: flex; }
+      .nav-links.open {
+        display: flex;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #050a05;
+        z-index: 9990;
+      }
+      nav.menu-open,
+      nav:has(.nav-links.open) {
+        backdrop-filter: none;
+        background: transparent !important;
+        border-bottom: none;
+        z-index: 9992;
+      }
       .nav-links a { font-size: 1.2rem; }
       .nav-right { gap: 0.5rem; }
       .nav-uptime { font-size: 0.55rem; letter-spacing: 0.04em; }
@@ -2005,14 +2018,17 @@
     // ── 19. HAMBURGER MENU ──
     const toggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-links');
+    const navEl = document.querySelector('nav');
     toggle.addEventListener('click', () => {
       toggle.classList.toggle('active');
       navMenu.classList.toggle('open');
+      navEl.classList.toggle('menu-open');
     });
     navMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         toggle.classList.remove('active');
         navMenu.classList.remove('open');
+        navEl.classList.remove('menu-open');
       });
     });
 
