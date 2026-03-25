@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kenny Desaintfuscien — Technicien Informatique</title>
+  <meta name="description" content="CV de Kenny Desaintfuscien — Technicien Informatique chez Econocom. Support IT, infrastructure réseau, projets digitaux." />
+  <meta property="og:title" content="Kenny Desaintfuscien — Technicien Informatique" />
+  <meta property="og:description" content="CV de Kenny Desaintfuscien — Technicien Informatique chez Econocom. Support IT, infrastructure réseau, projets digitaux." />
+  <meta property="og:type" content="website" />
+  <meta name="robots" content="index, follow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
   <style>
@@ -32,7 +37,6 @@
       font-family: var(--font-mono);
       font-size: 15px;
       line-height: 1.7;
-      cursor: none;
       overflow-x: hidden;
     }
 
@@ -825,10 +829,53 @@
       90%,91% { opacity:0.8; transform: translateX(4px); }
     }
 
+    /* ── CURSOR: only on pointer devices ──────────────── */
+    @media (pointer: fine) {
+      body { cursor: none; }
+    }
+    @media (pointer: coarse) {
+      #cursor, #cursor-dot { display: none !important; }
+    }
+
+    /* ── HAMBURGER MENU ────────────────────────────────── */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      z-index: 102;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--green);
+      margin: 5px 0;
+      transition: transform 0.3s, opacity 0.3s;
+      box-shadow: 0 0 6px var(--green);
+    }
+    .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .nav-toggle.active span:nth-child(2) { opacity: 0; }
+    .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
     /* ── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 768px) {
       nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(5,10,5,0.97);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2.5rem;
+        z-index: 101;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1.2rem; }
       #hero { padding: 0 1.5rem; }
       #about .about-grid { grid-template-columns: 1fr; }
       #education .edu-item { grid-template-columns: 1fr; }
@@ -847,6 +894,9 @@
   <!-- ── NAV ── -->
   <nav>
     <div class="nav-logo">KD<span class="blink">_</span></div>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#skills">Skills</a></li>
@@ -977,7 +1027,7 @@
           <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
         </div>
         <div class="skill-tags">
-          <span class="tag">Communication</span><span class="tag">Adaptation</span><span class="tag">Anthropic Claude</span>
+          <span class="tag">Communication</span><span class="tag">Adaptation</span><span class="tag">Autonomie</span>
         </div>
       </div>
     </div>
@@ -989,7 +1039,7 @@
     <h2 class="section-title reveal">Expérience</h2>
     <div class="timeline">
       <div class="timeline-item reveal">
-        <p class="timeline-date">Mai 2025 — Présent <span style="color:var(--amber);font-size:0.7rem;">· À venir</span></p>
+        <p class="timeline-date">Mai 2025 — Présent</p>
         <h3 class="timeline-role">Référent Informatique</h3>
         <p class="timeline-company">Econocom — Milieu sensible</p>
         <ul class="timeline-bullets">
@@ -1090,7 +1140,7 @@
     <p class="section-label reveal">// 06</p>
     <h2 class="section-title reveal">Contact</h2>
     <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto;">Disponible pour des opportunités en IT, alternance ou missions — n'hésite pas à me contacter directement.</p>
-    <a href="/cdn-cgi/l/email-protection#58333d3636213c2b3e6169183f35393134763b3735" class="contact-email reveal"><span class="__cf_email__" data-cfemail="5c3739323225382f3a656d1c3b313d3530723f3331">[email&#160;protected]</span></a>
+    <a href="mailto:kennydsf91@gmail.com" class="contact-email reveal">kennydsf91@gmail.com</a>
     <div class="contact-links reveal">
       <a href="https://www.linkedin.com/in/kenny-desaintfuscien-41a3451a4" target="_blank" class="contact-link">⌥ LinkedIn</a>
     </div>
@@ -1098,10 +1148,10 @@
 
   <!-- ── FOOTER ── -->
   <footer>
-    <p>© 2025 Kenny Desaintfuscien — Conçu avec <span style="color:var(--green)">▊</span> passion</p>
+    <p>© 2026 Kenny Desaintfuscien — Conçu avec <span style="color:var(--green)">▊</span> passion</p>
   </footer>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     // ── Custom Cursor ──
     const cursor = document.getElementById('cursor');
     const dot = document.getElementById('cursor-dot');
@@ -1182,6 +1232,20 @@
       });
       navLinks.forEach(a => {
         a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
+      });
+    });
+
+    // ── Hamburger Menu ──
+    const toggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-links');
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('active');
+      navMenu.classList.toggle('open');
+    });
+    navMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        toggle.classList.remove('active');
+        navMenu.classList.remove('open');
       });
     });
   </script>
