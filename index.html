@@ -1479,6 +1479,7 @@
   <!-- ── FOOTER ── -->
   <footer>
     <p>© 2026 Kenny Desaintfuscien — Conçu avec <span style="color:var(--green)">▊</span> passion</p>
+    <p style="opacity:0.06;font-size:0.55rem;margin-top:0.8rem;letter-spacing:0.2em;">kd_severed.exe</p>
   </footer>
 
   <script>
@@ -1731,16 +1732,15 @@
       });
     });
 
-    // ── 11. EASTER EGG — type "sudo" ──
+    // ── 11. EASTER EGGS — "sudo" + "lumon" ──
     let eggBuffer = '';
     const accessEl = document.getElementById('access-granted');
     document.addEventListener('keydown', e => {
       if (document.activeElement.tagName === 'INPUT') return;
       eggBuffer += e.key.toLowerCase();
-      if (eggBuffer.length > 10) eggBuffer = eggBuffer.slice(-10);
+      if (eggBuffer.length > 20) eggBuffer = eggBuffer.slice(-20);
       if (eggBuffer.includes('sudo')) {
         eggBuffer = '';
-        // Massive glitch
         for (let g = 0; g < 6; g++) {
           setTimeout(() => {
             document.body.classList.add('page-glitch');
@@ -1751,6 +1751,10 @@
           accessEl.classList.add('active');
           setTimeout(() => accessEl.classList.remove('active'), 2500);
         }, 600);
+      }
+      if (eggBuffer.includes('lumon')) {
+        eggBuffer = '';
+        launchLumon();
       }
     });
 
@@ -1895,6 +1899,9 @@
       } else if (cmd === 'clear') {
         const lines = termBody.querySelectorAll('.term-line');
         lines.forEach(l => l.remove());
+      } else if (cmd === 'lumon') {
+        addTermLine('> Initializing Macrodata Refinement...', 'term-output');
+        setTimeout(() => launchLumon(), 800);
       } else if (cmd === 'sudo' || cmd.startsWith('sudo ')) {
         eggBuffer = 'sudo';
         document.dispatchEvent(new KeyboardEvent('keydown', {key: 'o'}));
@@ -1993,6 +2000,403 @@
         navMenu.classList.remove('open');
       });
     });
+
+    // ══════════════════════════════════════════════════════
+    // ── 20. LUMON INDUSTRIES — MACRODATA REFINEMENT ──
+    // ══════════════════════════════════════════════════════
+    function launchLumon() {
+      if (document.getElementById('lumon-overlay')) return;
+
+      // ── Audio context for Lumon ──
+      let lCtx = null;
+      function lumonAudio() {
+        if (!lCtx) lCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return lCtx;
+      }
+      function playRefineChime() {
+        try {
+          const ctx = lumonAudio();
+          const notes = [523.25, 659.25, 783.99]; // C5 E5 G5
+          notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            g.gain.value = 0.06;
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4 + i * 0.1);
+            osc.connect(g).connect(ctx.destination);
+            osc.start(ctx.currentTime + i * 0.08);
+            osc.stop(ctx.currentTime + 0.5 + i * 0.1);
+          });
+        } catch(e) {}
+      }
+      function playCompleteJingle() {
+        try {
+          const ctx = lumonAudio();
+          const melody = [523.25, 587.33, 659.25, 783.99, 659.25, 783.99, 1046.5];
+          melody.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            g.gain.value = 0.07;
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.35);
+            osc.connect(g).connect(ctx.destination);
+            osc.start(ctx.currentTime + i * 0.18);
+            osc.stop(ctx.currentTime + i * 0.18 + 0.4);
+          });
+        } catch(e) {}
+      }
+
+      // ── File names from the show ──
+      const fileNames = ['COLD_HARBOR.bin','DRANESVILLE.bin','TUMWATER.bin','LEXINGTON.bin','ALLENTOWN.bin','SIENA.bin','CAIRNS.bin','MANILA.bin'];
+      const currentFile = fileNames[Math.floor(Math.random() * fileNames.length)];
+
+      // ── Build overlay DOM ──
+      const ov = document.createElement('div');
+      ov.id = 'lumon-overlay';
+      ov.innerHTML = `
+        <style>
+          #lumon-overlay {
+            position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;
+            background:#010510;animation:lumon-fadein 0.8s ease;font-family:'Share Tech Mono',monospace;
+          }
+          @keyframes lumon-fadein { from{opacity:0} to{opacity:1} }
+          #lumon-overlay * { box-sizing:border-box; }
+          .lumon-monitor {
+            width:min(96vw,900px);height:min(88vh,640px);position:relative;
+            border:3px solid rgba(0,180,255,0.3);border-radius:24px;
+            background:#020818;overflow:hidden;
+            box-shadow:0 0 60px rgba(0,140,255,0.15),0 0 120px rgba(0,100,200,0.08),inset 0 0 80px rgba(0,0,30,0.8);
+          }
+          /* CRT vignette */
+          .lumon-monitor::before {
+            content:'';position:absolute;inset:0;border-radius:22px;
+            background:radial-gradient(ellipse 70% 70% at 50% 50%,transparent 50%,rgba(0,0,10,0.7) 100%);
+            pointer-events:none;z-index:10;
+          }
+          /* Scanlines */
+          .lumon-monitor::after {
+            content:'';position:absolute;inset:0;border-radius:22px;
+            background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,20,0.3) 2px,rgba(0,0,20,0.3) 4px);
+            pointer-events:none;z-index:11;
+          }
+          .lumon-close {
+            position:absolute;top:12px;right:16px;z-index:20;background:none;border:1px solid rgba(0,200,255,0.3);
+            color:#00d4ff;font-family:inherit;font-size:0.75rem;padding:4px 10px;cursor:pointer;border-radius:4px;
+            transition:all 0.2s;letter-spacing:0.1em;
+          }
+          .lumon-close:hover { background:rgba(0,200,255,0.15);border-color:#00d4ff; }
+          /* Top bar */
+          .lumon-topbar {
+            position:absolute;top:0;left:0;right:0;height:42px;
+            border-bottom:1px solid rgba(0,180,255,0.2);
+            display:flex;align-items:center;justify-content:space-between;
+            padding:0 20px;z-index:5;
+            background:linear-gradient(180deg,rgba(0,40,80,0.3),transparent);
+          }
+          .lumon-logo { color:#00d4ff;font-size:0.7rem;letter-spacing:0.2em;font-weight:bold; }
+          .lumon-logo-globe {
+            display:inline-block;width:16px;height:16px;border:1.5px solid #00d4ff;border-radius:50%;
+            position:relative;margin-left:6px;vertical-align:middle;top:-1px;
+          }
+          .lumon-logo-globe::before {
+            content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:#00d4ff;transform:translateX(-50%);
+          }
+          .lumon-logo-globe::after {
+            content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#00d4ff;
+          }
+          .lumon-dept { color:rgba(0,200,255,0.7);font-size:0.6rem;letter-spacing:0.15em; }
+          .lumon-status { display:flex;align-items:center;gap:6px;font-size:0.6rem;color:rgba(0,200,255,0.5); }
+          .lumon-blink { width:6px;height:6px;background:#00d4ff;border-radius:50%;animation:lumon-blink-k 2s ease infinite;box-shadow:0 0 8px #00d4ff; }
+          @keyframes lumon-blink-k { 0%,100%{opacity:1}50%{opacity:0.2} }
+          /* Progress */
+          .lumon-progress {
+            position:absolute;top:42px;left:0;right:0;height:28px;
+            border-bottom:1px solid rgba(0,180,255,0.15);
+            display:flex;align-items:center;padding:0 20px;gap:12px;z-index:5;
+            background:rgba(0,20,60,0.3);
+          }
+          .lumon-file { color:rgba(0,200,255,0.6);font-size:0.6rem;letter-spacing:0.12em; }
+          .lumon-pbar-wrap {
+            flex:1;height:6px;background:rgba(0,100,200,0.15);border-radius:3px;overflow:hidden;
+            border:1px solid rgba(0,150,255,0.2);
+          }
+          .lumon-pbar-fill { height:100%;width:0%;background:linear-gradient(90deg,#003d7a,#00d4ff);transition:width 0.8s ease;border-radius:3px;box-shadow:0 0 8px rgba(0,200,255,0.5); }
+          .lumon-pct { color:#00d4ff;font-size:0.7rem;min-width:32px;text-align:right; }
+          /* Number field */
+          .lumon-field {
+            position:absolute;top:70px;left:0;right:0;bottom:56px;overflow:hidden;
+          }
+          .lumon-num {
+            position:absolute;color:rgba(0,180,255,0.35);font-size:14px;
+            transition:none;user-select:none;pointer-events:none;
+          }
+          .lumon-cluster-zone {
+            position:absolute;cursor:pointer;z-index:8;pointer-events:auto;
+          }
+          .lumon-cluster-zone .lumon-num {
+            color:rgba(0,220,255,0.9);text-shadow:0 0 12px rgba(0,200,255,0.8);
+            font-size:22px;pointer-events:none;
+          }
+          .lumon-cluster-zone.pulse .lumon-num {
+            animation:lumon-pulse 0.6s ease infinite alternate;
+          }
+          @keyframes lumon-pulse { from{transform:scale(1);opacity:0.9} to{transform:scale(1.15);opacity:1} }
+          .lumon-cluster-zone.refining .lumon-num {
+            animation:lumon-implode 0.5s ease forwards;
+          }
+          @keyframes lumon-implode {
+            0%{transform:scale(1);opacity:1}
+            50%{transform:scale(1.3);opacity:1;text-shadow:0 0 30px #00d4ff;}
+            100%{transform:scale(0);opacity:0}
+          }
+          /* Bottom bar */
+          .lumon-bottombar {
+            position:absolute;bottom:0;left:0;right:0;height:56px;
+            border-top:1px solid rgba(0,180,255,0.2);
+            display:flex;align-items:center;justify-content:center;
+            padding:0 16px;gap:8px;z-index:5;
+            background:linear-gradient(0deg,rgba(0,30,70,0.3),transparent);
+            flex-wrap:wrap;
+          }
+          .lumon-dept-box {
+            border:1px solid rgba(0,150,255,0.25);padding:3px 8px;min-width:80px;
+            text-align:center;border-radius:3px;background:rgba(0,30,80,0.2);
+          }
+          .lumon-dept-box-label { font-size:0.6rem;color:rgba(0,200,255,0.6);letter-spacing:0.1em; }
+          .lumon-dept-box-bar { height:4px;background:rgba(0,100,200,0.15);margin:3px 0 2px;border-radius:2px;overflow:hidden; }
+          .lumon-dept-box-fill { height:100%;background:#00d4ff;border-radius:2px;transition:width 2s; }
+          .lumon-dept-box-pct { font-size:0.55rem;color:#00d4ff; }
+          .lumon-hex {
+            position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+            font-size:0.5rem;color:rgba(0,180,255,0.3);letter-spacing:0.1em;z-index:6;
+          }
+          /* Complete screen */
+          .lumon-complete {
+            position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;background:rgba(2,8,24,0.95);
+            opacity:0;pointer-events:none;transition:opacity 0.8s;border-radius:22px;
+          }
+          .lumon-complete.show { opacity:1;pointer-events:auto; }
+          .lumon-complete h2 {
+            font-size:clamp(1.4rem,4vw,2.2rem);color:#00d4ff;letter-spacing:0.15em;
+            text-shadow:0 0 40px rgba(0,200,255,0.6);margin-bottom:1.5rem;
+            animation:lumon-pulse 0.8s ease 3;
+          }
+          .lumon-complete p {
+            color:rgba(0,200,255,0.6);font-size:0.85rem;font-style:italic;
+            letter-spacing:0.05em;max-width:400px;text-align:center;line-height:1.6;
+          }
+          @media (max-width:600px) {
+            .lumon-monitor { width:100vw;height:100vh;border-radius:0;border:none; }
+            .lumon-monitor::before,.lumon-monitor::after { border-radius:0; }
+            .lumon-complete { border-radius:0; }
+            .lumon-dept-box { min-width:50px;padding:2px 5px; }
+            .lumon-bottombar { gap:4px;padding:0 8px; }
+            .lumon-num { font-size:12px; }
+            .lumon-cluster-zone .lumon-num { font-size:18px; }
+          }
+        </style>
+        <div class="lumon-monitor">
+          <button class="lumon-close">ESC ✕</button>
+          <div class="lumon-topbar">
+            <span class="lumon-logo">LUMON<span class="lumon-logo-globe"></span></span>
+            <span class="lumon-dept">MACRODATA REFINEMENT</span>
+            <span class="lumon-status"><span class="lumon-blink"></span>ACTIVE</span>
+          </div>
+          <div class="lumon-progress">
+            <span class="lumon-file">${currentFile}</span>
+            <div class="lumon-pbar-wrap"><div class="lumon-pbar-fill" id="lum-pbar"></div></div>
+            <span class="lumon-pct" id="lum-pct">0%</span>
+          </div>
+          <div class="lumon-field" id="lum-field"></div>
+          <div class="lumon-bottombar" id="lum-bottom"></div>
+          <div class="lumon-hex" id="lum-hex">0x137056 : 0x09B32E</div>
+          <div class="lumon-complete" id="lum-complete">
+            <h2>REFINEMENT COMPLETE</h2>
+            <p>Your work today has made Lumon proud.</p>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(ov);
+
+      // ── State ──
+      let progress = 0;
+      let numbers = [];
+      let clusters = [];
+      let clusterTimer = null;
+      let driftRAF = null;
+      let hexCounter1 = 0x137056;
+      let hexCounter2 = 0x09B32E;
+      let deptPcts = [0,0,0,0,0];
+
+      const field = document.getElementById('lum-field');
+      const pbar = document.getElementById('lum-pbar');
+      const pctEl = document.getElementById('lum-pct');
+      const hexEl = document.getElementById('lum-hex');
+      const bottomBar = document.getElementById('lum-bottom');
+      const completeEl = document.getElementById('lum-complete');
+
+      // ── Department boxes ──
+      for (let d = 0; d < 5; d++) {
+        deptPcts[d] = Math.floor(Math.random() * 60 + 20);
+        const box = document.createElement('div');
+        box.className = 'lumon-dept-box';
+        box.innerHTML = \`
+          <div class="lumon-dept-box-label">0\${d+1}</div>
+          <div class="lumon-dept-box-bar"><div class="lumon-dept-box-fill" style="width:\${deptPcts[d]}%" id="lum-dept-\${d}"></div></div>
+          <div class="lumon-dept-box-pct" id="lum-dpct-\${d}">\${deptPcts[d]}%</div>
+        \`;
+        bottomBar.appendChild(box);
+      }
+
+      // ── Spawn background numbers ──
+      const fw = field.offsetWidth || 800;
+      const fh = field.offsetHeight || 400;
+      for (let i = 0; i < 160; i++) {
+        const el = document.createElement('span');
+        el.className = 'lumon-num';
+        el.textContent = Math.floor(Math.random() * 10);
+        const sz = 10 + Math.random() * 8;
+        el.style.fontSize = sz + 'px';
+        const n = {
+          el,
+          x: Math.random() * fw,
+          y: Math.random() * fh,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+        };
+        el.style.left = n.x + 'px';
+        el.style.top = n.y + 'px';
+        field.appendChild(el);
+        numbers.push(n);
+      }
+
+      // ── Drift animation ──
+      function drift() {
+        const cw = field.offsetWidth || 800;
+        const ch = field.offsetHeight || 400;
+        for (const n of numbers) {
+          n.x += n.vx;
+          n.y += n.vy;
+          if (n.x < 0 || n.x > cw) n.vx *= -1;
+          if (n.y < 0 || n.y > ch) n.vy *= -1;
+          n.el.style.left = n.x + 'px';
+          n.el.style.top = n.y + 'px';
+        }
+        driftRAF = requestAnimationFrame(drift);
+      }
+      drift();
+
+      // ── Hex counter ──
+      const hexInterval = setInterval(() => {
+        hexCounter1 += Math.floor(Math.random() * 16);
+        hexCounter2 += Math.floor(Math.random() * 12);
+        hexEl.textContent = '0x' + hexCounter1.toString(16).toUpperCase().padStart(6,'0') +
+          ' : 0x' + hexCounter2.toString(16).toUpperCase().padStart(6,'0');
+      }, 200);
+
+      // ── Dept bars live update ──
+      const deptInterval = setInterval(() => {
+        for (let d = 0; d < 5; d++) {
+          deptPcts[d] = Math.min(99, Math.max(10, deptPcts[d] + Math.floor(Math.random() * 5 - 2)));
+          const fill = document.getElementById('lum-dept-' + d);
+          const txt = document.getElementById('lum-dpct-' + d);
+          if (fill) fill.style.width = deptPcts[d] + '%';
+          if (txt) txt.textContent = deptPcts[d] + '%';
+        }
+      }, 2000);
+
+      // ── Spawn scary clusters ──
+      function spawnCluster() {
+        if (progress >= 100) return;
+        // Remove old clusters
+        clusters.forEach(c => { if (c.el && c.el.parentNode) c.el.remove(); });
+        clusters = [];
+
+        const cw = field.offsetWidth || 800;
+        const ch = field.offsetHeight || 400;
+        const cx = 80 + Math.random() * (cw - 160);
+        const cy = 60 + Math.random() * (ch - 120);
+
+        const zone = document.createElement('div');
+        zone.className = 'lumon-cluster-zone pulse';
+        zone.style.left = (cx - 50) + 'px';
+        zone.style.top = (cy - 40) + 'px';
+        zone.style.width = '100px';
+        zone.style.height = '80px';
+
+        const count = 5 + Math.floor(Math.random() * 6);
+        for (let i = 0; i < count; i++) {
+          const d = document.createElement('span');
+          d.className = 'lumon-num';
+          d.textContent = Math.floor(Math.random() * 10);
+          d.style.left = (Math.random() * 70 + 5) + 'px';
+          d.style.top = (Math.random() * 50 + 5) + 'px';
+          const sz = 18 + Math.random() * 10;
+          d.style.fontSize = sz + 'px';
+          zone.appendChild(d);
+        }
+
+        zone.addEventListener('click', () => refineCluster(zone));
+        field.appendChild(zone);
+        clusters.push({ el: zone });
+
+        clusterTimer = setTimeout(spawnCluster, 3000 + Math.random() * 4000);
+      }
+      clusterTimer = setTimeout(spawnCluster, 1500);
+
+      // ── Refine a cluster ──
+      function refineCluster(zone) {
+        if (zone.classList.contains('refining')) return;
+        zone.classList.remove('pulse');
+        zone.classList.add('refining');
+        playRefineChime();
+
+        const gain = 3 + Math.floor(Math.random() * 6);
+        progress = Math.min(100, progress + gain);
+        pbar.style.width = progress + '%';
+        pctEl.textContent = progress + '%';
+
+        setTimeout(() => {
+          if (zone.parentNode) zone.remove();
+          if (progress >= 100) {
+            completeSequence();
+          }
+        }, 500);
+      }
+
+      // ── Completion ──
+      function completeSequence() {
+        clearTimeout(clusterTimer);
+        setTimeout(() => {
+          completeEl.classList.add('show');
+          playCompleteJingle();
+          setTimeout(() => closeLumon(), 5000);
+        }, 600);
+      }
+
+      // ── Close ──
+      function closeLumon() {
+        cancelAnimationFrame(driftRAF);
+        clearTimeout(clusterTimer);
+        clearInterval(hexInterval);
+        clearInterval(deptInterval);
+        ov.style.transition = 'opacity 0.5s';
+        ov.style.opacity = '0';
+        setTimeout(() => { if (ov.parentNode) ov.remove(); }, 500);
+        if (lCtx) { lCtx.close().catch(()=>{}); lCtx = null; }
+      }
+
+      ov.querySelector('.lumon-close').addEventListener('click', closeLumon);
+      document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape' && document.getElementById('lumon-overlay')) {
+          closeLumon();
+          document.removeEventListener('keydown', escHandler);
+        }
+      });
+    }
 
     } // end initAll
   </script>
