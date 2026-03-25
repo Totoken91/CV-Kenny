@@ -128,7 +128,7 @@
       letter-spacing: 0.08em;
       text-shadow: 0 0 20px var(--green);
     }
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; margin: 0 auto 0 3rem; }
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
@@ -210,6 +210,8 @@
       grid-template-columns: 1fr 220px;
       gap: 3rem;
       align-items: center;
+      position: relative;
+      z-index: 1;
     }
     .hero-text { min-width: 0; }
 
@@ -882,10 +884,330 @@
       .edu-year { writing-mode: horizontal-tb; transform: none; font-size: 1rem; }
       section { padding: 4rem 1.5rem; }
       .hero-cta { flex-direction: column; align-items: flex-start; }
+      .nav-right { gap: 0.8rem; }
+      .nav-uptime, .sound-toggle, .mode-toggle { font-size: 0.6rem; }
+      .contact-terminal { margin: 1.5rem 1rem 0; }
+    }
+
+    /* ── BOOT SEQUENCE ─────────────────────────────────── */
+    #boot-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease;
+    }
+    #boot-overlay.done { opacity: 0; pointer-events: none; }
+    #boot-text {
+      font-family: var(--font-mono);
+      color: var(--green);
+      font-size: 0.8rem;
+      line-height: 1.9;
+      max-width: 600px;
+      padding: 2rem;
+      white-space: pre-wrap;
+    }
+
+    /* ── GLOBAL SCANLINE ───────────────────────────────── */
+    #global-scanline {
+      position: fixed;
+      left: 0; right: 0;
+      height: 2px;
+      background: rgba(0,255,65,0.3);
+      box-shadow: 0 0 20px rgba(0,255,65,0.5), 0 -5px 15px rgba(0,255,65,0.15);
+      z-index: 9997;
+      pointer-events: none;
+      animation: global-scan 8s linear infinite;
+    }
+    @keyframes global-scan {
+      0% { top: -2px; opacity: 0; }
+      3% { opacity: 1; }
+      97% { opacity: 1; }
+      100% { top: 100vh; opacity: 0; }
+    }
+
+    /* ── SCROLL PROGRESS ───────────────────────────────── */
+    #scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--amber));
+      box-shadow: 0 0 10px var(--green);
+      z-index: 10002;
+      width: 0%;
+    }
+
+    /* ── PAGE GLITCH ───────────────────────────────────── */
+    @keyframes page-glitch-anim {
+      0% { transform: translate(0); filter: none; }
+      15% { transform: translate(-3px, 1px) skewX(1deg); filter: hue-rotate(90deg); }
+      30% { transform: translate(2px, -1px); }
+      50% { transform: translate(-1px, 2px) skewX(-0.5deg); filter: hue-rotate(-60deg) saturate(1.5); }
+      70% { transform: translate(3px, -2px); }
+      100% { transform: translate(0); filter: none; }
+    }
+    body.page-glitch { animation: page-glitch-anim 0.15s ease-in-out; }
+
+    /* ── PARTICLE CANVAS ───────────────────────────────── */
+    #particle-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── PROJECT SCAN EFFECT ───────────────────────────── */
+    .project-card::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: var(--green);
+      box-shadow: 0 0 20px var(--green), 0 0 40px rgba(0,255,65,0.3);
+      top: 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .project-card.scanning::after {
+      animation: card-scan 0.6s ease-out forwards;
+    }
+    @keyframes card-scan {
+      0% { top: 0; opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* ── NAV EXTRAS ────────────────────────────────────── */
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .nav-uptime {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .nav-uptime span { color: var(--green); }
+    .sound-toggle, .mode-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .sound-toggle:hover, .mode-toggle:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .sound-toggle.active {
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 8px var(--green-glow);
+    }
+
+    /* ── CONTACT TERMINAL ──────────────────────────────── */
+    .contact-terminal {
+      max-width: 540px;
+      margin: 2rem auto 0;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      text-align: left;
+      overflow: hidden;
+    }
+    .contact-terminal-bar {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      display: flex;
+      justify-content: space-between;
+    }
+    .contact-terminal-body {
+      padding: 1rem 1.2rem;
+      min-height: 140px;
+      font-size: 0.85rem;
+      line-height: 1.9;
+    }
+    .term-line { color: var(--white); opacity: 0.8; margin-bottom: 0.1rem; }
+    .term-prompt { color: var(--green); }
+    .term-output { color: var(--muted); font-size: 0.8rem; }
+    .contact-terminal-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+    .contact-terminal-input span { color: var(--green); white-space: nowrap; }
+    .contact-terminal-input input {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      flex: 1;
+      caret-color: var(--green);
+    }
+
+    /* ── EASTER EGG ────────────────────────────────────── */
+    #access-granted {
+      position: fixed;
+      inset: 0;
+      z-index: 30000;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #access-granted.active { opacity: 1; pointer-events: auto; }
+    #access-granted h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 4rem);
+      color: var(--green);
+      text-shadow: 0 0 40px var(--green), 0 0 80px var(--green);
+      animation: access-pulse 0.4s ease-in-out 4;
+    }
+    #access-granted p {
+      color: var(--muted);
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+    @keyframes access-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.05); }
+    }
+
+    /* ── CLEAN MODE ────────────────────────────────────── */
+    body, body * { transition: background-color 0.5s, color 0.3s, border-color 0.3s, box-shadow 0.3s; }
+    body.clean-mode {
+      --bg: #fafafa;
+      --bg2: #f0f0f0;
+      --green: #0066ff;
+      --green-dim: #0052cc;
+      --green-glow: rgba(0,102,255,0.12);
+      --amber: #e65100;
+      --white: #1a1a1a;
+      --muted: #777;
+      --border: rgba(0,0,0,0.1);
+    }
+    body.clean-mode::before,
+    body.clean-mode::after,
+    body.clean-mode #global-scanline,
+    body.clean-mode .crt-glitch,
+    body.clean-mode .crt-frame::after { display: none !important; }
+    body.clean-mode .crt-frame img { filter: none; }
+    body.clean-mode .crt-frame::before { display: none; }
+    body.clean-mode .crt-frame {
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border-color: var(--border);
+      border-radius: 12px;
+    }
+    body.clean-mode nav { background: rgba(250,250,250,0.92); }
+    body.clean-mode .hero-prompt { display: none; }
+    body.clean-mode #hero::before { opacity: 0.3; }
+    body.clean-mode .mode-toggle { border-color: var(--green); color: var(--green); }
+
+    /* ── SECTION REVEAL VARIANTS ───────────────────────── */
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+    .reveal-clip {
+      opacity: 0;
+      clip-path: inset(100% 0 0 0);
+      transition: clip-path 1s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+    }
+    .reveal-clip.visible { opacity: 1; clip-path: inset(0 0 0 0); }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+    /* ── SKILL TERMINAL ────────────────────────────────── */
+    .skill-terminal {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.5rem;
+      font-size: 0.85rem;
+    }
+    .skill-terminal-header {
+      color: var(--amber);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    .skill-terminal-cmd {
+      color: var(--green);
+      margin-bottom: 0.8rem;
+      font-size: 0.8rem;
+    }
+    .skill-terminal-line {
+      color: var(--white);
+      opacity: 0;
+      margin-bottom: 0.35rem;
+      font-size: 0.82rem;
+      transform: translateX(-8px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .skill-terminal-line.typed { opacity: 0.85; transform: translateX(0); }
+    .skill-terminal-line .s-name { color: var(--white); }
+    .skill-terminal-line .s-dots { color: var(--muted); }
+    .skill-terminal-line .s-bar { color: var(--green); text-shadow: 0 0 6px var(--green); }
+    .skill-terminal-line .s-pct { color: var(--muted); margin-left: 0.5rem; }
+    .skill-terminal-tags {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* ── MAGNETIC TEXT ──────────────────────────────────── */
+    .hero-name .char {
+      display: inline-block;
+      transition: transform 0.15s ease-out;
     }
   </style>
 </head>
 <body>
+
+  <!-- ── BOOT SEQUENCE OVERLAY ── -->
+  <div id="boot-overlay"><div id="boot-text"></div></div>
+
+  <!-- ── GLOBAL SCANLINE ── -->
+  <div id="global-scanline"></div>
+
+  <!-- ── SCROLL PROGRESS ── -->
+  <div id="scroll-progress"></div>
+
+  <!-- ── EASTER EGG ── -->
+  <div id="access-granted"><h2>ACCESS GRANTED</h2><p>Bienvenue, root.</p></div>
 
   <!-- Custom Cursor -->
   <div id="cursor"></div>
@@ -894,9 +1216,6 @@
   <!-- ── NAV ── -->
   <nav>
     <div class="nav-logo">KD<span class="blink">_</span></div>
-    <button class="nav-toggle" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#skills">Skills</a></li>
@@ -904,10 +1223,19 @@
       <li><a href="#projects">Projects</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
+    <div class="nav-right">
+      <div class="nav-uptime">UPTIME: <span id="uptime">00:00:00</span></div>
+      <button class="sound-toggle" id="sound-toggle" title="CRT Sound">SND OFF</button>
+      <button class="mode-toggle" id="mode-toggle" title="Toggle clean mode">CRT</button>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
   <!-- ── HERO ── -->
   <section id="hero">
+    <canvas id="particle-canvas"></canvas>
     <div class="hero-inner">
       <div class="hero-text">
       <p class="hero-prompt"><span class="green">root@portfolio</span>:<span class="amber">~</span>$ ./load_cv.sh</p>
@@ -941,10 +1269,10 @@
 
   <!-- ── ABOUT ── -->
   <section id="about">
-    <p class="section-label reveal">// 01</p>
-    <h2 class="section-title reveal">À propos</h2>
+    <p class="section-label reveal-left">// 01</p>
+    <h2 class="section-title reveal-left">À propos</h2>
     <div class="about-grid">
-      <div class="terminal-box reveal">
+      <div class="terminal-box reveal-clip">
         <p>Actuellement impliqué dans le secteur du numérique, j'ai acquis une première expérience professionnelle enrichissante chez <span class="green">Econocom</span>, où j'ai développé des compétences solides en gestion de projets, en relation client et en environnement IT.</p>
         <p>Rigoureux, autonome et orienté résultats, je suis reconnu pour ma capacité à m'adapter rapidement, à résoudre des problématiques concrètes et à mener des projets avec efficacité. Je cherche constamment à <span class="amber">créer de la valeur</span> et à améliorer les processus existants.</p>
       </div>
@@ -971,62 +1299,38 @@
 
   <!-- ── SKILLS ── -->
   <section id="skills">
-    <p class="section-label reveal">// 02</p>
-    <h2 class="section-title reveal">Compétences</h2>
+    <p class="section-label reveal-left">// 02</p>
+    <h2 class="section-title reveal-left">Compétences</h2>
     <div class="skills-grid">
-      <div class="skill-category reveal">
-        <p class="skill-cat-title">Infrastructure & Réseaux</p>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Réseaux informatiques</span><span>85%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
-        </div>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Administration réseau</span><span>80%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="80"></div></div>
-        </div>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>VPN / Sécurité réseau</span><span>78%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="78"></div></div>
-        </div>
-        <div class="skill-tags">
+      <div class="skill-terminal reveal-scale">
+        <p class="skill-terminal-header">Infrastructure & Réseaux</p>
+        <p class="skill-terminal-cmd">$ scan --module "infra_network"</p>
+        <div class="skill-terminal-line" data-pct="85"><span class="s-name">Réseaux informatiques</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">85%</span></div>
+        <div class="skill-terminal-line" data-pct="80"><span class="s-name">Administration réseau</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">80%</span></div>
+        <div class="skill-terminal-line" data-pct="78"><span class="s-name">VPN / Sécurité réseau</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">78%</span></div>
+        <div class="skill-terminal-tags">
           <span class="tag">Logiciel de chiffrement</span><span class="tag">Bases de données</span>
         </div>
       </div>
 
-      <div class="skill-category reveal">
-        <p class="skill-cat-title">Support & Systèmes</p>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Support technique</span><span>90%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="90"></div></div>
-        </div>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Installation de logiciel</span><span>92%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="92"></div></div>
-        </div>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Réparation informatique</span><span>85%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
-        </div>
-        <div class="skill-tags">
+      <div class="skill-terminal reveal-scale">
+        <p class="skill-terminal-header">Support & Systèmes</p>
+        <p class="skill-terminal-cmd">$ scan --module "support_sys"</p>
+        <div class="skill-terminal-line" data-pct="90"><span class="s-name">Support technique</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">90%</span></div>
+        <div class="skill-terminal-line" data-pct="92"><span class="s-name">Installation de logiciel</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">92%</span></div>
+        <div class="skill-terminal-line" data-pct="85"><span class="s-name">Réparation informatique</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">85%</span></div>
+        <div class="skill-terminal-tags">
           <span class="tag">Résolution de problèmes</span><span class="tag">Technologies IT</span>
         </div>
       </div>
 
-      <div class="skill-category reveal">
-        <p class="skill-cat-title">Soft Skills & Gestion</p>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Gestion des comptes</span><span>88%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="88"></div></div>
-        </div>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Travail d'équipe</span><span>90%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="90"></div></div>
-        </div>
-        <div class="skill-bar">
-          <div class="skill-bar-header"><span>Sens de l'organisation</span><span>85%</span></div>
-          <div class="skill-track"><div class="skill-fill" data-width="85"></div></div>
-        </div>
-        <div class="skill-tags">
+      <div class="skill-terminal reveal-scale">
+        <p class="skill-terminal-header">Soft Skills & Gestion</p>
+        <p class="skill-terminal-cmd">$ scan --module "soft_skills"</p>
+        <div class="skill-terminal-line" data-pct="88"><span class="s-name">Gestion des comptes</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">88%</span></div>
+        <div class="skill-terminal-line" data-pct="90"><span class="s-name">Travail d'équipe</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">90%</span></div>
+        <div class="skill-terminal-line" data-pct="85"><span class="s-name">Sens de l'organisation</span> <span class="s-dots"></span> <span class="s-bar"></span> <span class="s-pct">85%</span></div>
+        <div class="skill-terminal-tags">
           <span class="tag">Communication</span><span class="tag">Adaptation</span><span class="tag">Autonomie</span>
         </div>
       </div>
@@ -1035,8 +1339,8 @@
 
   <!-- ── EXPERIENCE ── -->
   <section id="experience">
-    <p class="section-label reveal">// 03</p>
-    <h2 class="section-title reveal">Expérience</h2>
+    <p class="section-label reveal-right">// 03</p>
+    <h2 class="section-title reveal-right">Expérience</h2>
     <div class="timeline">
       <div class="timeline-item reveal">
         <p class="timeline-date">Mai 2025 — Présent</p>
@@ -1082,8 +1386,8 @@
 
   <!-- ── PROJECTS ── -->
   <section id="projects">
-    <p class="section-label reveal">// 04</p>
-    <h2 class="section-title reveal">Projets</h2>
+    <p class="section-label reveal-left">// 04</p>
+    <h2 class="section-title reveal-left">Projets</h2>
     <div class="projects-grid">
       <div class="project-card reveal">
         <p class="project-number">PRJ_001</p>
@@ -1123,9 +1427,9 @@
 
   <!-- ── EDUCATION ── -->
   <section id="education">
-    <p class="section-label reveal">// 05</p>
-    <h2 class="section-title reveal">Formation</h2>
-    <div class="edu-item reveal">
+    <p class="section-label reveal-right">// 05</p>
+    <h2 class="section-title reveal-right">Formation</h2>
+    <div class="edu-item reveal-clip">
       <div class="edu-year">2019</div>
       <div>
         <h3 class="edu-degree">Baccalauréat Professionnel</h3>
@@ -1137,11 +1441,20 @@
 
   <!-- ── CONTACT ── -->
   <section id="contact">
-    <p class="section-label reveal">// 06</p>
-    <h2 class="section-title reveal">Contact</h2>
-    <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto;">Disponible pour des opportunités en IT, alternance ou missions — n'hésite pas à me contacter directement.</p>
-    <a href="mailto:kennydsf91@gmail.com" class="contact-email reveal">kennydsf91@gmail.com</a>
-    <div class="contact-links reveal">
+    <p class="section-label reveal-scale">// 06</p>
+    <h2 class="section-title reveal-scale">Contact</h2>
+    <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto;">Disponible pour des opportunités en IT, alternance ou missions.</p>
+    <div class="contact-terminal reveal-scale">
+      <div class="contact-terminal-bar"><span>guest@kenny — bash</span><span>×</span></div>
+      <div class="contact-terminal-body" id="contact-term-body">
+        <div class="term-line term-output">Type <span style="color:var(--green)">help</span> for available commands.</div>
+        <div class="contact-terminal-input">
+          <span>guest@kenny:~$</span>
+          <input type="text" id="contact-input" autocomplete="off" spellcheck="false" placeholder="help" />
+        </div>
+      </div>
+    </div>
+    <div class="contact-links reveal" style="margin-top:1.5rem;">
       <a href="https://www.linkedin.com/in/kenny-desaintfuscien-41a3451a4" target="_blank" class="contact-link">⌥ LinkedIn</a>
     </div>
   </section>
@@ -1152,90 +1465,484 @@
   </footer>
 
   <script>
-    // ── Custom Cursor ──
+    /* ═══════════════════════════════════════════════════
+       KENNY CV — FULL INTERACTIVE ENGINE
+       ═══════════════════════════════════════════════════ */
+
+    // ── 1. BOOT SEQUENCE ──
+    const bootOverlay = document.getElementById('boot-overlay');
+    const bootText = document.getElementById('boot-text');
+    const bootLines = [
+      '[BIOS]  System check ............ OK',
+      '[BOOT]  Loading kernel v4.2.1 ... OK',
+      '[INIT]  Mounting /dev/portfolio . OK',
+      '[LOAD]  kenny_cv.exe',
+      '[NET]   Connecting to matrix .... OK',
+      '[GPU]   CRT shader engaged',
+      '',
+      '> All systems nominal.',
+      '> Initializing interface...'
+    ];
+    let bootIdx = 0;
+    function typeBoot() {
+      if (bootIdx < bootLines.length) {
+        bootText.textContent += bootLines[bootIdx] + '\n';
+        bootIdx++;
+        setTimeout(typeBoot, 120 + Math.random() * 180);
+      } else {
+        setTimeout(() => {
+          bootOverlay.classList.add('done');
+          setTimeout(() => bootOverlay.remove(), 600);
+          initAll();
+        }, 400);
+      }
+    }
+    typeBoot();
+
+    // ── 2. INIT — everything starts after boot ──
+    function initAll() {
+
+    // ── 3. CUSTOM CURSOR ──
     const cursor = document.getElementById('cursor');
     const dot = document.getElementById('cursor-dot');
     let mx = 0, my = 0, cx = 0, cy = 0;
-
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
     function animateCursor() {
       cx += (mx - cx) * 0.15;
       cy += (my - cy) * 0.15;
-      cursor.style.left = cx + 'px';
-      cursor.style.top  = cy + 'px';
-      dot.style.left = mx + 'px';
-      dot.style.top  = my + 'px';
+      if (cursor) {
+        cursor.style.left = cx + 'px';
+        cursor.style.top = cy + 'px';
+      }
+      if (dot) {
+        dot.style.left = mx + 'px';
+        dot.style.top = my + 'px';
+      }
       requestAnimationFrame(animateCursor);
     }
     animateCursor();
-
-    document.querySelectorAll('a, button, .project-card, .tag').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('expanded'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('expanded'));
+    document.querySelectorAll('a, button, .project-card, .tag, .skill-terminal, input').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor && cursor.classList.add('expanded'));
+      el.addEventListener('mouseleave', () => cursor && cursor.classList.remove('expanded'));
     });
 
-    // ── Scroll Reveal ──
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
+    // ── 4. PARTICLE SYSTEM ──
+    const canvas = document.getElementById('particle-canvas');
+    const hero = document.getElementById('hero');
+    if (canvas && hero) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      const PARTICLE_COUNT = 80;
+      const CONNECT_DIST = 120;
+      const MOUSE_DIST = 150;
+      let pmx = 0, pmy = 0;
+
+      function resizeCanvas() {
+        canvas.width = hero.offsetWidth;
+        canvas.height = hero.offsetHeight;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      hero.addEventListener('mousemove', e => {
+        const rect = hero.getBoundingClientRect();
+        pmx = e.clientX - rect.left;
+        pmy = e.clientY - rect.top;
+      });
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          r: Math.random() * 2 + 1
+        });
+      }
+
+      function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          // Mouse attraction
+          const dxm = pmx - p.x, dym = pmy - p.y;
+          const distM = Math.sqrt(dxm * dxm + dym * dym);
+          if (distM < MOUSE_DIST) {
+            p.x += dxm * 0.008;
+            p.y += dym * 0.008;
+          }
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,255,65,0.5)';
+          ctx.fill();
+
+          // Connections
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x, dy = p.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < CONNECT_DIST) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(0,255,65,${0.15 * (1 - dist / CONNECT_DIST)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+
+          // Mouse connections
+          if (distM < MOUSE_DIST) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(pmx, pmy);
+            ctx.strokeStyle = `rgba(0,255,65,${0.3 * (1 - distM / MOUSE_DIST)})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+        requestAnimationFrame(drawParticles);
+      }
+      drawParticles();
+    }
+
+    // ── 5. SCROLL REVEAL (multi-type) ──
+    const allReveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-clip, .reveal-scale');
+    const revealObs = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
           setTimeout(() => entry.target.classList.add('visible'), i * 80);
-          observer.unobserve(entry.target);
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+    allReveals.forEach(el => revealObs.observe(el));
 
-          // Trigger skill bars
-          entry.target.querySelectorAll('.skill-fill').forEach(bar => {
-            bar.style.width = bar.dataset.width + '%';
+    // ── 6. SKILL TERMINAL TYPING ──
+    const skillTerminals = document.querySelectorAll('.skill-terminal');
+    const skillObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          skillObs.unobserve(entry.target);
+          const lines = entry.target.querySelectorAll('.skill-terminal-line');
+          lines.forEach((line, idx) => {
+            const pct = parseInt(line.dataset.pct);
+            const filled = Math.round(pct / 10);
+            const empty = 10 - filled;
+            const dotsEl = line.querySelector('.s-dots');
+            const barEl = line.querySelector('.s-bar');
+            if (dotsEl) dotsEl.textContent = ' ' + '.'.repeat(Math.max(1, 22 - line.querySelector('.s-name').textContent.length)) + ' ';
+            if (barEl) barEl.textContent = '[' + '█'.repeat(filled) + '░'.repeat(empty) + ']';
+            setTimeout(() => line.classList.add('typed'), 300 + idx * 250);
           });
         }
       });
-    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    }, { threshold: 0.3 });
+    skillTerminals.forEach(t => skillObs.observe(t));
 
-    reveals.forEach(el => observer.observe(el));
-
-    // ── Typewriter Hero ──
+    // ── 7. TYPEWRITER HERO ──
     const title = document.querySelector('.hero-title');
     if (title) {
       const text = 'Technicien Informatique — Econocom';
       title.innerHTML = '<span class="blink">█</span>';
-      let i = 0;
+      let ti = 0;
       setTimeout(() => {
         const interval = setInterval(() => {
-          if (i < text.length) {
-            title.innerHTML = text.slice(0, ++i) + '<span class="blink">█</span>';
-          } else {
-            clearInterval(interval);
-          }
+          if (ti < text.length) {
+            title.innerHTML = text.slice(0, ++ti) + '<span class="blink">█</span>';
+          } else clearInterval(interval);
         }, 40);
-      }, 1400);
+      }, 600);
     }
 
-    // ── Copy email on click ──
-    document.querySelector('.contact-email')?.addEventListener('click', e => {
-      e.preventDefault();
-      navigator.clipboard.writeText('kennydsf91@gmail.com').then(() => {
-        const el = e.target;
-        const orig = el.textContent;
-        el.textContent = '✓ Copié !';
-        el.style.color = 'var(--green)';
-        setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1800);
+    // ── 8. PAGE GLITCH (every 8-10s) ──
+    function triggerGlitch() {
+      document.body.classList.add('page-glitch');
+      setTimeout(() => document.body.classList.remove('page-glitch'), 150);
+      setTimeout(triggerGlitch, 8000 + Math.random() * 4000);
+    }
+    setTimeout(triggerGlitch, 5000);
+
+    // ── 9. MAGNETIC TEXT ──
+    const heroName = document.querySelector('.hero-name');
+    if (heroName && window.matchMedia('(pointer: fine)').matches) {
+      const spans = heroName.querySelectorAll('.hero-firstname, .hero-lastname .accent');
+      spans.forEach(span => {
+        const text = span.textContent;
+        span.innerHTML = text.split('').map(c => `<span class="char">${c}</span>`).join('');
+      });
+      const chars = heroName.querySelectorAll('.char');
+      document.addEventListener('mousemove', e => {
+        chars.forEach(ch => {
+          const rect = ch.getBoundingClientRect();
+          const chx = rect.left + rect.width / 2;
+          const chy = rect.top + rect.height / 2;
+          const dx = e.clientX - chx;
+          const dy = e.clientY - chy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const maxDist = 200;
+          if (dist < maxDist) {
+            const force = (1 - dist / maxDist) * 12;
+            const ax = (dx / dist) * force;
+            const ay = (dy / dist) * force;
+            ch.style.transform = `translate(${ax}px, ${ay}px)`;
+          } else {
+            ch.style.transform = '';
+          }
+        });
+      });
+    }
+
+    // ── 10. PROJECT CARD SCAN ──
+    document.querySelectorAll('.project-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.classList.remove('scanning');
+        void card.offsetWidth;
+        card.classList.add('scanning');
       });
     });
 
-    // ── Active nav link on scroll ──
+    // ── 11. EASTER EGG — type "sudo" ──
+    let eggBuffer = '';
+    const accessEl = document.getElementById('access-granted');
+    document.addEventListener('keydown', e => {
+      if (document.activeElement.tagName === 'INPUT') return;
+      eggBuffer += e.key.toLowerCase();
+      if (eggBuffer.length > 10) eggBuffer = eggBuffer.slice(-10);
+      if (eggBuffer.includes('sudo')) {
+        eggBuffer = '';
+        // Massive glitch
+        for (let g = 0; g < 6; g++) {
+          setTimeout(() => {
+            document.body.classList.add('page-glitch');
+            setTimeout(() => document.body.classList.remove('page-glitch'), 80);
+          }, g * 100);
+        }
+        setTimeout(() => {
+          accessEl.classList.add('active');
+          setTimeout(() => accessEl.classList.remove('active'), 2500);
+        }, 600);
+      }
+    });
+
+    // ── 12. SOUND SYSTEM ──
+    let audioCtx = null;
+    let soundOn = false;
+    let hum = null;
+    let noiseNode = null;
+    const soundBtn = document.getElementById('sound-toggle');
+
+    function initAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      // CRT hum
+      hum = audioCtx.createOscillator();
+      hum.type = 'sine';
+      hum.frequency.value = 60;
+      const humGain = audioCtx.createGain();
+      humGain.gain.value = 0.015;
+      hum.connect(humGain).connect(audioCtx.destination);
+      hum.start();
+      // Static noise
+      const bufSize = audioCtx.sampleRate * 2;
+      const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = buf;
+      noiseNode.loop = true;
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'highpass';
+      noiseFilter.frequency.value = 4000;
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.value = 0.008;
+      noiseNode.connect(noiseFilter).connect(noiseGain).connect(audioCtx.destination);
+      noiseNode.start();
+    }
+
+    function playBeep() {
+      if (!audioCtx || !soundOn) return;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 800;
+      g.gain.value = 0.04;
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      osc.connect(g).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    soundBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? 'SND ON' : 'SND OFF';
+      soundBtn.classList.toggle('active', soundOn);
+      if (soundOn && !audioCtx) initAudio();
+      if (audioCtx) {
+        if (soundOn) audioCtx.resume();
+        else audioCtx.suspend();
+      }
+    });
+
+    // Beep on section change
+    let lastSection = '';
+    const sectionsAll = document.querySelectorAll('section[id]');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sectionsAll.forEach(s => { if (window.scrollY >= s.offsetTop - 200) cur = s.id; });
+      if (cur && cur !== lastSection) { lastSection = cur; playBeep(); }
+    });
+
+    // ── 13. UPTIME COUNTER ──
+    const uptimeEl = document.getElementById('uptime');
+    const startTime = Date.now();
+    setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const s = String(elapsed % 60).padStart(2, '0');
+      uptimeEl.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+
+    // ── 14. CONTACT TERMINAL ──
+    const contactInput = document.getElementById('contact-input');
+    const termBody = document.getElementById('contact-term-body');
+    if (contactInput) {
+      contactInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const cmd = contactInput.value.trim().toLowerCase();
+          contactInput.value = '';
+          addTermLine('guest@kenny:~$ ' + cmd, 'term-prompt');
+          handleTermCmd(cmd);
+        }
+      });
+    }
+
+    function addTermLine(text, cls) {
+      const inputRow = termBody.querySelector('.contact-terminal-input');
+      const div = document.createElement('div');
+      div.className = 'term-line ' + (cls || '');
+      div.textContent = text;
+      termBody.insertBefore(div, inputRow);
+      termBody.scrollTop = termBody.scrollHeight;
+    }
+
+    function handleTermCmd(cmd) {
+      if (cmd === 'help') {
+        addTermLine('Available commands:', 'term-output');
+        addTermLine('  contact --send    Open email client', 'term-output');
+        addTermLine('  whoami            About me', 'term-output');
+        addTermLine('  ls projects       List projects', 'term-output');
+        addTermLine('  linkedin          Open LinkedIn', 'term-output');
+        addTermLine('  clear             Clear terminal', 'term-output');
+        addTermLine('  sudo              ???', 'term-output');
+      } else if (cmd === 'contact --send' || cmd === 'contact') {
+        addTermLine('> Opening mail client...', 'term-output');
+        setTimeout(() => window.location.href = 'mailto:kennydsf91@gmail.com', 600);
+      } else if (cmd === 'whoami') {
+        addTermLine('Kenny Desaintfuscien', 'term-output');
+        addTermLine('Technicien Informatique @ Econocom', 'term-output');
+        addTermLine('Île-de-France (91)', 'term-output');
+      } else if (cmd === 'ls projects') {
+        addTermLine('drwxr-xr-x  Deviso           [En cours]', 'term-output');
+        addTermLine('drwxr-xr-x  Lettre Magique   [Live]', 'term-output');
+        addTermLine('drwxr-xr-x  KV2              [Interne]', 'term-output');
+      } else if (cmd === 'linkedin') {
+        addTermLine('> Opening LinkedIn...', 'term-output');
+        setTimeout(() => window.open('https://www.linkedin.com/in/kenny-desaintfuscien-41a3451a4', '_blank'), 600);
+      } else if (cmd === 'clear') {
+        const lines = termBody.querySelectorAll('.term-line');
+        lines.forEach(l => l.remove());
+      } else if (cmd === 'sudo' || cmd.startsWith('sudo ')) {
+        eggBuffer = 'sudo';
+        document.dispatchEvent(new KeyboardEvent('keydown', {key: 'o'}));
+      } else if (cmd) {
+        addTermLine(`bash: ${cmd}: command not found`, 'term-output');
+      }
+    }
+
+    // ── 15. MODE TOGGLE (CRT / Clean) ──
+    const modeBtn = document.getElementById('mode-toggle');
+    let cleanMode = false;
+    modeBtn.addEventListener('click', () => {
+      cleanMode = !cleanMode;
+      document.body.classList.toggle('clean-mode', cleanMode);
+      modeBtn.textContent = cleanMode ? 'CLEAN' : 'CRT';
+    });
+
+    // ── 16. LERP SCROLL (desktop only) ──
+    if (window.matchMedia('(pointer: fine)').matches && !('ontouchstart' in window)) {
+      let scrollTarget = window.scrollY;
+      let scrollCurrent = window.scrollY;
+      const LERP = 0.085;
+      let isLerping = false;
+
+      window.addEventListener('wheel', e => {
+        e.preventDefault();
+        scrollTarget += e.deltaY;
+        scrollTarget = Math.max(0, Math.min(scrollTarget, document.documentElement.scrollHeight - window.innerHeight));
+        if (!isLerping) { isLerping = true; lerpLoop(); }
+      }, { passive: false });
+
+      function lerpLoop() {
+        scrollCurrent += (scrollTarget - scrollCurrent) * LERP;
+        window.scrollTo(0, scrollCurrent);
+        if (Math.abs(scrollCurrent - scrollTarget) > 0.5) {
+          requestAnimationFrame(lerpLoop);
+        } else {
+          scrollCurrent = scrollTarget;
+          isLerping = false;
+        }
+      }
+
+      // Sync anchor clicks
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          const target = document.querySelector(a.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            scrollTarget = target.offsetTop - 80;
+            if (!isLerping) { isLerping = true; lerpLoop(); }
+          }
+        });
+      });
+
+      // Sync external scroll changes (keyboard, scrollbar drag)
+      let lastKnown = 0;
+      window.addEventListener('scroll', () => {
+        if (Math.abs(window.scrollY - scrollCurrent) > 80) {
+          scrollTarget = window.scrollY;
+          scrollCurrent = window.scrollY;
+        }
+        lastKnown = window.scrollY;
+      });
+    }
+
+    // ── 17. SCROLL PROGRESS BAR ──
+    const progressBar = document.getElementById('scroll-progress');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    });
+
+    // ── 18. ACTIVE NAV LINK ──
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
     window.addEventListener('scroll', () => {
       let current = '';
-      sections.forEach(s => {
-        if (window.scrollY >= s.offsetTop - 120) current = s.id;
-      });
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
       navLinks.forEach(a => {
         a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
       });
     });
 
-    // ── Hamburger Menu ──
+    // ── 19. HAMBURGER MENU ──
     const toggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-links');
     toggle.addEventListener('click', () => {
@@ -1248,6 +1955,8 @@
         navMenu.classList.remove('open');
       });
     });
+
+    } // end initAll
   </script>
 </body>
 </html>
