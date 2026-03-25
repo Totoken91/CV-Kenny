@@ -1226,7 +1226,7 @@
     </ul>
     <div class="nav-right">
       <div class="nav-uptime">UPTIME: <span id="uptime">00:00:00</span></div>
-      <button class="sound-toggle" id="sound-toggle" title="CRT Sound">SND OFF</button>
+      <button class="sound-toggle active" id="sound-toggle" title="CRT Sound">SND ON</button>
       <button class="mode-toggle" id="mode-toggle" title="Toggle clean mode">CRT</button>
       <button class="nav-toggle" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -1735,7 +1735,7 @@
 
     // ── 12. SOUND SYSTEM ──
     let audioCtx = null;
-    let soundOn = false;
+    let soundOn = true;
     let hum = null;
     let noiseNode = null;
     const soundBtn = document.getElementById('sound-toggle');
@@ -1779,6 +1779,20 @@
       osc.start();
       osc.stop(audioCtx.currentTime + 0.1);
     }
+
+    // Auto-start audio on first user interaction (browser requirement)
+    function autoStartAudio() {
+      if (!audioCtx) {
+        initAudio();
+        if (audioCtx && soundOn) audioCtx.resume();
+      }
+      document.removeEventListener('click', autoStartAudio);
+      document.removeEventListener('scroll', autoStartAudio);
+      document.removeEventListener('touchstart', autoStartAudio);
+    }
+    document.addEventListener('click', autoStartAudio);
+    document.addEventListener('scroll', autoStartAudio);
+    document.addEventListener('touchstart', autoStartAudio);
 
     soundBtn.addEventListener('click', () => {
       soundOn = !soundOn;
