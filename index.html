@@ -863,8 +863,9 @@
 
     /* ── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 768px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-toggle { display: block; }
+      nav { padding: 0.8rem 1rem; gap: 0.5rem; }
+      .nav-logo { font-size: 0.9rem; }
+      .nav-toggle { display: block; flex-shrink: 0; }
       .nav-links {
         display: none;
         position: fixed;
@@ -878,15 +879,17 @@
       }
       .nav-links.open { display: flex; }
       .nav-links a { font-size: 1.2rem; }
-      #hero { padding: 0 1.5rem; }
+      .nav-right { gap: 0.5rem; }
+      .nav-uptime { font-size: 0.55rem; letter-spacing: 0.04em; }
+      .sound-toggle, .mode-toggle { font-size: 0.55rem; padding: 0.2rem 0.4rem; }
+      #hero { padding: 0 1rem; }
+      .hero-inner { gap: 1.5rem; }
       #about .about-grid { grid-template-columns: 1fr; }
       #education .edu-item { grid-template-columns: 1fr; }
       .edu-year { writing-mode: horizontal-tb; transform: none; font-size: 1rem; }
       section { padding: 4rem 1.5rem; }
       .hero-cta { flex-direction: column; align-items: flex-start; }
-      .nav-right { gap: 0.8rem; }
-      .nav-uptime, .sound-toggle, .mode-toggle { font-size: 0.6rem; }
-      .contact-terminal { margin: 1.5rem 1rem 0; }
+      .contact-terminal { margin: 1.5rem 0.5rem 0; }
     }
 
     /* ── BOOT SEQUENCE ─────────────────────────────────── */
@@ -942,14 +945,14 @@
 
     /* ── PAGE GLITCH ───────────────────────────────────── */
     @keyframes page-glitch-anim {
-      0% { transform: translate(0); filter: none; }
-      15% { transform: translate(-3px, 1px) skewX(1deg); filter: hue-rotate(90deg); }
-      30% { transform: translate(2px, -1px); }
-      50% { transform: translate(-1px, 2px) skewX(-0.5deg); filter: hue-rotate(-60deg) saturate(1.5); }
-      70% { transform: translate(3px, -2px); }
-      100% { transform: translate(0); filter: none; }
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 1px) skewX(0.5deg); }
+      40% { transform: translate(1px, -1px); }
+      60% { transform: translate(-1px, 1px) skewX(-0.3deg); }
+      80% { transform: translate(2px, -1px); }
+      100% { transform: translate(0); }
     }
-    body.page-glitch { animation: page-glitch-anim 0.15s ease-in-out; }
+    body.page-glitch { animation: page-glitch-anim 0.12s ease-in-out; }
 
     /* ── PARTICLE CANVAS ───────────────────────────────── */
     #particle-canvas {
@@ -1094,7 +1097,6 @@
     }
 
     /* ── CLEAN MODE ────────────────────────────────────── */
-    body, body * { transition: background-color 0.5s, color 0.3s, border-color 0.3s, box-shadow 0.3s; }
     body.clean-mode {
       --bg: #fafafa;
       --bg2: #f0f0f0;
@@ -1137,11 +1139,10 @@
     }
     .reveal-right.visible { opacity: 1; transform: translateX(0); }
     .reveal-clip {
-      opacity: 0;
       clip-path: inset(100% 0 0 0);
-      transition: clip-path 1s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+      transition: clip-path 1s cubic-bezier(0.4,0,0.2,1);
     }
-    .reveal-clip.visible { opacity: 1; clip-path: inset(0 0 0 0); }
+    .reveal-clip.visible { clip-path: inset(0 0 0 0); }
     .reveal-scale {
       opacity: 0;
       transform: scale(0.92);
@@ -1614,13 +1615,13 @@
     // ── 5. SCROLL REVEAL (multi-type) ──
     const allReveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-clip, .reveal-scale');
     const revealObs = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          entry.target.classList.add('visible');
           revealObs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: 0 });
     allReveals.forEach(el => revealObs.observe(el));
 
     // ── 6. SKILL TERMINAL TYPING ──
@@ -1642,7 +1643,7 @@
           });
         }
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.05 });
     skillTerminals.forEach(t => skillObs.observe(t));
 
     // ── 7. TYPEWRITER HERO ──
@@ -1660,13 +1661,15 @@
       }, 600);
     }
 
-    // ── 8. PAGE GLITCH (every 8-10s) ──
-    function triggerGlitch() {
-      document.body.classList.add('page-glitch');
-      setTimeout(() => document.body.classList.remove('page-glitch'), 150);
-      setTimeout(triggerGlitch, 8000 + Math.random() * 4000);
+    // ── 8. PAGE GLITCH (every 8-10s, desktop only) ──
+    if (window.matchMedia('(pointer: fine)').matches) {
+      function triggerGlitch() {
+        document.body.classList.add('page-glitch');
+        setTimeout(() => document.body.classList.remove('page-glitch'), 120);
+        setTimeout(triggerGlitch, 8000 + Math.random() * 4000);
+      }
+      setTimeout(triggerGlitch, 5000);
     }
-    setTimeout(triggerGlitch, 5000);
 
     // ── 9. MAGNETIC TEXT ──
     const heroName = document.querySelector('.hero-name');
