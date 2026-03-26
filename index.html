@@ -2176,24 +2176,26 @@
           }
           return null;
         }
-        // Track which individual CELLS have been discovered by mouse
-        var revealedCells={}; // "cx,cy" -> true
+        // Track which individual CELLS have been discovered by mouse (timestamp)
+        var revealedCells={}; // "cx,cy" -> timestamp (ms)
 
         function spawnCl(){
+          // Expire clusters far from camera
+          var ccx=Math.round(camX/CELL),ccy=Math.round(camY/CELL);
+          for(var i=0;i<cls.length;i++){
+            if(!cls[i].done&&(Math.abs(cls[i].wx-ccx)>25||Math.abs(cls[i].wy-ccy)>20)){cls[i].done=true;}
+          }
           var active=cls.filter(function(c){return!c.done;}).length;
           if(active>=MAX_CL)return;
-          var cx=Math.round(camX/CELL),cy=Math.round(camY/CELL);
-          var wx=cx+Math.floor(Math.random()*20-10);
-          var wy=cy+Math.floor(Math.random()*14-7);
-          // Don't spawn too close to existing clusters
+          var wx=ccx+Math.floor(Math.random()*18-9);
+          var wy=ccy+Math.floor(Math.random()*12-6);
           var tooClose=false;
-          for(var i=0;i<cls.length;i++){if(!cls[i].done&&Math.abs(cls[i].wx-wx)<5&&Math.abs(cls[i].wy-wy)<4){tooClose=true;break;}}
+          for(var i=0;i<cls.length;i++){if(!cls[i].done&&Math.abs(cls[i].wx-wx)<6&&Math.abs(cls[i].wy-wy)<5){tooClose=true;break;}}
           if(tooClose)return;
           cls.push({id:clId++,wx:wx,wy:wy,temper:TEMPERS[clId%4],targetBin:clId%5,done:false});
         }
         spawnCl();spawnCl();
-        // Slowly spawn new clusters as player explores
-        intervals.push(setInterval(function(){spawnCl();},6000));
+        intervals.push(setInterval(function(){spawnCl();},4000));
 
         // Bins
         for(var b=0;b<5;b++){
@@ -2265,25 +2267,26 @@
               var mCellY=Math.round((camY+(msY-H/2)/zm)/CELL);
 
               if(cl&&!cl.done){
-                // Per-cell discovery: mouse reveals individual cells
                 var cellKey=cx+','+cy;
                 var dm=Math.sqrt((mCellX-cx)*(mCellX-cx)+(mCellY-cy)*(mCellY-cy));
-                if(dm<2.5)revealedCells[cellKey]=true;
-                var isRevealed=!!revealedCells[cellKey];
+                var now=Date.now();
+                if(dm<2.5&&!revealedCells[cellKey])revealedCells[cellKey]=now;
+                var revTime=revealedCells[cellKey];
 
                 if(selCluster===cl.id){
                   c2.fillStyle='#ffffff';c2.shadowColor='#fff';c2.shadowBlur=14;
                   c2.font='bold '+Math.round(26*zm)+'px "Share Tech Mono",monospace';
-                } else if(isRevealed){
-                  // THIS cell has been discovered — stays big permanently
+                } else if(revTime){
+                  // Progressive grow over 800ms
+                  var grow=Math.min(1,(now-revTime)/800);
                   var dcx=cx-cl.wx,dcy=cy-cl.wy;
                   var cellDist=Math.sqrt(dcx*dcx+dcy*dcy);
                   var cellFactor=Math.max(0.4,1-cellDist/3.5);
-                  var sz=(14+(26-14)*cellFactor)*zm;
-                  c2.font='bold '+Math.round(sz)+'px "Share Tech Mono",monospace';
-                  c2.fillStyle='rgba(0,220,255,0.9)';
-                  c2.shadowColor='rgba(0,212,255,0.35)';c2.shadowBlur=5;
-                  // Extra glow when mouse is currently nearby
+                  var sz=(14+(26-14)*cellFactor*grow)*zm;
+                  var alpha=0.45+0.45*grow;
+                  c2.font=(grow>0.5?'bold ':'')+Math.round(sz)+'px "Share Tech Mono",monospace';
+                  c2.fillStyle='rgba(0,220,255,'+alpha.toFixed(2)+')';
+                  if(grow>0.5){c2.shadowColor='rgba(0,212,255,0.3)';c2.shadowBlur=grow*5;}
                   if(dm<3){
                     var nearness=1-dm/3;
                     c2.shadowColor=cl.temper.color;c2.shadowBlur=nearness*16;
@@ -2292,7 +2295,6 @@
                     fy+=Math.cos(t*7+ph)*1.5*nearness;
                   }
                 } else {
-                  // NOT YET REVEALED — identical to normal numbers
                   c2.fillStyle='rgba(0,200,240,0.45)';
                   c2.font=Math.round(baseSz)+'px "Share Tech Mono",monospace';
                 }
@@ -2311,6 +2313,25 @@
             var lw=Math.abs(selE.x-selS.x),lh=Math.abs(selE.y-selS.y);
             c2.strokeStyle='rgba(0,212,255,0.5)';c2.lineWidth=1;c2.strokeRect(lx,ly,lw,lh);
             c2.fillStyle='rgba(0,212,255,0.04)';c2.fillRect(lx,ly,lw,lh);
+          }
+
+          // Draw flying numbers
+          var now2=Date.now();
+          c2.textBaseline='middle';c2.textAlign='center';
+          for(var fi=flyingNums.length-1;fi>=0;fi--){
+            var fn=flyingNums[fi];
+            var elapsed=(now2-fn.t0)/fn.dur;
+            if(elapsed>=1){flyingNums.splice(fi,1);continue;}
+            var ease=1-Math.pow(1-elapsed,3); // ease-out cubic
+            var fnx=fn.x+(fn.tx-fn.x)*ease;
+            var fny=fn.y+(fn.ty-fn.y)*ease;
+            var fnAlpha=1-elapsed;
+            var fnSz=Math.round((20-elapsed*12)*zm);
+            c2.font='bold '+fnSz+'px "Share Tech Mono",monospace';
+            c2.fillStyle='rgba(0,220,255,'+fnAlpha.toFixed(2)+')';
+            c2.shadowColor='rgba(0,212,255,0.6)';c2.shadowBlur=10;
+            c2.fillText(String(fn.d),fnx,fny);
+            c2.shadowBlur=0;
           }
 
           animRAF=requestAnimationFrame(render);
@@ -2332,23 +2353,23 @@
         });
         field.addEventListener('mouseleave',function(){msX=-999;msY=-999;});
 
-        // Lasso
+        // Click to select cluster
         field.addEventListener('mousedown',function(e){
-          if(e.button!==0)return;sel=true;selS={x:msX,y:msY};selE={x:msX,y:msY};selCluster=-1;
+          if(e.button!==0)return;sel=true;selS={x:msX,y:msY};selE={x:msX,y:msY};
         });
         field.addEventListener('mouseup',function(){
           if(!sel)return;sel=false;
+          // Simple click: find cluster at mouse position
           var W=field.offsetWidth,H=field.offsetHeight;
-          var wx1=camX+(Math.min(selS.x,selE.x)-W/2)/zm;
-          var wy1=camY+(Math.min(selS.y,selE.y)-H/2)/zm;
-          var wx2=camX+(Math.max(selS.x,selE.x)-W/2)/zm;
-          var wy2=camY+(Math.max(selS.y,selE.y)-H/2)/zm;
-          for(var i=0;i<cls.length;i++){
-            var cl=cls[i];if(cl.done)continue;
-            var cwx=cl.wx*CELL,cwy=cl.wy*CELL;
-            if(cwx>=wx1&&cwx<=wx2&&cwy>=wy1&&cwy<=wy2){selCluster=cl.id;return;}
+          var clickCellX=Math.round((camX+(msX-W/2)/zm)/CELL);
+          var clickCellY=Math.round((camY+(msY-H/2)/zm)/CELL);
+          var found=getCluster(clickCellX,clickCellY);
+          if(found&&!found.done&&revealedCells[clickCellX+','+clickCellY]){
+            selCluster=found.id;
+          } else {
+            selCluster=-1;
           }
-          selCluster=-1;selS=null;selE=null;
+          selS=null;selE=null;
         });
 
         // Touch
@@ -2357,23 +2378,56 @@
         field.addEventListener('touchend',function(){field.dispatchEvent(new MouseEvent('mouseup'));});
 
         // Drop
+        // Flying numbers for animation
+        var flyingNums=[];
+
         function dropBin(bi){
           if(selCluster<0)return;
           var cd=null;for(var i=0;i<cls.length;i++){if(cls[i].id===selCluster){cd=cls[i];break;}}
           if(!cd||cd.done)return;
-          if(cd.targetBin!==bi){
-            playWrong();var bn=binsEl.children[bi];
-            bn.classList.add('wrong');setTimeout(function(){bn.classList.remove('wrong');},500);
-            selCluster=-1;return;
-          }
+
+          // ALWAYS accept — any bin works
           playChime([523.25,659.25,783.99]);
           cd.done=true;selCluster=-1;
           var bn2=binsEl.children[bi];bn2.classList.add('correct');setTimeout(function(){bn2.classList.remove('correct');},600);
+
+          // Find all revealed cells of this cluster and create fly animation
+          var binRect=bn2.getBoundingClientRect();
+          var fieldRect=field.getBoundingClientRect();
+          var targetX=binRect.left-fieldRect.left+binRect.width/2;
+          var targetY=binRect.top-fieldRect.top+binRect.height/2;
+
+          for(var key in revealedCells){
+            var parts=key.split(',');var fcx=parseInt(parts[0]),fcy=parseInt(parts[1]);
+            var fcl=null;
+            // Check if this cell belonged to this cluster
+            for(var j=0;j<cls.length;j++){
+              if(cls[j]===cd){
+                var ddx=fcx-cd.wx,ddy=fcy-cd.wy;
+                if(Math.abs(ddx)<=4&&Math.abs(ddy)<=3){
+                  var nn=perlin((fcx+cd.id*37)*0.35,(fcy+cd.id*53)*0.35);
+                  var dd=Math.sqrt(ddx*ddx+ddy*ddy);
+                  var thr=-0.3+dd*0.2;
+                  if(nn>thr&&dd<3.5)fcl=cd;
+                }
+                break;
+              }
+            }
+            if(fcl){
+              var W2=field.offsetWidth,H2=field.offsetHeight;
+              var startX=(fcx*CELL-camX)*zm+W2/2;
+              var startY=(fcy*CELL-camY)*zm+H2/2;
+              var dig=cellDigit(fcx,fcy)%10;
+              flyingNums.push({x:startX,y:startY,tx:targetX,ty:targetY,d:dig,t0:Date.now(),dur:500+Math.random()*300});
+              delete revealedCells[key];
+            }
+          }
+
           var ti=TEMPERS.indexOf(cd.temper);var ks=['wo','fc','dr','ma'];
           binData[bi][ks[ti]]+=5;updateBin(bi);
           refined++;progress=Math.round(refined/TOTAL_REF*100);
           pfill.style.width=Math.min(100,progress)+'%';ppct.textContent=Math.min(100,progress)+'% Complete';
-          setTimeout(spawnCl,1200);
+          setTimeout(spawnCl,1500);
           if(progress>=100){setTimeout(function(){compEl.classList.add('show');playChime([523.25,587.33,659.25,783.99,659.25,783.99,1046.5],0.06);setTimeout(closeLumon,6000);},800);}
         }
         function updateBin(b){
