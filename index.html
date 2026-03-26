@@ -2051,6 +2051,15 @@
       document.body.appendChild(ov);
       document.body.style.overflow='hidden';
 
+      // ── ESC handler (always works, even if startGame errors) ──
+      function globalEsc(e){
+        if(e.key==='Escape'&&document.getElementById('lumon-overlay')){closeLumon();document.removeEventListener('keydown',globalEsc);}
+      }
+      document.addEventListener('keydown',globalEsc);
+
+      // Also close button on boot screen
+      ov.addEventListener('click',function(e){if(e.target.classList.contains('lum-close'))closeLumon();});
+
       // ── STYLE ──
       const sty=document.createElement('style');
       sty.textContent=`
@@ -2146,6 +2155,7 @@
         const compEl=document.getElementById('lum-comp');
         let lassoEl=null;
         const CELL=32;
+        const noiseScale=0.15;
 
         // ── Clusters via Perlin ──
         for(let c=0;c<CLUSTER_COUNT;c++){
