@@ -2224,7 +2224,7 @@
           camX+=(tCamX-camX)*0.1;camY+=(tCamY-camY)*0.1;zm+=(tZm-zm)*0.1;
 
           c2.clearRect(0,0,W,H);
-          coordsEl.textContent='X:'+Math.round(4521+camX/CELL)+' Y:'+Math.round(1877+camY/CELL)+' ['+zm.toFixed(1)+'x]';
+          if(coordsEl)coordsEl.textContent='X:'+Math.round(4521+camX/CELL)+' Y:'+Math.round(1877+camY/CELL)+' ['+zm.toFixed(1)+'x]';
 
           // Visible cells
           var hW=W/(2*zm),hH=H/(2*zm);
