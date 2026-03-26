@@ -2046,8 +2046,8 @@
       // ── BUILD DOM ──
       const ov=document.createElement('div');
       ov.id='lumon-overlay';
-      ov.innerHTML='<div id="lum-boot"></div><div id="lum-main" style="display:none"></div>';
-      ov.style.cssText='position:fixed;inset:0;z-index:50000;background:#0a0a0a;font-family:"Share Tech Mono",monospace;cursor:default;overflow:hidden;';
+      ov.innerHTML='<div id="lum-monitor"><div id="lum-boot"></div><div id="lum-main" style="display:none"></div></div>';
+      ov.style.cssText='position:fixed;inset:0;z-index:50000;background:#050505;font-family:"Share Tech Mono",monospace;cursor:default;overflow:hidden;display:flex;align-items:center;justify-content:center;';
       document.body.appendChild(ov);
       document.body.style.overflow='hidden';
 
@@ -2055,6 +2055,14 @@
       const sty=document.createElement('style');
       sty.textContent=`
 #lumon-overlay *{box-sizing:border-box;cursor:inherit;}
+#lum-monitor{
+  width:min(92vw,960px);aspect-ratio:4/3;max-height:88vh;position:relative;
+  background:#0a0a0a;border-radius:18px;overflow:hidden;
+  border:3px solid rgba(0,212,255,0.2);
+  box-shadow:0 0 80px rgba(0,100,200,0.12),0 0 0 8px #111,0 0 0 10px rgba(0,212,255,0.08),inset 0 0 60px rgba(0,0,20,0.6);
+}
+#lum-monitor::before{content:'';position:absolute;inset:0;border-radius:16px;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 60%,rgba(0,0,10,0.7) 100%);pointer-events:none;z-index:90;}
+#lum-monitor::after{content:'';position:absolute;inset:0;border-radius:16px;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,20,0.2) 2px,rgba(0,0,20,0.2) 4px);pointer-events:none;z-index:91;}
 #lum-boot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#00d4ff;font-size:0.8rem;letter-spacing:0.15em;line-height:2;}
 #lum-boot .boot-line{opacity:0;animation:lum-bfade 0.3s forwards;}
 @keyframes lum-bfade{to{opacity:0.8;}}
@@ -2100,7 +2108,7 @@
 .lum-complete.show{opacity:1;pointer-events:auto;}
 .lum-complete h2{font-size:clamp(1.2rem,3.5vw,2rem);color:#00d4ff;letter-spacing:0.15em;text-shadow:0 0 30px rgba(0,200,255,0.5);margin-bottom:1rem;}
 .lum-complete p{color:rgba(0,212,255,0.5);font-size:0.75rem;max-width:420px;text-align:center;line-height:1.7;font-style:italic;}
-@media(max-width:600px){.lum-n{font-size:11px;}.lum-n.cluster{font-size:13px;}.lum-bins{gap:3px;}.lum-bin{min-width:55px;padding:3px 4px;}}
+@media(max-width:600px){#lum-monitor{width:100vw;height:100vh;max-height:100vh;border-radius:0;border:none;aspect-ratio:auto;}.lum-n{font-size:11px;}.lum-n.cluster{font-size:13px;}.lum-bins{gap:3px;}.lum-bin{min-width:55px;padding:3px 4px;}}
 `;
       ov.appendChild(sty);
 
@@ -2173,14 +2181,16 @@
           }
         }
 
-        // Center grid (delay 1 frame so flex layout is computed)
-        requestAnimationFrame(function(){
-          var fw=field.offsetWidth||window.innerWidth;
-          var fh=field.offsetHeight||(window.innerHeight-140);
+        // Center grid (double RAF to ensure layout is computed)
+        function centerGrid(){
+          var fw=field.offsetWidth;
+          var fh=field.offsetHeight;
+          if(fw<10||fh<10){requestAnimationFrame(centerGrid);return;}
           gridOffX=Math.round((fw-NUM_COLS*CELL)/2);
           gridOffY=Math.round((fh-NUM_ROWS*CELL)/2);
           grid.style.transform='translate('+gridOffX+'px,'+gridOffY+'px)';
-        });
+        }
+        requestAnimationFrame(function(){requestAnimationFrame(centerGrid);});
 
         // ── Build 5 bins ──
         for(let b=0;b<5;b++){
