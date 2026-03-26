@@ -2000,7 +2000,7 @@
         { id:'MA', name:'Malice', color:'#76ff03', colorDim:'rgba(118,255,3,0.3)' }
       ];
       const FILES = ['COLD HARBOR','TUMWATER','ALLENTOWN','DRANESVILLE','LEXINGTON','SIENA','CAIRNS'];
-      const curFile = FILES[Math.floor(Math.random()*FILES.length)];
+      const curFile = 'Cold Harbor';
       const NUM_COLS = 22, NUM_ROWS = 14;
       const TOTAL_NUMS = NUM_COLS * NUM_ROWS;
       const CLUSTER_COUNT = 8;
@@ -2067,7 +2067,7 @@
 #lum-monitor{
   width:min(92vw,960px);aspect-ratio:4/3;max-height:88vh;position:relative;
   background:#0c1018;border-radius:20px;overflow:hidden;
-  border:2px solid rgba(50,55,65,0.5);
+  border:3px solid rgba(50,55,65,0.6);
   box-shadow:0 0 60px rgba(0,60,120,0.1),0 0 0 6px #080808,0 0 0 9px rgba(40,42,50,0.3),inset 0 0 60px rgba(0,10,25,0.5);
 }
 #lum-monitor::before{content:'';position:absolute;inset:0;border-radius:18px;background:radial-gradient(ellipse 85% 85% at 50% 50%,transparent 55%,rgba(0,0,8,0.4) 80%,rgba(0,0,5,0.65) 100%);pointer-events:none;z-index:90;}
@@ -2085,16 +2085,16 @@
 .lum-sub{color:rgba(0,212,255,0.45);font-size:0.52rem;letter-spacing:0.12em;}
 .lum-close{position:absolute;top:8px;right:8px;z-index:50;background:rgba(0,10,20,0.6);border:1px solid rgba(0,212,255,0.2);color:rgba(0,212,255,0.5);font-family:inherit;font-size:0.8rem;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer!important;border-radius:4px;transition:all 0.2s;padding:0;}
 .lum-close:hover{background:rgba(0,212,255,0.15);border-color:#00d4ff;color:#00d4ff;}
-.lum-topbar{height:34px;border-bottom:2px solid rgba(0,212,255,0.3);display:flex;align-items:center;padding:0;flex-shrink:0;background:rgba(0,8,18,0.5);}
-.lum-fname{color:#00d4ff;font-size:0.8rem;letter-spacing:0.08em;white-space:nowrap;font-weight:bold;padding:0 14px;border-right:1px solid rgba(0,212,255,0.2);}
-.lum-logo-wrap{display:flex;align-items:center;gap:5px;padding:0 12px;border-left:1px solid rgba(0,212,255,0.2);}
-.lum-logotext{color:rgba(0,212,255,0.6);font-size:0.55rem;letter-spacing:0.18em;font-weight:bold;}
-.lum-ptrack{flex:1;height:10px;margin:0 12px;background:repeating-linear-gradient(90deg,rgba(0,60,100,0.08) 0px,rgba(0,60,100,0.08) 6px,rgba(0,180,255,0.18) 6px,rgba(0,180,255,0.18) 7px);overflow:hidden;border:1px solid rgba(0,180,255,0.2);position:relative;}
+.lum-topbar{height:36px;border-bottom:3px solid rgba(0,212,255,0.35);display:flex;align-items:center;padding:0;flex-shrink:0;background:rgba(0,8,18,0.5);}
+.lum-fname{color:#00d4ff;font-size:0.85rem;letter-spacing:0.08em;white-space:nowrap;font-weight:bold;padding:0 16px;border-right:2px solid rgba(0,212,255,0.25);}
+.lum-logo-wrap{display:flex;align-items:center;gap:5px;padding:0 14px;border-left:2px solid rgba(0,212,255,0.25);}
+.lum-logotext{color:rgba(0,212,255,0.7);font-size:0.6rem;letter-spacing:0.18em;font-weight:bold;}
+.lum-ptrack{flex:1;height:12px;margin:0 12px;background:repeating-linear-gradient(90deg,rgba(0,60,100,0.08) 0px,rgba(0,60,100,0.08) 6px,rgba(0,180,255,0.2) 6px,rgba(0,180,255,0.2) 7px);overflow:hidden;border:2px solid rgba(0,180,255,0.25);position:relative;}
 .lum-pfill{height:100%;width:0%;background:linear-gradient(90deg,#004080,#00d4ff);transition:width 0.6s;box-shadow:0 0 8px rgba(0,212,255,0.5);}
-.lum-ppct{color:#00d4ff;font-size:0.6rem;padding-right:10px;white-space:nowrap;}
+.lum-ppct{color:#00d4ff;font-size:0.65rem;padding-right:12px;white-space:nowrap;}
 .lum-field{flex:1;position:relative;overflow:hidden;cursor:crosshair!important;}
-.lum-bins{height:80px;border-top:2px solid rgba(0,212,255,0.25);display:flex;align-items:stretch;justify-content:center;gap:0;padding:0;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;background:rgba(0,5,12,0.4);}
-.lum-bin{border:1.5px solid rgba(0,180,255,0.3);padding:6px 4px 4px;min-width:100px;text-align:center;background:rgba(0,8,20,0.2);cursor:pointer!important;transition:all 0.2s;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;}
+.lum-bins{height:82px;border-top:3px solid rgba(0,212,255,0.3);display:flex;align-items:stretch;justify-content:center;gap:0;padding:0;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;background:rgba(0,5,12,0.4);}
+.lum-bin{border:2px solid rgba(0,180,255,0.35);padding:6px 4px 4px;min-width:100px;text-align:center;background:rgba(0,8,20,0.2);cursor:pointer!important;transition:all 0.2s;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;}
 .lum-bin:hover,.lum-bin.hover{border-color:rgba(0,212,255,0.7);background:rgba(0,20,50,0.3);}
 .lum-bin.wrong{animation:lum-shake 0.4s;}
 .lum-bin.correct{animation:lum-glow 0.5s;}
@@ -2161,17 +2161,24 @@
         function cellDigit(x,y){return((x*374761+y*668265)^(x*y*91))>>>0&0x7FFFFFFF;}
         function cellSz(x,y){return 12+((x*127+y*311)>>>0&0xFF)%5;}
 
+        // Organic cluster shape via Perlin (not circular)
         function getCluster(cx,cy){
           for(var i=0;i<cls.length;i++){
             var cl=cls[i];if(cl.done)continue;
             var dx=cx-cl.wx,dy=cy-cl.wy;
-            if(dx*dx+dy*dy<=CLUSTER_R*CLUSTER_R+1){
-              var n=perlin((cx+cl.id*37)*noiseScale,(cy+cl.id*53)*noiseScale);
-              if(n>-0.2)return cl;
-            }
+            // Broad bounding box first (perf)
+            if(Math.abs(dx)>4||Math.abs(dy)>3)continue;
+            // Perlin noise creates organic blob shape
+            var n=perlin((cx+cl.id*37)*0.35,(cy+cl.id*53)*0.35);
+            // Threshold varies by distance — closer to center = easier to be in cluster
+            var dist=Math.sqrt(dx*dx+dy*dy);
+            var threshold=-0.3+dist*0.2; // center: -0.3 (easy), edge: 0.5 (hard)
+            if(n>threshold&&dist<3.5)return cl;
           }
           return null;
         }
+        // Track which clusters have been "discovered" by mouse
+        var discovered={}; // clId -> true
 
         function spawnCl(){
           var active=cls.filter(function(c){return!c.done;}).length;
@@ -2262,40 +2269,35 @@
               var mCellY=Math.round((camY+(msY-H/2)/zm)/CELL);
 
               if(cl&&!cl.done){
-                // Distance from THIS cell to cluster center
                 var dcx=cx-cl.wx,dcy=cy-cl.wy;
                 var cellDist=Math.sqrt(dcx*dcx+dcy*dcy);
-                // Distance from MOUSE to cluster center
                 var mcx=mCellX-cl.wx,mcy=mCellY-cl.wy;
                 var mouseDist=Math.sqrt(mcx*mcx+mcy*mcy);
-                // Reveal factor: 0 (invisible) to 1 (fully revealed)
-                var reveal=Math.max(0,1-mouseDist/5);
-                // Per-cell factor: cells closer to center reveal more
-                var cellFactor=Math.max(0,1-cellDist/(CLUSTER_R*1.5));
+                // Mark as discovered when mouse is close enough
+                if(mouseDist<4.5)discovered[cl.id]=true;
+                var isDiscovered=!!discovered[cl.id];
 
                 if(selCluster===cl.id){
-                  // Selected: full white glow
                   c2.fillStyle='#ffffff';c2.shadowColor='#fff';c2.shadowBlur=16;
                   c2.font='bold '+Math.round(28*zm)+'px "Share Tech Mono",monospace';
-                } else if(reveal>0.05){
-                  // Revealing organically: size/brightness scales with proximity
-                  var rf=reveal*cellFactor;
-                  var sz=baseSz+(28-14)*rf*zm;
-                  c2.font=(rf>0.3?'bold ':'')+Math.round(sz)+'px "Share Tech Mono",monospace';
-                  var alpha=0.45+rf*0.55;
-                  c2.fillStyle='rgba(0,212,255,'+alpha.toFixed(2)+')';
-                  if(rf>0.4){
-                    c2.shadowColor=cl.temper.color;
-                    c2.shadowBlur=rf*16;
-                    if(rf>0.7)c2.fillStyle=cl.temper.color;
-                  }
-                  // Agitation when very close
-                  if(reveal>0.6){
-                    fx+=Math.sin(t*8+ph)*2*reveal;
-                    fy+=Math.cos(t*7+ph)*1.5*reveal;
+                } else if(isDiscovered){
+                  // DISCOVERED: stays big and visible permanently
+                  var cellFactor=Math.max(0.3,1-cellDist/3.5);
+                  var sz=baseSz+(28-14)*cellFactor*zm;
+                  c2.font='bold '+Math.round(sz)+'px "Share Tech Mono",monospace';
+                  c2.fillStyle='rgba(0,220,255,0.85)';
+                  c2.shadowColor='rgba(0,212,255,0.4)';c2.shadowBlur=6;
+                  // Extra glow + temper color when mouse is currently near
+                  if(mouseDist<4){
+                    var nearness=1-mouseDist/4;
+                    c2.shadowColor=cl.temper.color;c2.shadowBlur=nearness*18;
+                    if(nearness>0.5)c2.fillStyle=cl.temper.color;
+                    // Agitation
+                    fx+=Math.sin(t*8+ph)*2.5*nearness;
+                    fy+=Math.cos(t*7+ph)*2*nearness;
                   }
                 } else {
-                  // INVISIBLE: same as normal numbers
+                  // NOT YET DISCOVERED: looks like normal numbers
                   c2.fillStyle='rgba(0,200,240,0.45)';
                   c2.font=Math.round(baseSz)+'px "Share Tech Mono",monospace';
                 }
