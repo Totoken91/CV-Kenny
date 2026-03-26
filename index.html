@@ -2049,6 +2049,7 @@
       ov.innerHTML='<div id="lum-boot"></div><div id="lum-main" style="display:none"></div>';
       ov.style.cssText='position:fixed;inset:0;z-index:50000;background:#0a0a0a;font-family:"Share Tech Mono",monospace;cursor:default;overflow:hidden;';
       document.body.appendChild(ov);
+      document.body.style.overflow='hidden';
 
       // ── STYLE ──
       const sty=document.createElement('style');
@@ -2172,11 +2173,14 @@
           }
         }
 
-        // Center grid
-        const fw=field.offsetWidth||700,fh=field.offsetHeight||400;
-        gridOffX=(fw-NUM_COLS*CELL)/2;
-        gridOffY=(fh-NUM_ROWS*CELL)/2;
-        grid.style.transform='translate('+gridOffX+'px,'+gridOffY+'px)';
+        // Center grid (delay 1 frame so flex layout is computed)
+        requestAnimationFrame(function(){
+          var fw=field.offsetWidth||window.innerWidth;
+          var fh=field.offsetHeight||(window.innerHeight-140);
+          gridOffX=Math.round((fw-NUM_COLS*CELL)/2);
+          gridOffY=Math.round((fh-NUM_ROWS*CELL)/2);
+          grid.style.transform='translate('+gridOffX+'px,'+gridOffY+'px)';
+        });
 
         // ── Build 5 bins ──
         for(let b=0;b<5;b++){
@@ -2351,7 +2355,8 @@
         }
         document.addEventListener('keydown',onKey);
 
-        // ── Zoom (wheel) ──
+        // ── Zoom (wheel) — also block scroll on overlay ──
+        ov.addEventListener('wheel',function(e){e.preventDefault();},{passive:false});
         field.addEventListener('wheel',function(e){
           e.preventDefault();
           zoomLevel=Math.max(0.5,Math.min(2,zoomLevel+(e.deltaY>0?-0.1:0.1)));
@@ -2370,7 +2375,7 @@
         if(lCtx){lCtx.close().catch(function(){});lCtx=null;}
         if(cursor)cursor.style.display='';
         if(dot)dot.style.display='';
-        document.removeEventListener('keydown',arguments.callee);
+        document.body.style.overflow='';
       }
     }
 
