@@ -2066,17 +2066,17 @@
 #lumon-overlay *{box-sizing:border-box;cursor:inherit;}
 #lum-monitor{
   width:min(92vw,960px);aspect-ratio:4/3;max-height:88vh;position:relative;
-  background:#060a12;border-radius:24px;overflow:hidden;
-  border:3px solid rgba(35,38,45,0.6);
-  box-shadow:0 0 60px rgba(0,60,120,0.08),0 0 0 6px #0a0a0a,0 0 0 9px rgba(30,32,40,0.25),inset 0 0 120px rgba(0,8,20,0.9),inset 0 0 250px rgba(0,30,60,0.12);
+  background:#0c1018;border-radius:20px;overflow:hidden;
+  border:2px solid rgba(50,55,65,0.5);
+  box-shadow:0 0 60px rgba(0,60,120,0.1),0 0 0 6px #080808,0 0 0 9px rgba(40,42,50,0.3),inset 0 0 60px rgba(0,10,25,0.5);
 }
-#lum-monitor::before{content:'';position:absolute;inset:0;border-radius:22px;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 40%,rgba(0,0,8,0.7) 75%,rgba(0,0,5,0.92) 100%);pointer-events:none;z-index:90;}
-#lum-monitor::after{content:'';position:absolute;inset:0;border-radius:22px;background:repeating-linear-gradient(0deg,transparent,transparent 1.5px,rgba(0,0,0,0.45) 1.5px,rgba(0,0,0,0.45) 2.5px);pointer-events:none;z-index:91;}
+#lum-monitor::before{content:'';position:absolute;inset:0;border-radius:18px;background:radial-gradient(ellipse 85% 85% at 50% 50%,transparent 55%,rgba(0,0,8,0.4) 80%,rgba(0,0,5,0.65) 100%);pointer-events:none;z-index:90;}
+#lum-monitor::after{content:'';position:absolute;inset:0;border-radius:18px;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 4px);pointer-events:none;z-index:91;}
 #lum-boot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#00d4ff;font-size:0.8rem;letter-spacing:0.15em;line-height:2;}
 #lum-boot .boot-line{opacity:0;animation:lum-bfade 0.3s forwards;}
 @keyframes lum-bfade{to{opacity:0.8;}}
 #lum-main{position:absolute;inset:0;display:flex;flex-direction:column;}
-#lum-main::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 1.5px,rgba(0,0,0,0.42) 1.5px,rgba(0,0,0,0.42) 2.5px);pointer-events:none;z-index:100;}
+#lum-main::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:100;}
 .lum-header{height:38px;border-bottom:1.5px solid rgba(0,212,255,0.5);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;background:rgba(0,12,28,0.45);flex-direction:row-reverse;}
 .lum-logo{color:#00d4ff;font-size:0.62rem;letter-spacing:0.2em;font-weight:bold;text-shadow:0 0 5px rgba(0,212,255,0.35);}
 .lum-globe{display:inline-block;width:14px;height:14px;border:1.5px solid #00d4ff;border-radius:50%;position:relative;margin-left:5px;vertical-align:middle;}
@@ -2093,7 +2093,7 @@
 .lum-pfill{height:100%;width:0%;background:linear-gradient(90deg,#003a6a,#00d4ff);border-radius:1px;transition:width 0.6s;box-shadow:0 0 10px rgba(0,212,255,0.6),0 0 4px rgba(0,212,255,0.3);}
 .lum-ppct{color:#00d4ff;font-size:0.65rem;min-width:55px;text-align:right;}
 .lum-coords{color:rgba(0,212,255,0.3);font-size:0.5rem;letter-spacing:0.08em;}
-.lum-field{flex:1;position:relative;overflow:hidden;cursor:crosshair!important;background:rgba(2,5,12,0.55);}
+.lum-field{flex:1;position:relative;overflow:hidden;cursor:crosshair!important;background:rgba(6,10,18,0.3);}
 .lum-grid{position:absolute;top:0;left:0;}
 .lum-n{position:absolute;color:rgba(0,212,255,0.22);font-size:12px;user-select:none;pointer-events:none;transition:color 0.3s,text-shadow 0.3s,transform 0.2s;}
 .lum-n.cluster{color:rgba(0,220,255,0.9);font-size:26px;text-shadow:0 0 8px rgba(0,212,255,0.5),0 0 2px rgba(0,212,255,0.3);font-weight:bold;}
@@ -2157,7 +2157,7 @@
         var compEl=document.getElementById('lum-comp');
         canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;';
 
-        var CELL=38, noiseScale=0.12, CLUSTER_R=2.5, MAX_CL=3, TOTAL_REF=8;
+        var CELL=42, noiseScale=0.12, CLUSTER_R=2.5, MAX_CL=5, TOTAL_REF=8;
         var camX=0,camY=0,zm=1,tCamX=0,tCamY=0,tZm=1;
         var msX=-999,msY=-999,mwX=0,mwY=0;
         var keys={};
@@ -2181,12 +2181,20 @@
         }
 
         function spawnCl(){
-          if(cls.filter(function(c){return!c.done;}).length>=MAX_CL)return;
-          var wx=Math.round(camX/CELL)+Math.floor(Math.random()*16-8);
-          var wy=Math.round(camY/CELL)+Math.floor(Math.random()*12-6);
+          var active=cls.filter(function(c){return!c.done;}).length;
+          if(active>=MAX_CL)return;
+          var cx=Math.round(camX/CELL),cy=Math.round(camY/CELL);
+          var wx=cx+Math.floor(Math.random()*20-10);
+          var wy=cy+Math.floor(Math.random()*14-7);
+          // Don't spawn too close to existing clusters
+          var tooClose=false;
+          for(var i=0;i<cls.length;i++){if(!cls[i].done&&Math.abs(cls[i].wx-wx)<5&&Math.abs(cls[i].wy-wy)<4){tooClose=true;break;}}
+          if(tooClose)return;
           cls.push({id:clId++,wx:wx,wy:wy,temper:TEMPERS[clId%4],targetBin:clId%5,done:false});
         }
-        spawnCl();spawnCl();spawnCl();
+        spawnCl();spawnCl();spawnCl();spawnCl();spawnCl();
+        // Keep spawning clusters as player moves
+        intervals.push(setInterval(function(){spawnCl();},3000));
 
         // Bins
         for(var b=0;b<5;b++){
@@ -2253,33 +2261,34 @@
               var fx=sx+ox+px,fy=sy+oy+py;
               var cl=getCluster(cx,cy);
               var dig=cellDigit(cx,cy)%10;
-              var sz=cl?(18*zm):(cellSz(cx,cy)*zm);
-
-              c2.font=Math.round(sz)+'px "Share Tech Mono",monospace';
+              var baseSz=14*zm;
               c2.shadowBlur=0;c2.shadowColor='transparent';
 
               if(cl&&!cl.done){
-                // Is mouse near this cluster?
+                // Cluster numbers — MUCH bigger like in the show
+                var clSz=28*zm;
                 var mCellX=Math.round((camX+(msX-W/2)/zm)/CELL);
                 var mCellY=Math.round((camY+(msY-H/2)/zm)/CELL);
                 var cdx=mCellX-cl.wx,cdy=mCellY-cl.wy;
                 var near=cdx*cdx+cdy*cdy<12;
                 if(near){
-                  sz*=1.15+Math.sin(t*5+ph)*0.1;
-                  c2.font=Math.round(sz)+'px "Share Tech Mono",monospace';
-                  c2.shadowColor=cl.temper.color;c2.shadowBlur=14;
+                  clSz*=1.2+Math.sin(t*5+ph)*0.1;
+                  c2.shadowColor=cl.temper.color;c2.shadowBlur=18;
                   c2.fillStyle=cl.temper.color;
                 } else {
-                  c2.shadowColor='rgba(0,212,255,0.3)';c2.shadowBlur=5;
-                  c2.fillStyle='rgba(0,212,255,0.7)';
+                  c2.shadowColor='rgba(0,212,255,0.5)';c2.shadowBlur=8;
+                  c2.fillStyle='rgba(0,230,255,0.95)';
                 }
                 if(selCluster===cl.id){
-                  c2.fillStyle='#ffffff';c2.shadowColor='#fff';c2.shadowBlur=16;
+                  c2.fillStyle='#ffffff';c2.shadowColor='#fff';c2.shadowBlur=20;
                 }
+                c2.font='bold '+Math.round(clSz)+'px "Share Tech Mono",monospace';
               } else {
-                c2.fillStyle='rgba(0,212,255,0.22)';
+                // Normal numbers — visible like the show (not too dim!)
+                c2.fillStyle='rgba(0,200,240,0.45)';
+                c2.font=Math.round(baseSz)+'px "Share Tech Mono",monospace';
               }
-              c2.fillText(dig,fx,fy);
+              c2.fillText(String(dig),fx,fy);
             }
           }
           c2.shadowBlur=0;
