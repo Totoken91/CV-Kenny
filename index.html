@@ -1262,8 +1262,8 @@
     </ul>
     <div class="nav-right">
       <div class="nav-uptime">UPTIME: <span id="uptime">00:00:00</span></div>
-      <button class="sound-toggle active" id="sound-toggle" title="CRT Sound">SND ON</button>
-      <button class="mode-toggle" id="mode-toggle" title="Toggle clean mode">CRT</button>
+      <button class="sound-toggle" id="sound-toggle" title="CRT Sound">SND OFF</button>
+      <button class="mode-toggle" id="mode-toggle" title="Toggle clean mode">CLEAN</button>
       <button class="nav-toggle" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -1785,7 +1785,7 @@
 
     // ── 12. SOUND SYSTEM ──
     let audioCtx = null;
-    let soundOn = true;
+    let soundOn = false;
     let hum = null;
     let noiseNode = null;
     const soundBtn = document.getElementById('sound-toggle');
@@ -1937,7 +1937,8 @@
 
     // ── 15. MODE TOGGLE (CRT / Clean) ──
     const modeBtn = document.getElementById('mode-toggle');
-    let cleanMode = false;
+    let cleanMode = true;
+    document.body.classList.add('clean-mode');
     modeBtn.addEventListener('click', () => {
       cleanMode = !cleanMode;
       document.body.classList.toggle('clean-mode', cleanMode);
