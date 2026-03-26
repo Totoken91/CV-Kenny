@@ -2202,18 +2202,18 @@
         }
 
         function rsz(){
-          var dpr=window.devicePixelRatio||1;
-          canvas.width=field.offsetWidth*dpr;canvas.height=field.offsetHeight*dpr;
-          c2.setTransform(dpr,0,0,dpr,0,0);
+          var w=field.offsetWidth,h=field.offsetHeight;
+          if(w<10||h<10)return;
+          canvas.width=w;canvas.height=h;
         }
-        requestAnimationFrame(function(){requestAnimationFrame(rsz);});
+        setTimeout(rsz,50);setTimeout(rsz,200);setTimeout(rsz,500);
         window.addEventListener('resize',rsz);
 
         // ── RENDER ──
         function render(){
           t+=0.016;
-          var W=field.offsetWidth||600,H=field.offsetHeight||400;
-          if(canvas.width<10)rsz();
+          var W=canvas.width,H=canvas.height;
+          if(W<10||H<10){rsz();W=canvas.width;H=canvas.height;if(W<10){animRAF=requestAnimationFrame(render);return;}}
 
           // Smooth camera via keys
           var spd=5/zm;
