@@ -1716,16 +1716,7 @@
       }, 600);
     }
 
-    // ── 8. PAGE GLITCH (every 8-10s, desktop only) ──
-    const isDesktop = !('ontouchstart' in window) && navigator.maxTouchPoints === 0;
-    if (isDesktop) {
-      function triggerGlitch() {
-        document.body.classList.add('page-glitch');
-        setTimeout(() => document.body.classList.remove('page-glitch'), 120);
-        setTimeout(triggerGlitch, 8000 + Math.random() * 4000);
-      }
-      setTimeout(triggerGlitch, 5000);
-    }
+    // ── 8. (page glitch removed — caused lag spikes) ──
 
     // ── 9. MAGNETIC TEXT ──
     const heroName = document.querySelector('.hero-name');
@@ -1953,53 +1944,7 @@
       modeBtn.textContent = cleanMode ? 'CLEAN' : 'CRT';
     });
 
-    // ── 16. LERP SCROLL (desktop only) ──
-    if (window.matchMedia('(pointer: fine)').matches && !('ontouchstart' in window)) {
-      let scrollTarget = window.scrollY;
-      let scrollCurrent = window.scrollY;
-      const LERP = 0.085;
-      let isLerping = false;
-
-      window.addEventListener('wheel', e => {
-        e.preventDefault();
-        scrollTarget += e.deltaY;
-        scrollTarget = Math.max(0, Math.min(scrollTarget, document.documentElement.scrollHeight - window.innerHeight));
-        if (!isLerping) { isLerping = true; lerpLoop(); }
-      }, { passive: false });
-
-      function lerpLoop() {
-        scrollCurrent += (scrollTarget - scrollCurrent) * LERP;
-        window.scrollTo(0, scrollCurrent);
-        if (Math.abs(scrollCurrent - scrollTarget) > 0.5) {
-          requestAnimationFrame(lerpLoop);
-        } else {
-          scrollCurrent = scrollTarget;
-          isLerping = false;
-        }
-      }
-
-      // Sync anchor clicks
-      document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', e => {
-          const target = document.querySelector(a.getAttribute('href'));
-          if (target) {
-            e.preventDefault();
-            scrollTarget = target.offsetTop - 80;
-            if (!isLerping) { isLerping = true; lerpLoop(); }
-          }
-        });
-      });
-
-      // Sync external scroll changes (keyboard, scrollbar drag)
-      let lastKnown = 0;
-      window.addEventListener('scroll', () => {
-        if (Math.abs(window.scrollY - scrollCurrent) > 80) {
-          scrollTarget = window.scrollY;
-          scrollCurrent = window.scrollY;
-        }
-        lastKnown = window.scrollY;
-      });
-    }
+    // ── 16. (lerp scroll removed — native smooth scroll used) ──
 
     // ── 17. SCROLL PROGRESS BAR ──
     const progressBar = document.getElementById('scroll-progress');
@@ -2097,7 +2042,11 @@
           #lumon-overlay {
             position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;
             background:#010510;animation:lumon-fadein 0.8s ease;font-family:'Share Tech Mono',monospace;
+            cursor:default !important;
           }
+          #lumon-overlay * { cursor:inherit; }
+          #lumon-overlay .lumon-cluster-zone { cursor:pointer !important; }
+          #lumon-overlay .lumon-close { cursor:pointer !important; }
           @keyframes lumon-fadein { from{opacity:0} to{opacity:1} }
           #lumon-overlay * { box-sizing:border-box; }
           .lumon-monitor {
@@ -2119,7 +2068,7 @@
             pointer-events:none;z-index:11;
           }
           .lumon-close {
-            position:absolute;top:12px;right:16px;z-index:20;background:none;border:1px solid rgba(0,200,255,0.3);
+            position:absolute;top:12px;right:16px;z-index:30;background:none;border:1px solid rgba(0,200,255,0.3);
             color:#00d4ff;font-family:inherit;font-size:0.75rem;padding:4px 10px;cursor:pointer;border-radius:4px;
             transition:all 0.2s;letter-spacing:0.1em;
           }
@@ -2170,7 +2119,7 @@
             transition:none;user-select:none;pointer-events:none;
           }
           .lumon-cluster-zone {
-            position:absolute;cursor:pointer;z-index:8;pointer-events:auto;
+            position:absolute;cursor:pointer !important;z-index:15;pointer-events:auto;
           }
           .lumon-cluster-zone .lumon-num {
             color:rgba(0,220,255,0.9);text-shadow:0 0 12px rgba(0,200,255,0.8);
@@ -2257,6 +2206,10 @@
         </div>
       `;
       document.body.appendChild(ov);
+
+      // Hide custom cursor during Lumon
+      if (cursor) cursor.style.display = 'none';
+      if (dot) dot.style.display = 'none';
 
       // ── State ──
       let progress = 0;
@@ -2423,6 +2376,9 @@
         ov.style.opacity = '0';
         setTimeout(() => { if (ov.parentNode) ov.remove(); }, 500);
         if (lCtx) { lCtx.close().catch(()=>{}); lCtx = null; }
+        // Restore custom cursor
+        if (cursor) cursor.style.display = '';
+        if (dot) dot.style.display = '';
       }
 
       ov.querySelector('.lumon-close').addEventListener('click', closeLumon);
