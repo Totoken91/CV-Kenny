@@ -2085,33 +2085,26 @@
 .lum-sub{color:rgba(0,212,255,0.45);font-size:0.52rem;letter-spacing:0.12em;}
 .lum-close{position:absolute;top:8px;right:8px;z-index:50;background:rgba(0,10,20,0.6);border:1px solid rgba(0,212,255,0.2);color:rgba(0,212,255,0.5);font-family:inherit;font-size:0.8rem;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer!important;border-radius:4px;transition:all 0.2s;padding:0;}
 .lum-close:hover{background:rgba(0,212,255,0.15);border-color:#00d4ff;color:#00d4ff;}
-.lum-topbar{height:36px;border-bottom:1.5px solid rgba(0,212,255,0.35);display:flex;align-items:center;padding:0 14px;gap:12px;flex-shrink:0;background:rgba(0,12,28,0.4);}
-.lum-fname{color:rgba(0,212,255,0.7);font-size:0.7rem;letter-spacing:0.12em;white-space:nowrap;font-weight:bold;}
-.lum-logo-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;padding-left:12px;border-left:1px solid rgba(0,212,255,0.15);}
-.lum-logotext{color:rgba(0,212,255,0.7);font-size:0.6rem;letter-spacing:0.18em;font-weight:bold;}
-.lum-ptrack{flex:1;height:8px;background:repeating-linear-gradient(90deg,rgba(0,60,100,0.06) 0px,rgba(0,60,100,0.06) 7px,rgba(0,180,255,0.22) 7px,rgba(0,180,255,0.22) 8px);border-radius:1px;overflow:hidden;border:1px solid rgba(0,180,255,0.25);position:relative;}
-.lum-pfill{height:100%;width:0%;background:linear-gradient(90deg,#003a6a,#00d4ff);border-radius:1px;transition:width 0.6s;box-shadow:0 0 10px rgba(0,212,255,0.6),0 0 4px rgba(0,212,255,0.3);}
-.lum-ppct{color:#00d4ff;font-size:0.65rem;min-width:55px;text-align:right;}
-.lum-coords{color:rgba(0,212,255,0.3);font-size:0.5rem;letter-spacing:0.08em;}
-.lum-field{flex:1;position:relative;overflow:hidden;cursor:crosshair!important;background:rgba(6,10,18,0.3);}
-.lum-grid{position:absolute;top:0;left:0;}
-.lum-n{position:absolute;color:rgba(0,212,255,0.22);font-size:12px;user-select:none;pointer-events:none;transition:color 0.3s,text-shadow 0.3s,transform 0.2s;}
-.lum-n.cluster{color:rgba(0,220,255,0.9);font-size:26px;text-shadow:0 0 8px rgba(0,212,255,0.5),0 0 2px rgba(0,212,255,0.3);font-weight:bold;}
-.lum-n.cluster.hover{transform:scale(1.4);text-shadow:0 0 22px rgba(0,212,255,1),0 0 8px rgba(0,212,255,0.7);}
-.lum-n.selected{color:#fff!important;text-shadow:0 0 12px #fff!important;}
-.lum-n.flying{transition:left 0.5s ease,top 0.5s ease,opacity 0.5s;pointer-events:none;}
-.lum-lasso{position:absolute;border:1px solid rgba(0,212,255,0.6);background:rgba(0,212,255,0.08);pointer-events:none;z-index:50;}
-.lum-bins{height:72px;border-top:1.5px solid rgba(0,212,255,0.35);display:flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;background:rgba(0,8,20,0.3);}
-.lum-bin{border:1px solid rgba(0,180,255,0.2);padding:5px 8px;min-width:80px;text-align:center;border-radius:1px;background:rgba(0,10,30,0.3);cursor:pointer!important;transition:all 0.2s;flex-shrink:0;}
-.lum-bin:hover,.lum-bin.hover{border-color:rgba(0,212,255,0.7);box-shadow:0 0 10px rgba(0,200,255,0.15);}
+.lum-topbar{height:34px;border-bottom:2px solid rgba(0,212,255,0.3);display:flex;align-items:center;padding:0;flex-shrink:0;background:rgba(0,8,18,0.5);}
+.lum-fname{color:#00d4ff;font-size:0.8rem;letter-spacing:0.08em;white-space:nowrap;font-weight:bold;padding:0 14px;border-right:1px solid rgba(0,212,255,0.2);}
+.lum-logo-wrap{display:flex;align-items:center;gap:5px;padding:0 12px;border-left:1px solid rgba(0,212,255,0.2);}
+.lum-logotext{color:rgba(0,212,255,0.6);font-size:0.55rem;letter-spacing:0.18em;font-weight:bold;}
+.lum-ptrack{flex:1;height:10px;margin:0 12px;background:repeating-linear-gradient(90deg,rgba(0,60,100,0.08) 0px,rgba(0,60,100,0.08) 6px,rgba(0,180,255,0.18) 6px,rgba(0,180,255,0.18) 7px);overflow:hidden;border:1px solid rgba(0,180,255,0.2);position:relative;}
+.lum-pfill{height:100%;width:0%;background:linear-gradient(90deg,#004080,#00d4ff);transition:width 0.6s;box-shadow:0 0 8px rgba(0,212,255,0.5);}
+.lum-ppct{color:#00d4ff;font-size:0.6rem;padding-right:10px;white-space:nowrap;}
+.lum-field{flex:1;position:relative;overflow:hidden;cursor:crosshair!important;}
+.lum-bins{height:80px;border-top:2px solid rgba(0,212,255,0.25);display:flex;align-items:stretch;justify-content:center;gap:0;padding:0;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;background:rgba(0,5,12,0.4);}
+.lum-bin{border:1.5px solid rgba(0,180,255,0.3);padding:6px 4px 4px;min-width:100px;text-align:center;background:rgba(0,8,20,0.2);cursor:pointer!important;transition:all 0.2s;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;}
+.lum-bin:hover,.lum-bin.hover{border-color:rgba(0,212,255,0.7);background:rgba(0,20,50,0.3);}
 .lum-bin.wrong{animation:lum-shake 0.4s;}
 .lum-bin.correct{animation:lum-glow 0.5s;}
 @keyframes lum-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 @keyframes lum-glow{0%{box-shadow:0 0 0 transparent}50%{box-shadow:0 0 20px rgba(0,212,255,0.5)}100%{box-shadow:none}}
-.lum-bin-label{font-size:0.55rem;color:rgba(0,212,255,0.55);letter-spacing:0.14em;font-weight:bold;}
-.lum-bin-bars{display:flex;gap:1px;margin:3px 0 2px;height:4px;background:rgba(0,60,100,0.1);border:1px solid rgba(0,180,255,0.1);}
-.lum-bin-bar{flex:1;border-radius:0px;transition:height 0.3s;}
-.lum-bin-pct{font-size:0.48rem;color:rgba(0,212,255,0.45);letter-spacing:0.06em;}
+.lum-bin-label{font-size:0.7rem;color:rgba(0,212,255,0.7);letter-spacing:0.14em;font-weight:bold;}
+.lum-bin-bars{width:80%;display:flex;flex-direction:column;gap:2px;margin:4px 0;}
+.lum-bin-row{height:3px;background:rgba(0,40,80,0.2);overflow:hidden;width:100%;}
+.lum-bin-fill{height:100%;width:0%;transition:width 0.5s;}
+.lum-bin-pct{font-size:0.5rem;color:rgba(0,212,255,0.5);letter-spacing:0.06em;}
 .lum-hex{text-align:center;font-size:0.48rem;color:rgba(0,200,255,0.25);letter-spacing:0.14em;padding:5px 0 4px;flex-shrink:0;border-top:1px solid rgba(0,180,255,0.08);background:rgba(0,6,16,0.2);}
 .lum-thumb{position:absolute;font-size:2rem;pointer-events:none;z-index:60;animation:lum-thumba 0.8s forwards;}
 @keyframes lum-thumba{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(2) translateY(-20px)}}
@@ -2200,10 +2193,10 @@
         for(var b=0;b<5;b++){
           var bn=document.createElement('div');bn.className='lum-bin';
           bn.innerHTML='<div class="lum-bin-label">0'+(b+1)+'</div><div class="lum-bin-bars">'
-            +'<div class="lum-bin-bar" style="background:'+TEMPERS[0].colorDim+';height:2px" id="bb'+b+'_0"></div>'
-            +'<div class="lum-bin-bar" style="background:'+TEMPERS[1].colorDim+';height:2px" id="bb'+b+'_1"></div>'
-            +'<div class="lum-bin-bar" style="background:'+TEMPERS[2].colorDim+';height:2px" id="bb'+b+'_2"></div>'
-            +'<div class="lum-bin-bar" style="background:'+TEMPERS[3].colorDim+';height:2px" id="bb'+b+'_3"></div>'
+            +'<div class="lum-bin-row"><div class="lum-bin-fill" style="background:'+TEMPERS[0].color+'" id="bb'+b+'_0"></div></div>'
+            +'<div class="lum-bin-row"><div class="lum-bin-fill" style="background:'+TEMPERS[1].color+'" id="bb'+b+'_1"></div></div>'
+            +'<div class="lum-bin-row"><div class="lum-bin-fill" style="background:'+TEMPERS[2].color+'" id="bb'+b+'_2"></div></div>'
+            +'<div class="lum-bin-row"><div class="lum-bin-fill" style="background:'+TEMPERS[3].color+'" id="bb'+b+'_3"></div></div>'
             +'</div><div class="lum-bin-pct" id="bp'+b+'">0%</div>';
           (function(i){bn.addEventListener('click',function(){dropBin(i);});})(b);
           binsEl.appendChild(bn);
@@ -2264,27 +2257,49 @@
               var baseSz=14*zm;
               c2.shadowBlur=0;c2.shadowColor='transparent';
 
+              // Mouse distance to this cluster center (in cells)
+              var mCellX=Math.round((camX+(msX-W/2)/zm)/CELL);
+              var mCellY=Math.round((camY+(msY-H/2)/zm)/CELL);
+
               if(cl&&!cl.done){
-                // Cluster numbers — MUCH bigger like in the show
-                var clSz=28*zm;
-                var mCellX=Math.round((camX+(msX-W/2)/zm)/CELL);
-                var mCellY=Math.round((camY+(msY-H/2)/zm)/CELL);
-                var cdx=mCellX-cl.wx,cdy=mCellY-cl.wy;
-                var near=cdx*cdx+cdy*cdy<12;
-                if(near){
-                  clSz*=1.2+Math.sin(t*5+ph)*0.1;
-                  c2.shadowColor=cl.temper.color;c2.shadowBlur=18;
-                  c2.fillStyle=cl.temper.color;
-                } else {
-                  c2.shadowColor='rgba(0,212,255,0.5)';c2.shadowBlur=8;
-                  c2.fillStyle='rgba(0,230,255,0.95)';
-                }
+                // Distance from THIS cell to cluster center
+                var dcx=cx-cl.wx,dcy=cy-cl.wy;
+                var cellDist=Math.sqrt(dcx*dcx+dcy*dcy);
+                // Distance from MOUSE to cluster center
+                var mcx=mCellX-cl.wx,mcy=mCellY-cl.wy;
+                var mouseDist=Math.sqrt(mcx*mcx+mcy*mcy);
+                // Reveal factor: 0 (invisible) to 1 (fully revealed)
+                var reveal=Math.max(0,1-mouseDist/5);
+                // Per-cell factor: cells closer to center reveal more
+                var cellFactor=Math.max(0,1-cellDist/(CLUSTER_R*1.5));
+
                 if(selCluster===cl.id){
-                  c2.fillStyle='#ffffff';c2.shadowColor='#fff';c2.shadowBlur=20;
+                  // Selected: full white glow
+                  c2.fillStyle='#ffffff';c2.shadowColor='#fff';c2.shadowBlur=16;
+                  c2.font='bold '+Math.round(28*zm)+'px "Share Tech Mono",monospace';
+                } else if(reveal>0.05){
+                  // Revealing organically: size/brightness scales with proximity
+                  var rf=reveal*cellFactor;
+                  var sz=baseSz+(28-14)*rf*zm;
+                  c2.font=(rf>0.3?'bold ':'')+Math.round(sz)+'px "Share Tech Mono",monospace';
+                  var alpha=0.45+rf*0.55;
+                  c2.fillStyle='rgba(0,212,255,'+alpha.toFixed(2)+')';
+                  if(rf>0.4){
+                    c2.shadowColor=cl.temper.color;
+                    c2.shadowBlur=rf*16;
+                    if(rf>0.7)c2.fillStyle=cl.temper.color;
+                  }
+                  // Agitation when very close
+                  if(reveal>0.6){
+                    fx+=Math.sin(t*8+ph)*2*reveal;
+                    fy+=Math.cos(t*7+ph)*1.5*reveal;
+                  }
+                } else {
+                  // INVISIBLE: same as normal numbers
+                  c2.fillStyle='rgba(0,200,240,0.45)';
+                  c2.font=Math.round(baseSz)+'px "Share Tech Mono",monospace';
                 }
-                c2.font='bold '+Math.round(clSz)+'px "Share Tech Mono",monospace';
               } else {
-                // Normal numbers — visible like the show (not too dim!)
                 c2.fillStyle='rgba(0,200,240,0.45)';
                 c2.font=Math.round(baseSz)+'px "Share Tech Mono",monospace';
               }
@@ -2366,7 +2381,7 @@
         }
         function updateBin(b){
           var d=binData[b],tot=d.wo+d.fc+d.dr+d.ma||1;var ks=['wo','fc','dr','ma'];
-          for(var i=0;i<4;i++){var bar=document.getElementById('bb'+b+'_'+i);if(bar){bar.style.height=Math.max(2,Math.round(d[ks[i]]/tot*16))+'px';bar.style.background=TEMPERS[i].color;}}
+          for(var i=0;i<4;i++){var fill=document.getElementById('bb'+b+'_'+i);if(fill){fill.style.width=Math.round(d[ks[i]]/tot*100)+'%';}}
           var p=document.getElementById('bp'+b);if(p)p.textContent=Math.round(tot/3)+'%';
         }
 
