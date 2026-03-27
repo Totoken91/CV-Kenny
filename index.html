@@ -494,16 +494,19 @@
     }
     .stat-item {
       background: var(--bg2);
-      padding: 1.5rem;
+      padding: 1.2rem 0.8rem;
       text-align: center;
+      overflow: hidden;
     }
     .stat-number {
       font-family: var(--font-display);
-      font-size: 2.5rem;
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
       font-weight: 800;
       color: var(--green);
       text-shadow: 0 0 20px var(--green);
       display: block;
+      line-height: 1.2;
+      white-space: nowrap;
     }
     .stat-label {
       font-size: 0.75rem;
@@ -1310,16 +1313,16 @@
     <h2 class="section-title reveal-left">À propos</h2>
     <div class="about-grid">
       <div class="terminal-box reveal-clip">
-        <p>Technicien IT autodidacte chez <span class="green">Econocom</span> en environnement sensible — j'apprends sur le terrain depuis le début. Passé d'équipier McDonald's à manager, puis de zéro en informatique à Référent Informatique en moins de deux ans.</p>
-        <p>Ce que je n'ai pas en diplômes IT, je le compense en volume : des milliers de tickets traités, des systèmes maintenus sous contrainte, et des projets en ligne qui fonctionnent. Je me forme activement sur <span class="amber">Active Directory</span>, Windows Server et l'administration système.</p>
+        <p>Technicien IT autodidacte chez <span class="green">Econocom</span> en environnement sensible — j'apprends sur le terrain depuis le début. Passé d'équipier McDonald's à manager, puis de zéro en informatique à Référent Informatique en un an.</p>
+        <p>Ce que je n'ai pas en diplômes IT, je le compense en volume : plus de 5 000 tickets traités, des systèmes maintenus sous contrainte, et des projets en ligne qui fonctionnent. Je me forme activement sur <span class="amber">Active Directory</span>, Windows Server et l'administration système.</p>
       </div>
       <div class="stat-grid reveal">
         <div class="stat-item">
-          <span class="stat-number">2 ans</span>
-          <span class="stat-label">De zéro à Référent IT</span>
+          <span class="stat-number">1 an</span>
+          <span class="stat-label">Tech → Référent IT</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">1000+</span>
+          <span class="stat-number">5000+</span>
           <span class="stat-label">Tickets traités</span>
         </div>
         <div class="stat-item">
@@ -1327,7 +1330,7 @@
           <span class="stat-label">Projets en ligne</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">94</span>
+          <span class="stat-number">91</span>
           <span class="stat-label">Île-de-France</span>
         </div>
       </div>
