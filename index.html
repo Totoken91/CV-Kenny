@@ -1240,17 +1240,17 @@
       body > *:not(#cv-print) { display:none !important; }
       #cv-print { display:block !important; }
       @page { margin:0; size:A4; }
-      *, *::before, *::after { animation:none!important;transition:none!important; }
     }
     #cv-print {
       width:210mm;min-height:297mm;max-height:297mm;overflow:hidden;
       font-family:'Segoe UI',Arial,sans-serif;font-size:9pt;line-height:1.45;color:#222;background:#fff;
       display:none;margin:0 auto;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;
     }
     #cv-print * { box-sizing:border-box; }
     .cv-wrap { display:flex;height:297mm; }
     /* LEFT SIDEBAR */
-    .cv-side { width:72mm;background:#1a1f2e;color:#fff;padding:12mm 6mm 8mm;display:flex;flex-direction:column;gap:5mm;flex-shrink:0; }
+    .cv-side { width:72mm;background:#1a1f2e;color:#fff;padding:12mm 6mm 8mm;display:flex;flex-direction:column;gap:5mm;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact; }
     .cv-photo { width:48mm;height:48mm;border-radius:50%;object-fit:cover;object-position:center top;border:2.5px solid #4a9fff;margin:0 auto 2mm;display:block; }
     .cv-side h3 { font-size:8.5pt;color:#6ab4ff;text-transform:uppercase;letter-spacing:0.12em;margin:0 0 2.5mm;padding-bottom:1.5mm;border-bottom:0.5px solid rgba(255,255,255,0.2); }
     .cv-side p, .cv-side li { font-size:8pt;color:#fff;line-height:1.55;margin:0; }
@@ -1260,8 +1260,8 @@
     .cv-skill-row { display:flex;justify-content:space-between;align-items:center;font-size:7.8pt;margin-bottom:2mm; }
     .cv-skill-row span:first-child { color:#fff; }
     .cv-skill-dots { display:flex;gap:1.5mm; }
-    .cv-skill-dot { width:2.2mm;height:2.2mm;border-radius:50%;background:rgba(255,255,255,0.18);display:inline-block; }
-    .cv-skill-dot.filled { background:#6ab4ff; }
+    .cv-skill-dot { width:2.2mm;height:2.2mm;border-radius:50%;background:rgba(255,255,255,0.18);display:inline-block;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
+    .cv-skill-dot.filled { background:#6ab4ff;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
     .cv-lang-row { display:flex;justify-content:space-between;font-size:8pt;margin-bottom:1.5mm; }
     .cv-lang-row span:first-child { color:#fff; }
     .cv-lang-row span:last-child { color:rgba(255,255,255,0.85);font-size:7.5pt; }
