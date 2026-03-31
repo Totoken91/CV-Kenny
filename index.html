@@ -1694,9 +1694,12 @@
             p.y += dym * 0.008;
           }
 
+          var isClean = document.body.classList.contains('clean-mode');
+          var pR = isClean ? '0,102,255' : '0,255,65';
+
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(0,255,65,0.5)';
+          ctx.fillStyle = 'rgba('+pR+',0.5)';
           ctx.fill();
 
           // Connections
@@ -1708,7 +1711,7 @@
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
-              ctx.strokeStyle = `rgba(0,255,65,${0.15 * (1 - dist / CONNECT_DIST)})`;
+              ctx.strokeStyle = `rgba(${pR},${0.15 * (1 - dist / CONNECT_DIST)})`;
               ctx.lineWidth = 0.5;
               ctx.stroke();
             }
@@ -1719,7 +1722,7 @@
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(pmx, pmy);
-            ctx.strokeStyle = `rgba(0,255,65,${0.3 * (1 - distM / MOUSE_DIST)})`;
+            ctx.strokeStyle = `rgba(${pR},${0.3 * (1 - distM / MOUSE_DIST)})`;
             ctx.lineWidth = 0.8;
             ctx.stroke();
           }
