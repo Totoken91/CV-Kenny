@@ -1234,95 +1234,55 @@
       transition: transform 0.15s ease-out;
     }
 
-    /* ── PRINT STYLESHEET ──────────────────────────────── */
+    /* ── PRINT CV (one-page) ──────────────────────────── */
+    #cv-print { display:none; }
     @media print {
-      /* Reset everything to clean black on white */
-      *, *::before, *::after { background: transparent !important; color: #000 !important; text-shadow: none !important; box-shadow: none !important; animation: none !important; transition: none !important; }
-      body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.5; background: #fff !important; }
-
-      /* Hide all decorative/interactive elements */
-      nav, #cursor, #cursor-dot, #boot-overlay, #global-scanline, #scroll-progress, #access-granted,
-      #particle-canvas, .hero-prompt, .hero-cta, .hero-photo-wrap, .crt-frame, .crt-glitch, .crt-corner, .crt-status,
-      .contact-terminal, .contact-links, footer, #lumon-overlay,
-      body::before, body::after, #hero::before, .hero-lastname::before, .hero-lastname::after { display: none !important; }
-
-      /* Force all reveals visible */
-      .reveal, .reveal-left, .reveal-right, .reveal-clip, .reveal-scale { opacity: 1 !important; transform: none !important; clip-path: none !important; }
-
-      /* Layout */
-      section { max-width: 100% !important; padding: 1.5rem 0 !important; margin: 0 !important; page-break-inside: avoid; }
-      #hero { min-height: auto !important; padding: 1rem 0 !important; }
-
-      /* Hero — name and title */
-      .hero-name { font-size: 24pt !important; }
-      .hero-firstname, .hero-lastname, .hero-lastname .accent { font-size: 24pt !important; color: #000 !important; }
-      .hero-title { font-size: 12pt !important; color: #444 !important; margin-top: 0.3rem !important; }
-      .hero-manifesto { border-left: 2px solid #333 !important; padding-left: 0.8rem !important; font-size: 10pt !important; color: #333 !important; margin-top: 0.8rem !important; }
-      .blink { display: none !important; }
-
-      /* Section titles */
-      .section-label { color: #999 !important; font-size: 8pt !important; }
-      .section-title { font-size: 16pt !important; margin-bottom: 1rem !important; }
-      .section-title::after { background: #333 !important; height: 1px !important; }
-
-      /* About */
-      #about .about-grid { display: block !important; }
-      .terminal-box { border: 1px solid #ddd !important; padding: 1rem !important; margin-bottom: 1rem !important; }
-      .terminal-box::before { display: none !important; }
-      .terminal-box p { font-size: 10pt !important; color: #333 !important; opacity: 1 !important; }
-      .green { color: #0066cc !important; }
-      .amber { color: #cc6600 !important; }
-      .stat-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 0 !important; border: 1px solid #ddd !important; margin-top: 0.5rem !important; }
-      .stat-item { padding: 0.6rem 0.3rem !important; border-right: 1px solid #eee !important; }
-      .stat-number { font-size: 14pt !important; color: #0066cc !important; }
-      .stat-label { font-size: 7pt !important; color: #666 !important; }
-
-      /* Skills */
-      #skills .skills-grid { display: block !important; }
-      .skill-category { border: 1px solid #ddd !important; padding: 0.8rem !important; margin-bottom: 0.8rem !important; page-break-inside: avoid; }
-      .skill-cat-title { font-size: 9pt !important; color: #cc6600 !important; margin-bottom: 0.5rem !important; }
-      .skill-bar { margin-bottom: 0.4rem !important; }
-      .skill-bar-header { font-size: 9pt !important; }
-      .skill-bar-header span:last-child { color: #666 !important; }
-      .skill-track { height: 4px !important; background: #eee !important; }
-      .skill-fill { background: #0066cc !important; box-shadow: none !important; }
-      .skill-tags { margin-top: 0.3rem !important; }
-      .tag { font-size: 7pt !important; border-color: #ccc !important; padding: 0.1rem 0.4rem !important; }
-
-      /* Experience */
-      .timeline::before { background: #ccc !important; }
-      .timeline-item { page-break-inside: avoid; margin-bottom: 1rem !important; }
-      .timeline-item::before { background: #0066cc !important; box-shadow: none !important; }
-      .timeline-date { color: #cc6600 !important; font-size: 8pt !important; }
-      .timeline-role { font-size: 12pt !important; }
-      .timeline-company { color: #0066cc !important; font-size: 9pt !important; }
-      .timeline-bullets li { font-size: 9pt !important; color: #333 !important; opacity: 1 !important; }
-      .timeline-bullets li::before { color: #0066cc !important; }
-
-      /* Projects */
-      #projects .projects-grid { display: block !important; }
-      .project-card { border: 1px solid #ddd !important; padding: 0.8rem !important; margin-bottom: 0.6rem !important; page-break-inside: avoid; }
-      .project-card::before { display: none !important; }
-      .project-number { font-size: 7pt !important; color: #999 !important; }
-      .project-name { font-size: 11pt !important; }
-      .project-desc { font-size: 9pt !important; color: #333 !important; }
-      .project-stack span { font-size: 7pt !important; border: 1px solid #ccc !important; color: #555 !important; background: transparent !important; }
-      .project-links { margin-top: 0.3rem !important; }
-      .project-link { font-size: 8pt !important; color: #0066cc !important; }
-
-      /* Education */
-      .edu-item { border: 1px solid #ddd !important; padding: 0.8rem !important; margin-bottom: 0.6rem !important; page-break-inside: avoid; }
-      .edu-year { font-size: 14pt !important; color: #0066cc !important; opacity: 1 !important; }
-      .edu-degree { font-size: 11pt !important; }
-      .edu-school { color: #0066cc !important; font-size: 9pt !important; }
-      .edu-desc { font-size: 9pt !important; color: #333 !important; }
-
-      /* Contact — show email as text */
-      #contact { text-align: left !important; }
-
-      /* Footer with URL */
-      @page { margin: 1.5cm; }
+      body > *:not(#cv-print) { display:none !important; }
+      #cv-print { display:block !important; }
+      @page { margin:0; size:A4; }
+      *, *::before, *::after { animation:none!important;transition:none!important; }
     }
+    #cv-print {
+      width:210mm;min-height:297mm;max-height:297mm;overflow:hidden;
+      font-family:'Segoe UI',Arial,sans-serif;font-size:9pt;line-height:1.45;color:#222;background:#fff;
+      display:none;margin:0 auto;
+    }
+    #cv-print * { box-sizing:border-box; }
+    .cv-wrap { display:flex;height:297mm; }
+    /* LEFT SIDEBAR */
+    .cv-side { width:72mm;background:#1a1f2e;color:#fff;padding:12mm 6mm 8mm;display:flex;flex-direction:column;gap:5mm;flex-shrink:0; }
+    .cv-photo { width:48mm;height:48mm;border-radius:50%;object-fit:cover;object-position:center top;border:2.5px solid #4a9fff;margin:0 auto 2mm;display:block; }
+    .cv-side h3 { font-size:8.5pt;color:#6ab4ff;text-transform:uppercase;letter-spacing:0.12em;margin:0 0 2mm;padding-bottom:1.5mm;border-bottom:0.5px solid rgba(255,255,255,0.15); }
+    .cv-side p, .cv-side li { font-size:8pt;color:rgba(255,255,255,0.85);line-height:1.4;margin:0; }
+    .cv-side a { color:#6ab4ff;text-decoration:none; }
+    .cv-side ul { list-style:none;padding:0;margin:0; }
+    .cv-side ul li { padding:1mm 0;font-size:8pt; }
+    .cv-skill-row { display:flex;justify-content:space-between;align-items:center;font-size:7.5pt;margin-bottom:1.5mm; }
+    .cv-skill-row span:first-child { color:rgba(255,255,255,0.9); }
+    .cv-skill-row span:last-child { color:rgba(255,255,255,0.5);font-size:7pt; }
+    .cv-skill-track { height:2.5px;background:rgba(255,255,255,0.12);margin-bottom:2.5mm;border-radius:1px; }
+    .cv-skill-fill { height:100%;background:#6ab4ff;border-radius:1px; }
+    .cv-lang-row { display:flex;justify-content:space-between;font-size:8pt;margin-bottom:1mm; }
+    .cv-lang-row span:last-child { color:rgba(255,255,255,0.55); }
+    /* RIGHT MAIN */
+    .cv-main { flex:1;padding:10mm 8mm 8mm;display:flex;flex-direction:column;gap:4mm; }
+    .cv-header h1 { font-size:20pt;font-weight:800;color:#1a1f2e;margin:0;line-height:1.1; }
+    .cv-header h2 { font-size:10pt;font-weight:400;color:#666;margin:1mm 0 0; }
+    .cv-header p { font-size:8.5pt;color:#444;margin:2mm 0 0;line-height:1.45; }
+    .cv-section h3 { font-size:9pt;color:#1a1f2e;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 2mm;padding-bottom:1.5mm;border-bottom:1px solid #ddd; }
+    .cv-exp-item { margin-bottom:3mm; }
+    .cv-exp-date { font-size:7.5pt;color:#888;margin:0; }
+    .cv-exp-role { font-size:9pt;font-weight:700;color:#1a1f2e;margin:0.3mm 0 0; }
+    .cv-exp-company { font-size:8pt;color:#4a8fd4;margin:0; }
+    .cv-exp-bullets { margin:1mm 0 0;padding-left:3.5mm;font-size:7.8pt;color:#333;line-height:1.4; }
+    .cv-exp-bullets li { margin-bottom:0.5mm; }
+    .cv-proj-row { display:flex;gap:2mm;margin-bottom:1.5mm; }
+    .cv-proj-name { font-size:8pt;font-weight:700;color:#1a1f2e;min-width:28mm; }
+    .cv-proj-desc { font-size:7.5pt;color:#555;flex:1; }
+    .cv-edu-item { margin-bottom:2mm; }
+    .cv-edu-item strong { font-size:8.5pt;color:#1a1f2e; }
+    .cv-edu-item em { font-size:7.5pt;color:#4a8fd4;font-style:normal; }
+    .cv-edu-item small { font-size:7pt;color:#888;display:block; }
   </style>
 </head>
 <body>
@@ -2122,10 +2082,10 @@
     var dlBtn = document.getElementById('dl-cv');
     if (dlBtn) dlBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      // Force all skill bars to their target width before printing
-      document.querySelectorAll('.skill-fill').forEach(function(bar) { bar.style.width = bar.dataset.width + '%'; });
-      // Force all reveals visible
-      document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-clip,.reveal-scale').forEach(function(el) { el.classList.add('visible'); });
+      // Copy photo src to print CV
+      var heroImg = document.querySelector('.crt-frame img');
+      var cvPhoto = document.getElementById('cv-photo');
+      if (heroImg && cvPhoto) cvPhoto.src = heroImg.src;
       window.print();
     });
 
@@ -2652,5 +2612,119 @@
 
     } // end initAll
   </script>
+
+  <!-- ── CV PRINT (hidden, shown only on print) ── -->
+  <div id="cv-print">
+    <div class="cv-wrap">
+      <div class="cv-side">
+        <img class="cv-photo" id="cv-photo" src="" alt="Kenny Desaintfuscien" />
+        <div>
+          <h3>Contact</h3>
+          <ul>
+            <li>kennydsf91@gmail.com</li>
+            <li>Île-de-France (91)</li>
+            <li>linkedin.com/in/kenny-desaintfuscien-41a3451a4</li>
+            <li>kenny.quest</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Support</h3>
+          <div class="cv-skill-row"><span>Support N1/N2</span><span>92%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:92%"></div></div>
+          <div class="cv-skill-row"><span>Déploiement Windows</span><span>88%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:88%"></div></div>
+          <div class="cv-skill-row"><span>Active Directory</span><span>80%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:80%"></div></div>
+          <div class="cv-skill-row"><span>Ticketing</span><span>90%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:90%"></div></div>
+          <div class="cv-skill-row"><span>Chiffrement</span><span>85%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:85%"></div></div>
+        </div>
+        <div>
+          <h3>Système</h3>
+          <div class="cv-skill-row"><span>Windows Server</span><span>45%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:45%"></div></div>
+          <div class="cv-skill-row"><span>PowerShell</span><span>40%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:40%"></div></div>
+          <div class="cv-skill-row"><span>Linux</span><span>35%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:35%"></div></div>
+        </div>
+        <div>
+          <h3>Réseau</h3>
+          <div class="cv-skill-row"><span>TCP/IP, DNS, DHCP</span><span>20%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:20%"></div></div>
+          <div class="cv-skill-row"><span>Diagnostic réseau</span><span>25%</span></div>
+          <div class="cv-skill-track"><div class="cv-skill-fill" style="width:25%"></div></div>
+        </div>
+        <div>
+          <h3>Langues</h3>
+          <div class="cv-lang-row"><span>Français</span><span>Natif</span></div>
+          <div class="cv-lang-row"><span>Anglais</span><span>Courant</span></div>
+        </div>
+      </div>
+      <div class="cv-main">
+        <div class="cv-header">
+          <h1>Kenny Desaintfuscien</h1>
+          <h2>Référent Informatique — Econocom</h2>
+          <p>Technicien IT autodidacte en environnement sensible. Passé d'équipier McDonald's à Référent Informatique en un an. Plus de 5 000 tickets traités, 6 projets en ligne, formation continue en administration système.</p>
+        </div>
+        <div class="cv-section">
+          <h3>Expérience</h3>
+          <div class="cv-exp-item">
+            <p class="cv-exp-date">Mai 2026 — Présent</p>
+            <p class="cv-exp-role">Référent Informatique</p>
+            <p class="cv-exp-company">Econocom — Milieu sensible</p>
+            <ul class="cv-exp-bullets">
+              <li>Point de contact technique unique pour l'équipe IT sur site sensible</li>
+              <li>Prise en charge des escalades et incidents complexes hors portée N1</li>
+              <li>Formation et accompagnement des techniciens juniors</li>
+              <li>Coordination avec les équipes sécurité et infrastructure</li>
+            </ul>
+          </div>
+          <div class="cv-exp-item">
+            <p class="cv-exp-date">Mai 2025 — Mai 2026 · 1 an</p>
+            <p class="cv-exp-role">Technicien Support IT</p>
+            <p class="cv-exp-company">Econocom — Milieu sensible</p>
+            <ul class="cv-exp-bullets">
+              <li>Traitement de 5 000+ tickets (N1/N2) en environnement contrôlé</li>
+              <li>Déploiement et configuration de postes Windows</li>
+              <li>Gestion des comptes utilisateurs via Active Directory</li>
+              <li>Maintenance préventive et curative du parc informatique</li>
+            </ul>
+          </div>
+          <div class="cv-exp-item">
+            <p class="cv-exp-date">Sep 2023 — Avr 2024 · 8 mois</p>
+            <p class="cv-exp-role">Manager</p>
+            <p class="cv-exp-company">McDonald's — Les Ulis</p>
+            <ul class="cv-exp-bullets">
+              <li>Management d'une équipe de 10+ personnes en flux tendu</li>
+              <li>Formation, planning et suivi des performances</li>
+            </ul>
+          </div>
+        </div>
+        <div class="cv-section">
+          <h3>Projets</h3>
+          <div class="cv-proj-row"><span class="cv-proj-name">KV2</span><span class="cv-proj-desc">Outil interne de gestion des comptes utilisateurs — Econocom</span></div>
+          <div class="cv-proj-row"><span class="cv-proj-name">STOCKV2</span><span class="cv-proj-desc">Suivi des entrées/sorties de matériel IT — Econocom</span></div>
+          <div class="cv-proj-row"><span class="cv-proj-name">SYS://ADMIN</span><span class="cv-proj-desc">Plateforme de formation sysadmin — sysops.cool</span></div>
+          <div class="cv-proj-row"><span class="cv-proj-name">Lettre Magique</span><span class="cv-proj-desc">SaaS génération de courriers IA — lettre-magique.com</span></div>
+          <div class="cv-proj-row"><span class="cv-proj-name">kenny.quest</span><span class="cv-proj-desc">Portfolio personnel HTML/CSS/JS — kenny.quest</span></div>
+          <div class="cv-proj-row"><span class="cv-proj-name">Deviso</span><span class="cv-proj-desc">Logiciel de devis pour freelances — deviso.app</span></div>
+        </div>
+        <div class="cv-section">
+          <h3>Formation</h3>
+          <div class="cv-edu-item">
+            <strong>Auto-formation continue</strong> — <em>Microsoft Learn · Ressources IT en ligne</em>
+            <small>Labos virtuels Windows Server et Active Directory. Depuis 2024.</small>
+          </div>
+          <div class="cv-edu-item">
+            <strong>Baccalauréat Professionnel</strong> — <em>Lycée l'Initiative</em>
+            <small>Communication Visuelle Plurimédia. 2016 — 2019.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
