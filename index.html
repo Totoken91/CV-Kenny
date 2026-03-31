@@ -1233,6 +1233,96 @@
       display: inline-block;
       transition: transform 0.15s ease-out;
     }
+
+    /* ── PRINT STYLESHEET ──────────────────────────────── */
+    @media print {
+      /* Reset everything to clean black on white */
+      *, *::before, *::after { background: transparent !important; color: #000 !important; text-shadow: none !important; box-shadow: none !important; animation: none !important; transition: none !important; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.5; background: #fff !important; }
+
+      /* Hide all decorative/interactive elements */
+      nav, #cursor, #cursor-dot, #boot-overlay, #global-scanline, #scroll-progress, #access-granted,
+      #particle-canvas, .hero-prompt, .hero-cta, .hero-photo-wrap, .crt-frame, .crt-glitch, .crt-corner, .crt-status,
+      .contact-terminal, .contact-links, footer, #lumon-overlay,
+      body::before, body::after, #hero::before, .hero-lastname::before, .hero-lastname::after { display: none !important; }
+
+      /* Force all reveals visible */
+      .reveal, .reveal-left, .reveal-right, .reveal-clip, .reveal-scale { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+
+      /* Layout */
+      section { max-width: 100% !important; padding: 1.5rem 0 !important; margin: 0 !important; page-break-inside: avoid; }
+      #hero { min-height: auto !important; padding: 1rem 0 !important; }
+
+      /* Hero — name and title */
+      .hero-name { font-size: 24pt !important; }
+      .hero-firstname, .hero-lastname, .hero-lastname .accent { font-size: 24pt !important; color: #000 !important; }
+      .hero-title { font-size: 12pt !important; color: #444 !important; margin-top: 0.3rem !important; }
+      .hero-manifesto { border-left: 2px solid #333 !important; padding-left: 0.8rem !important; font-size: 10pt !important; color: #333 !important; margin-top: 0.8rem !important; }
+      .blink { display: none !important; }
+
+      /* Section titles */
+      .section-label { color: #999 !important; font-size: 8pt !important; }
+      .section-title { font-size: 16pt !important; margin-bottom: 1rem !important; }
+      .section-title::after { background: #333 !important; height: 1px !important; }
+
+      /* About */
+      #about .about-grid { display: block !important; }
+      .terminal-box { border: 1px solid #ddd !important; padding: 1rem !important; margin-bottom: 1rem !important; }
+      .terminal-box::before { display: none !important; }
+      .terminal-box p { font-size: 10pt !important; color: #333 !important; opacity: 1 !important; }
+      .green { color: #0066cc !important; }
+      .amber { color: #cc6600 !important; }
+      .stat-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 0 !important; border: 1px solid #ddd !important; margin-top: 0.5rem !important; }
+      .stat-item { padding: 0.6rem 0.3rem !important; border-right: 1px solid #eee !important; }
+      .stat-number { font-size: 14pt !important; color: #0066cc !important; }
+      .stat-label { font-size: 7pt !important; color: #666 !important; }
+
+      /* Skills */
+      #skills .skills-grid { display: block !important; }
+      .skill-category { border: 1px solid #ddd !important; padding: 0.8rem !important; margin-bottom: 0.8rem !important; page-break-inside: avoid; }
+      .skill-cat-title { font-size: 9pt !important; color: #cc6600 !important; margin-bottom: 0.5rem !important; }
+      .skill-bar { margin-bottom: 0.4rem !important; }
+      .skill-bar-header { font-size: 9pt !important; }
+      .skill-bar-header span:last-child { color: #666 !important; }
+      .skill-track { height: 4px !important; background: #eee !important; }
+      .skill-fill { background: #0066cc !important; box-shadow: none !important; }
+      .skill-tags { margin-top: 0.3rem !important; }
+      .tag { font-size: 7pt !important; border-color: #ccc !important; padding: 0.1rem 0.4rem !important; }
+
+      /* Experience */
+      .timeline::before { background: #ccc !important; }
+      .timeline-item { page-break-inside: avoid; margin-bottom: 1rem !important; }
+      .timeline-item::before { background: #0066cc !important; box-shadow: none !important; }
+      .timeline-date { color: #cc6600 !important; font-size: 8pt !important; }
+      .timeline-role { font-size: 12pt !important; }
+      .timeline-company { color: #0066cc !important; font-size: 9pt !important; }
+      .timeline-bullets li { font-size: 9pt !important; color: #333 !important; opacity: 1 !important; }
+      .timeline-bullets li::before { color: #0066cc !important; }
+
+      /* Projects */
+      #projects .projects-grid { display: block !important; }
+      .project-card { border: 1px solid #ddd !important; padding: 0.8rem !important; margin-bottom: 0.6rem !important; page-break-inside: avoid; }
+      .project-card::before { display: none !important; }
+      .project-number { font-size: 7pt !important; color: #999 !important; }
+      .project-name { font-size: 11pt !important; }
+      .project-desc { font-size: 9pt !important; color: #333 !important; }
+      .project-stack span { font-size: 7pt !important; border: 1px solid #ccc !important; color: #555 !important; background: transparent !important; }
+      .project-links { margin-top: 0.3rem !important; }
+      .project-link { font-size: 8pt !important; color: #0066cc !important; }
+
+      /* Education */
+      .edu-item { border: 1px solid #ddd !important; padding: 0.8rem !important; margin-bottom: 0.6rem !important; page-break-inside: avoid; }
+      .edu-year { font-size: 14pt !important; color: #0066cc !important; opacity: 1 !important; }
+      .edu-degree { font-size: 11pt !important; }
+      .edu-school { color: #0066cc !important; font-size: 9pt !important; }
+      .edu-desc { font-size: 9pt !important; color: #333 !important; }
+
+      /* Contact — show email as text */
+      #contact { text-align: left !important; }
+
+      /* Footer with URL */
+      @page { margin: 1.5cm; }
+    }
   </style>
 </head>
 <body>
@@ -1290,6 +1380,7 @@
       <div class="hero-cta">
         <a href="#projects" class="btn">Voir les projets</a>
         <a href="#contact" class="btn btn-ghost">Me contacter</a>
+        <a href="#" class="btn btn-ghost" id="dl-cv">Télécharger CV</a>
       </div>
       </div><!-- /hero-text -->
 
@@ -2012,6 +2103,17 @@
       navLinks.forEach(a => {
         a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
       });
+    });
+
+    // ── 19b. DOWNLOAD CV (print) ──
+    var dlBtn = document.getElementById('dl-cv');
+    if (dlBtn) dlBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Force all skill bars to their target width before printing
+      document.querySelectorAll('.skill-fill').forEach(function(bar) { bar.style.width = bar.dataset.width + '%'; });
+      // Force all reveals visible
+      document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-clip,.reveal-scale').forEach(function(el) { el.classList.add('visible'); });
+      window.print();
     });
 
     // ── 19. HAMBURGER MENU ──
