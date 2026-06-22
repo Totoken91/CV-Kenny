@@ -354,11 +354,35 @@
 
     @media (max-width: 768px) {
       .hero-inner {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.75rem;
+        padding-top: 0;
+        text-align: center;
       }
-      .hero-photo-wrap { width: 180px; height: 200px; justify-self: center; }
+      /* flatten so photo can sit between title and manifesto */
+      .hero-text { display: contents; }
+      .hero-prompt { order: 1; margin-bottom: 0; }
+      .hero-name { order: 2; }
+      .hero-firstname { font-size: clamp(2.2rem, 11vw, 3rem); }
+      .hero-lastname { font-size: clamp(1.7rem, 8.5vw, 2.4rem); }
+      .hero-title { order: 3; margin-top: 0; }
+      .hero-photo-wrap {
+        order: 4;
+        width: 210px;
+        height: 240px;
+        align-self: center;
+        margin: 0.25rem 0;
+      }
+      .hero-manifesto {
+        order: 5;
+        margin: 0 auto;
+        max-width: 38ch;
+        text-align: left;
+      }
+      .hero-cta { order: 6; margin-top: 0.5rem; }
+      .crt-status { text-align: center; }
     }
 
     .hero-prompt {
@@ -912,12 +936,12 @@
       .nav-uptime { font-size: 0.55rem; letter-spacing: 0.04em; }
       .sound-toggle, .mode-toggle { font-size: 0.55rem; padding: 0.2rem 0.4rem; }
       #hero { padding: 5.5rem 1rem 2rem; justify-content: flex-start; }
-      .hero-inner { gap: 1.5rem; }
       #about .about-grid { grid-template-columns: 1fr; }
       #education .edu-item { grid-template-columns: 1fr; }
       .edu-year { writing-mode: horizontal-tb; transform: none; font-size: 1rem; }
       section { padding: 4rem 1.5rem; }
-      .hero-cta { flex-direction: column; align-items: flex-start; }
+      .hero-cta { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+      .hero-cta .btn { width: 100%; text-align: center; box-sizing: border-box; }
       .contact-terminal { margin: 1.5rem 0.5rem 0; }
     }
 
