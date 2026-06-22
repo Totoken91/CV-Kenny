@@ -336,7 +336,7 @@
       opacity: 0.6;
     }
 
-    /* ── PORTRAIT DECONSTRUCT / RECONSTRUCT FX ── */
+    /* ── PORTRAIT DISINTEGRATION WAVE FX ── */
     .crt-particles {
       position: absolute;
       inset: 0;
@@ -347,8 +347,6 @@
       display: none;
     }
     .crt-frame.fx-on .crt-particles { display: block; }
-    .crt-frame.fx-on img { opacity: 0; }
-    .crt-frame { cursor: pointer; }
 
 
     @keyframes scanline-move {
@@ -2650,17 +2648,16 @@
     }
 
     /* ═══════════════════════════════════════════════════════
-       PORTRAIT DECONSTRUCT / RECONSTRUCT FX
-       Samples the portrait into a particle grid, then explodes
-       and re-assembles it on hover / tap / interval. Adapts its
-       tint to the active theme (full colour in clean mode,
-       phosphor-grey in CRT mode) and bows out for reduced-motion.
+       PORTRAIT DISINTEGRATION WAVE
+       A slow, perpetual wave sweeps diagonally across the
+       portrait: cells lift off and drift as the crest passes,
+       then settle back onto the crisp photo behind it. Tint
+       adapts to the theme; pauses off-screen / reduced-motion.
        ═══════════════════════════════════════════════════════ */
     (function portraitFX(){
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var frame  = document.querySelector('.crt-frame');
       var img    = frame && frame.querySelector('img');
-      var status = document.querySelector('.crt-status');
       if (!frame || !img || reduce) return;
 
       var canvas = document.createElement('canvas');
@@ -2670,7 +2667,7 @@
       if (!ctx) return;
 
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var W = 0, H = 0, cx = 0, cy = 0, cellW = 0, cellH = 0, maxLen = 1;
+      var W = 0, H = 0, cellW = 0, cellH = 0, amp = 0;
       var particles = [];
       var ready = false;
 
@@ -2689,31 +2686,15 @@
         }
       }
 
-      function assignScatter(){
-        for (var i=0;i<particles.length;i++){
-          var p = particles[i];
-          var nx = p.hx - cx, ny = p.hy - cy;
-          var len = Math.hypot(nx, ny) || 1;
-          var ux = nx/len, uy = ny/len;
-          var a  = 0.5 + Math.random()*0.6;            // swirl
-          var ca = Math.cos(a), sa = Math.sin(a);
-          var sx = ux*ca - uy*sa, sy = ux*sa + uy*ca;
-          var push = (0.45 + Math.random()*0.95) * Math.max(W,H);
-          p.tx = p.hx + sx*push + (Math.random()-0.5)*W*0.35;
-          p.ty = p.hy + sy*push + (Math.random()-0.5)*H*0.35;
-          p.delay = (len/maxLen) * 0.35 + Math.random()*0.10;
-        }
-      }
-
       function build(){
         var rect = frame.getBoundingClientRect();
         W = Math.max(1, Math.round(rect.width));
         H = Math.max(1, Math.round(rect.height));
         if (W < 8 || H < 8) return false;
-        cx = W/2; cy = H/2;
         canvas.width = W*dpr; canvas.height = H*dpr;
         canvas.style.width = W+'px'; canvas.style.height = H+'px';
         ctx.setTransform(dpr,0,0,dpr,0,0);
+        amp = Math.max(W,H) * 0.16;
 
         // mirror object-fit:cover + object-position:center top
         var off = document.createElement('canvas');
@@ -2727,141 +2708,112 @@
         try { data = octx.getImageData(0,0,W,H).data; }
         catch(e){ return false; }
 
-        var cols = Math.max(22, Math.min(46, Math.round(W/7)));
+        var cols = Math.max(26, Math.min(54, Math.round(W/6)));
         cellW = W/cols;
         var rows = Math.max(1, Math.round(H/cellW));
         cellH = H/rows;
         particles = [];
-        maxLen = Math.hypot(cx, cy) || 1;
         for (var r=0;r<rows;r++){
           for (var c=0;c<cols;c++){
             var sxp = Math.min(W-1, Math.floor(c*cellW + cellW/2));
             var syp = Math.min(H-1, Math.floor(r*cellH + cellH/2));
             var idx = (syp*W + sxp)*4;
+            // diagonal wave coordinate (top-left -> bottom-right)
+            var u = 0.5*(c*cellW)/W + 0.5*(r*cellH)/H;
+            // drift direction: biased upward + a little outward, per-cell jitter
+            var theta = -Math.PI/2 + (Math.random()-0.5)*1.7;
             particles.push({
               hx: c*cellW, hy: r*cellH,
               r: data[idx], g: data[idx+1], b: data[idx+2],
-              tx: 0, ty: 0, delay: 0, color: '#000'
+              color: '#000',
+              u: u + (Math.random()-0.5)*0.05,
+              dx: Math.cos(theta), dy: Math.sin(theta),
+              ph: Math.random()*Math.PI*2,
+              sp: 0.7 + Math.random()*0.6
             });
           }
         }
         recolor();
-        assignScatter();
         ready = true;
         return true;
       }
 
-      function easeOutCubic(t){ return 1 - Math.pow(1-t, 3); }
-      function easeInCubic(t){ return t*t*t; }
+      // ── wave timing ──
+      var WIDTH   = 0.16;     // crest half-width (in u units)
+      var SWEEP   = 7200;     // ms for one diagonal pass
+      var GAP     = 2600;     // ms fully-composed pause between passes
+      var TOTAL   = SWEEP + GAP;
+      var travel  = 1 + WIDTH*2;          // -WIDTH .. 1+WIDTH
 
-      var SPAN = 1 - 0.40;          // stagger denominator
-      var DUR_OUT = 820, DUR_HOLD = 150, DUR_IN = 1060;
-      var phase = 'idle', t0 = 0, rafId = 0;
+      var boost = 0, boostTarget = 0;     // hover intensifier
+      var startTs = 0, rafId = 0, running = false;
 
-      function draw(progress, dir){
+      function frameDraw(ts){
+        if (!startTs) startTs = ts;
+        var t = (ts - startTs) / 1000;
+        var cyc = ((ts - startTs) % TOTAL) / SWEEP;          // 0..>1 (>1 during gap)
+        var center = cyc <= 1 ? (cyc * travel - WIDTH) : 99;  // off-canvas during gap
+        boost += (boostTarget - boost) * 0.08;
+        var curAmp = amp * (1 + boost*0.9);
+        var glow = isClean() ? '255,255,255' : '120,255,150';
+
         ctx.clearRect(0,0,W,H);
-        var sz = Math.ceil(Math.max(cellW, cellH)) + 1;
-        var bY1 = -1, bY2 = -1, bOff = 0;
-        if (Math.random() < 0.5){             // datamosh glitch band
-          bY1 = Math.random()*H; bY2 = bY1 + 6 + Math.random()*22;
-          bOff = (Math.random()-0.5) * 26;
-        }
+        var hsz = Math.ceil(Math.max(cellW, cellH)) + 1;
+
         for (var i=0;i<particles.length;i++){
           var p = particles[i];
-          var local = (progress - p.delay) / SPAN;
-          if (local < 0) local = 0; else if (local > 1) local = 1;
-          var e, x, y, alpha;
-          if (dir === 'out'){
-            e = easeInCubic(local);
-            x = p.hx + (p.tx - p.hx)*e;
-            y = p.hy + (p.ty - p.hy)*e;
-            alpha = 1 - e*0.85;
-          } else {
-            e = easeOutCubic(local);
-            x = p.tx + (p.hx - p.tx)*e;
-            y = p.ty + (p.hy - p.ty)*e;
-            alpha = 0.15 + e*0.85;
-          }
-          if (bY1 >= 0 && y >= bY1 && y <= bY2) x += bOff;
-          ctx.globalAlpha = alpha;
+          var dd = (p.u - center) / WIDTH;
+          var inten = Math.exp(-dd*dd);
+          if (inten < 0.025) continue;
+
+          // 1) darken the vacated home cell
+          ctx.globalAlpha = inten * (isClean() ? 0.5 : 0.85);
+          ctx.fillStyle = isClean() ? '#0a0d12' : '#04070a';
+          ctx.fillRect(p.hx - 0.5, p.hy - 0.5, hsz, hsz);
+
+          // 2) draw the lifted, drifting cell
+          var lift = inten * curAmp * p.sp * (1 + 0.25*Math.sin(t*2.2 + p.ph));
+          var sway = inten * 4 * Math.sin(t*1.6 + p.ph);
+          var x = p.hx + p.dx*lift + sway;
+          var y = p.hy + p.dy*lift;
+          ctx.globalAlpha = Math.min(1, inten*1.05);
           ctx.fillStyle = p.color;
-          ctx.fillRect(x, y, sz, sz);
+          ctx.fillRect(x, y, hsz, hsz);
+
+          // 3) energised glint near the crest
+          if (inten > 0.55){
+            ctx.globalAlpha = (inten-0.55) * 0.9;
+            ctx.fillStyle = 'rgba('+glow+',1)';
+            ctx.fillRect(x + hsz*0.25, y + hsz*0.25, hsz*0.5, hsz*0.5);
+          }
         }
         ctx.globalAlpha = 1;
+        rafId = requestAnimationFrame(frameDraw);
       }
 
-      function setStatus(txt){
-        if (status && status.firstChild) status.firstChild.nodeValue = txt;
-      }
+      function play(){ if (!running && ready){ running = true; startTs = 0; rafId = requestAnimationFrame(frameDraw); } }
+      function stop(){ running = false; if (rafId){ cancelAnimationFrame(rafId); rafId = 0; } }
 
-      function finish(){
-        phase = 'idle'; t0 = 0;
-        if (rafId){ cancelAnimationFrame(rafId); rafId = 0; }
-        frame.classList.remove('fx-on');   // crisp <img> revealed instantly
-        ctx.clearRect(0,0,W,H);
-        if (status && status._orig !== undefined) setStatus(status._orig);
-      }
-
-      function loop(ts){
-        if (!t0) t0 = ts;
-        var el = ts - t0;
-        if (phase === 'out'){
-          var go = el/DUR_OUT;
-          if (go >= 1){ phase = 'hold'; t0 = ts; draw(1,'out'); rafId = requestAnimationFrame(loop); return; }
-          draw(go,'out');
-          rafId = requestAnimationFrame(loop); return;
-        }
-        if (phase === 'hold'){
-          if (el >= DUR_HOLD){ phase = 'in'; t0 = ts; setStatus('RECONSTRUCT '); }
-          draw(1,'out');
-          rafId = requestAnimationFrame(loop); return;
-        }
-        if (phase === 'in'){
-          var gi = el/DUR_IN;
-          draw(gi,'in');
-          ctx.globalAlpha = 0.22*(1-gi);     // reconstruction sweep line
-          ctx.fillStyle = isClean() ? '#4a9fff' : '#00ff41';
-          ctx.fillRect(0, (1-easeOutCubic(Math.min(gi,1)))*H - 1, W, 2);
-          ctx.globalAlpha = 1;
-          if (gi >= 1){ finish(); return; }
-          rafId = requestAnimationFrame(loop); return;
-        }
-      }
-
-      function start(mode){            // 'cycle' | 'reform'
-        if (phase !== 'idle') return;
-        if (!ready && !build()) return;
+      // ── lifecycle ──
+      function startFX(){
+        if (!ready && !build()) return;     // fall back to crisp <img>
         frame.classList.add('fx-on');
-        if (status && status._orig === undefined){
-          status._orig = status.firstChild ? status.firstChild.nodeValue : 'SIGNAL OK';
-        }
-        recolor();
-        t0 = 0;
-        if (mode === 'reform'){
-          setStatus('RECONSTRUCT ');
-          phase = 'in';
-        } else {
-          assignScatter();
-          setStatus('DECONSTRUCT ');
-          phase = 'out';
-        }
-        rafId = requestAnimationFrame(loop);
+        play();
       }
 
-      // ── triggers ──
+      // hover gently intensifies the wave
       if (window.matchMedia('(pointer: fine)').matches){
-        frame.addEventListener('mouseenter', function(){ start('cycle'); });
+        frame.addEventListener('mouseenter', function(){ boostTarget = 1; });
+        frame.addEventListener('mouseleave', function(){ boostTarget = 0; });
       }
-      frame.addEventListener('click', function(){ start('cycle'); });
 
+      // pause when off-screen or tab hidden
       var visible = true;
+      function sync(){ (visible && !document.hidden && ready) ? play() : stop(); }
       if ('IntersectionObserver' in window){
-        visible = false;
-        new IntersectionObserver(function(es){ visible = es[0].isIntersecting; }, {threshold:0.25}).observe(frame);
+        new IntersectionObserver(function(es){ visible = es[0].isIntersecting; sync(); }, {threshold:0.1}).observe(frame);
       }
-      setInterval(function(){
-        if (visible && !document.hidden && phase === 'idle') start('cycle');
-      }, 9000);
+      document.addEventListener('visibilitychange', sync);
 
       if ('MutationObserver' in window){
         new MutationObserver(function(){ if (ready) recolor(); })
@@ -2871,12 +2823,14 @@
       var rt;
       window.addEventListener('resize', function(){
         clearTimeout(rt);
-        rt = setTimeout(function(){ if (phase === 'idle'){ ready = false; build(); } }, 250);
+        rt = setTimeout(function(){
+          var wasRunning = running; stop(); ready = false;
+          if (build() && wasRunning) play();
+        }, 250);
       });
 
-      function entrance(){ if (build()) start('reform'); }
-      if (img.complete && img.naturalWidth){ setTimeout(entrance, 500); }
-      else { img.addEventListener('load', function(){ setTimeout(entrance, 250); }); }
+      if (img.complete && img.naturalWidth){ setTimeout(startFX, 400); }
+      else { img.addEventListener('load', function(){ setTimeout(startFX, 250); }); }
     })();
 
 
