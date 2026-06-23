@@ -347,6 +347,7 @@
       display: none;
     }
     .crt-frame.fx-on .crt-particles { display: block; }
+    .crt-frame.fx-on img { opacity: 0; }
 
 
     @keyframes scanline-move {
@@ -2647,193 +2648,6 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════
-       PORTRAIT DISINTEGRATION WAVE
-       A slow, perpetual wave sweeps diagonally across the
-       portrait: cells lift off and drift as the crest passes,
-       then settle back onto the crisp photo behind it. Tint
-       adapts to the theme; pauses off-screen / reduced-motion.
-       ═══════════════════════════════════════════════════════ */
-    (function portraitFX(){
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var frame  = document.querySelector('.crt-frame');
-      var img    = frame && frame.querySelector('img');
-      if (!frame || !img || reduce) return;
-
-      var canvas = document.createElement('canvas');
-      canvas.className = 'crt-particles';
-      frame.appendChild(canvas);
-      var ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var W = 0, H = 0, cellW = 0, cellH = 0, amp = 0;
-      var particles = [];
-      var ready = false;
-
-      function isClean(){ return document.body.classList.contains('clean-mode'); }
-
-      function recolor(){
-        var clean = isClean();
-        for (var i=0;i<particles.length;i++){
-          var p = particles[i];
-          if (clean){
-            p.color = 'rgb('+p.r+','+p.g+','+p.b+')';
-          } else {
-            var l = (0.299*p.r + 0.587*p.g + 0.114*p.b) * 0.85;
-            p.color = 'rgb('+((l*0.25)|0)+','+(Math.min(255,l*1.06)|0)+','+((l*0.32)|0)+')';
-          }
-        }
-      }
-
-      function build(){
-        var rect = frame.getBoundingClientRect();
-        W = Math.max(1, Math.round(rect.width));
-        H = Math.max(1, Math.round(rect.height));
-        if (W < 8 || H < 8) return false;
-        canvas.width = W*dpr; canvas.height = H*dpr;
-        canvas.style.width = W+'px'; canvas.style.height = H+'px';
-        ctx.setTransform(dpr,0,0,dpr,0,0);
-        amp = Math.max(W,H) * 0.16;
-
-        // mirror object-fit:cover + object-position:center top
-        var off = document.createElement('canvas');
-        off.width = W; off.height = H;
-        var octx = off.getContext('2d');
-        var nw = img.naturalWidth || W, nh = img.naturalHeight || H;
-        var scale = Math.max(W/nw, H/nh);
-        var dw = nw*scale, dh = nh*scale;
-        octx.drawImage(img, (W-dw)/2, 0, dw, dh);
-        var data;
-        try { data = octx.getImageData(0,0,W,H).data; }
-        catch(e){ return false; }
-
-        var cols = Math.max(26, Math.min(54, Math.round(W/6)));
-        cellW = W/cols;
-        var rows = Math.max(1, Math.round(H/cellW));
-        cellH = H/rows;
-        particles = [];
-        for (var r=0;r<rows;r++){
-          for (var c=0;c<cols;c++){
-            var sxp = Math.min(W-1, Math.floor(c*cellW + cellW/2));
-            var syp = Math.min(H-1, Math.floor(r*cellH + cellH/2));
-            var idx = (syp*W + sxp)*4;
-            // diagonal wave coordinate (top-left -> bottom-right)
-            var u = 0.5*(c*cellW)/W + 0.5*(r*cellH)/H;
-            // drift direction: biased upward + a little outward, per-cell jitter
-            var theta = -Math.PI/2 + (Math.random()-0.5)*1.7;
-            particles.push({
-              hx: c*cellW, hy: r*cellH,
-              r: data[idx], g: data[idx+1], b: data[idx+2],
-              color: '#000',
-              u: u + (Math.random()-0.5)*0.05,
-              dx: Math.cos(theta), dy: Math.sin(theta),
-              ph: Math.random()*Math.PI*2,
-              sp: 0.7 + Math.random()*0.6
-            });
-          }
-        }
-        recolor();
-        ready = true;
-        return true;
-      }
-
-      // ── wave timing ──
-      var WIDTH   = 0.16;     // crest half-width (in u units)
-      var SWEEP   = 7200;     // ms for one diagonal pass
-      var GAP     = 2600;     // ms fully-composed pause between passes
-      var TOTAL   = SWEEP + GAP;
-      var travel  = 1 + WIDTH*2;          // -WIDTH .. 1+WIDTH
-
-      var boost = 0, boostTarget = 0;     // hover intensifier
-      var startTs = 0, rafId = 0, running = false;
-
-      function frameDraw(ts){
-        if (!startTs) startTs = ts;
-        var t = (ts - startTs) / 1000;
-        var cyc = ((ts - startTs) % TOTAL) / SWEEP;          // 0..>1 (>1 during gap)
-        var center = cyc <= 1 ? (cyc * travel - WIDTH) : 99;  // off-canvas during gap
-        boost += (boostTarget - boost) * 0.08;
-        var curAmp = amp * (1 + boost*0.9);
-        var glow = isClean() ? '255,255,255' : '120,255,150';
-
-        ctx.clearRect(0,0,W,H);
-        var hsz = Math.ceil(Math.max(cellW, cellH)) + 1;
-
-        for (var i=0;i<particles.length;i++){
-          var p = particles[i];
-          var dd = (p.u - center) / WIDTH;
-          var inten = Math.exp(-dd*dd);
-          if (inten < 0.025) continue;
-
-          // 1) darken the vacated home cell
-          ctx.globalAlpha = inten * (isClean() ? 0.5 : 0.85);
-          ctx.fillStyle = isClean() ? '#0a0d12' : '#04070a';
-          ctx.fillRect(p.hx - 0.5, p.hy - 0.5, hsz, hsz);
-
-          // 2) draw the lifted, drifting cell
-          var lift = inten * curAmp * p.sp * (1 + 0.25*Math.sin(t*2.2 + p.ph));
-          var sway = inten * 4 * Math.sin(t*1.6 + p.ph);
-          var x = p.hx + p.dx*lift + sway;
-          var y = p.hy + p.dy*lift;
-          ctx.globalAlpha = Math.min(1, inten*1.05);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(x, y, hsz, hsz);
-
-          // 3) energised glint near the crest
-          if (inten > 0.55){
-            ctx.globalAlpha = (inten-0.55) * 0.9;
-            ctx.fillStyle = 'rgba('+glow+',1)';
-            ctx.fillRect(x + hsz*0.25, y + hsz*0.25, hsz*0.5, hsz*0.5);
-          }
-        }
-        ctx.globalAlpha = 1;
-        rafId = requestAnimationFrame(frameDraw);
-      }
-
-      function play(){ if (!running && ready){ running = true; startTs = 0; rafId = requestAnimationFrame(frameDraw); } }
-      function stop(){ running = false; if (rafId){ cancelAnimationFrame(rafId); rafId = 0; } }
-
-      // ── lifecycle ──
-      function startFX(){
-        if (!ready && !build()) return;     // fall back to crisp <img>
-        frame.classList.add('fx-on');
-        play();
-      }
-
-      // hover gently intensifies the wave
-      if (window.matchMedia('(pointer: fine)').matches){
-        frame.addEventListener('mouseenter', function(){ boostTarget = 1; });
-        frame.addEventListener('mouseleave', function(){ boostTarget = 0; });
-      }
-
-      // pause when off-screen or tab hidden
-      var visible = true;
-      function sync(){ (visible && !document.hidden && ready) ? play() : stop(); }
-      if ('IntersectionObserver' in window){
-        new IntersectionObserver(function(es){ visible = es[0].isIntersecting; sync(); }, {threshold:0.1}).observe(frame);
-      }
-      document.addEventListener('visibilitychange', sync);
-
-      if ('MutationObserver' in window){
-        new MutationObserver(function(){ if (ready) recolor(); })
-          .observe(document.body, { attributes:true, attributeFilter:['class'] });
-      }
-
-      var rt;
-      window.addEventListener('resize', function(){
-        clearTimeout(rt);
-        rt = setTimeout(function(){
-          var wasRunning = running; stop(); ready = false;
-          if (build() && wasRunning) play();
-        }, 250);
-      });
-
-      if (img.complete && img.naturalWidth){ setTimeout(startFX, 400); }
-      else { img.addEventListener('load', function(){ setTimeout(startFX, 250); }); }
-    })();
-
-
     } // end initAll
   </script>
 
@@ -2930,6 +2744,143 @@
       </div>
     </div>
   </div>
+
+  <!-- ── PORTRAIT DISINTEGRATION WAVE (standalone, self-contained) ── -->
+  <script>
+  (function(){
+    function init(){
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var frame  = document.querySelector('#hero .crt-frame') || document.querySelector('.crt-frame');
+      var img    = frame && frame.querySelector('img');
+      if (!frame || !img || reduce) return;
+
+      var canvas = document.createElement('canvas');
+      canvas.className = 'crt-particles';
+      frame.appendChild(canvas);
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var W=0, H=0, cell=0, ch=0, cols=0, rows=0, amp=0;
+      var P=[], ready=false;
+
+      function isClean(){ return document.body.classList.contains('clean-mode'); }
+      function colorOf(p){
+        if (isClean()) return 'rgb('+p.r+','+p.g+','+p.b+')';
+        var l=(0.299*p.r+0.587*p.g+0.114*p.b)*0.9;
+        return 'rgb('+((l*0.22)|0)+','+(Math.min(255,l*1.08)|0)+','+((l*0.30)|0)+')';
+      }
+      function recolor(){ for (var i=0;i<P.length;i++) P[i].color=colorOf(P[i]); }
+
+      function build(){
+        var rect=frame.getBoundingClientRect();
+        W=Math.max(1,Math.round(rect.width)); H=Math.max(1,Math.round(rect.height));
+        if (W<8||H<8) return false;
+        canvas.width=W*dpr; canvas.height=H*dpr;
+        canvas.style.width=W+'px'; canvas.style.height=H+'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        amp=Math.max(W,H)*0.22;
+
+        var off=document.createElement('canvas'); off.width=W; off.height=H;
+        var octx=off.getContext('2d');
+        var nw=img.naturalWidth||W, nh=img.naturalHeight||H;
+        var sc=Math.max(W/nw,H/nh);
+        octx.drawImage(img,(W-nw*sc)/2,0,nw*sc,nh*sc);
+        var data; try{ data=octx.getImageData(0,0,W,H).data; }catch(e){ return false; }
+
+        cols=Math.max(28,Math.min(60,Math.round(W/5)));
+        cell=W/cols; rows=Math.max(1,Math.round(H/cell)); ch=H/rows;
+        P=[];
+        for (var r=0;r<rows;r++) for (var c=0;c<cols;c++){
+          var sx=Math.min(W-1,(c*cell+cell/2)|0), sy=Math.min(H-1,(r*ch+ch/2)|0);
+          var k=(sy*W+sx)*4;
+          var th=-Math.PI/2+(Math.random()-0.5)*1.6;
+          P.push({
+            hx:c*cell, hy:r*ch, r:data[k], g:data[k+1], b:data[k+2], color:'#000',
+            u: 0.5*(c/cols)+0.5*(r/rows) + (Math.random()-0.5)*0.04,
+            dx:Math.cos(th), dy:Math.sin(th), ph:Math.random()*6.283, sp:0.7+Math.random()*0.7
+          });
+        }
+        recolor(); ready=true; return true;
+      }
+
+      var WIDTH=0.14, SWEEP=6000, GAP=1400, TOTAL=SWEEP+GAP, travel=1+WIDTH*2;
+      var boost=0, target=0, t0=0, raf=0, running=false;
+
+      function frameDraw(ts){
+        if (!running) return;
+        if (!t0) t0=ts;
+        var sec=(ts-t0)/1000;
+        var cyc=((ts-t0)%TOTAL)/SWEEP;
+        var center = cyc<=1 ? cyc*travel-WIDTH : 99;   // off-canvas during the gap
+        boost+=(target-boost)*0.08;
+        var A=amp*(1+boost*0.8);
+        var glow=isClean()?'255,255,255':'150,255,180';
+        var ov=cell+0.8;
+
+        ctx.clearRect(0,0,W,H);
+        for (var i=0;i<P.length;i++){
+          var p=P[i];
+          var dd=(p.u-center)/WIDTH;
+          var inten=Math.exp(-dd*dd);
+          // gentle, coherent breathing ripple (always alive)
+          var rx=Math.sin(sec*1.1 + p.hy*0.04)*0.9;
+          var ry=Math.cos(sec*0.9 + p.hx*0.045)*0.9;
+          // disintegration lift within the travelling crest
+          var lift=inten*A*p.sp*(1+0.25*Math.sin(sec*2.2+p.ph));
+          var x=p.hx + p.dx*lift + rx + inten*4*Math.sin(sec*3+p.ph);
+          var y=p.hy + p.dy*lift + ry;
+          ctx.globalAlpha=1 - inten*0.12;
+          ctx.fillStyle=p.color;
+          ctx.fillRect(x,y,ov,ov);
+          if (inten>0.5){
+            ctx.globalAlpha=(inten-0.5)*1.3;
+            ctx.fillStyle='rgba('+glow+',1)';
+            ctx.fillRect(x+ov*0.25, y+ov*0.25, ov*0.5, ov*0.5);
+          }
+        }
+        ctx.globalAlpha=1;
+        raf=requestAnimationFrame(frameDraw);
+      }
+
+      function play(){ if (!running && ready){ running=true; t0=0; raf=requestAnimationFrame(frameDraw); } }
+      function stop(){ running=false; if (raf){ cancelAnimationFrame(raf); raf=0; } }
+
+      function startFX(){
+        if (!ready && !build()) return;     // fall back to the crisp <img>
+        frame.classList.add('fx-on');
+        play();
+      }
+
+      if (window.matchMedia('(pointer: fine)').matches){
+        frame.addEventListener('mouseenter', function(){ target=1; });
+        frame.addEventListener('mouseleave', function(){ target=0; });
+      }
+
+      var visible=true;
+      function sync(){ if (visible && !document.hidden && ready) play(); else stop(); }
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(function(es){ visible=es[0].isIntersecting; sync(); }, {threshold:0.05}).observe(frame);
+      }
+      document.addEventListener('visibilitychange', sync);
+      if ('MutationObserver' in window){
+        new MutationObserver(function(){ if (ready) recolor(); })
+          .observe(document.body, { attributes:true, attributeFilter:['class'] });
+      }
+      var rt;
+      window.addEventListener('resize', function(){
+        clearTimeout(rt);
+        rt=setTimeout(function(){ var w=running; stop(); ready=false; if (build() && w) play(); }, 250);
+      });
+
+      if (img.complete && img.naturalWidth) startFX();
+      else img.addEventListener('load', startFX);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
 
 </body>
 </html>
