@@ -2748,6 +2748,7 @@
   <!-- ── PORTRAIT DISINTEGRATION WAVE (standalone, self-contained) ── -->
   <script>
   (function(){
+    function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
     function init(){
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var frame  = document.querySelector('#hero .crt-frame') || document.querySelector('.crt-frame');
@@ -2779,7 +2780,7 @@
         canvas.width=W*dpr; canvas.height=H*dpr;
         canvas.style.width=W+'px'; canvas.style.height=H+'px';
         ctx.setTransform(dpr,0,0,dpr,0,0);
-        amp=Math.max(W,H)*0.22;
+        amp=Math.max(W,H)*0.26;
 
         var off=document.createElement('canvas'); off.width=W; off.height=H;
         var octx=off.getContext('2d');
@@ -2795,38 +2796,55 @@
           var sx=Math.min(W-1,(c*cell+cell/2)|0), sy=Math.min(H-1,(r*ch+ch/2)|0);
           var k=(sy*W+sx)*4;
           var th=-Math.PI/2+(Math.random()-0.5)*1.6;
+          var ang=Math.random()*6.283, dist=(0.55+Math.random()*0.9)*Math.max(W,H);
           P.push({
             hx:c*cell, hy:r*ch, r:data[k], g:data[k+1], b:data[k+2], color:'#000',
             u: 0.5*(c/cols)+0.5*(r/rows) + (Math.random()-0.5)*0.04,
-            dx:Math.cos(th), dy:Math.sin(th), ph:Math.random()*6.283, sp:0.7+Math.random()*0.7
+            dx:Math.cos(th), dy:Math.sin(th), ph:Math.random()*6.283, sp:0.7+Math.random()*0.7,
+            ix:c*cell+Math.cos(ang)*dist, iy:r*ch+Math.sin(ang)*dist
           });
         }
         recolor(); ready=true; return true;
       }
 
-      var WIDTH=0.14, SWEEP=6000, GAP=1400, TOTAL=SWEEP+GAP, travel=1+WIDTH*2;
+      var WIDTH=0.13, SWEEP=4500, travel=1+WIDTH*2, INTRO=1500;
       var boost=0, target=0, t0=0, raf=0, running=false;
+
+      function wInten(u, phase){
+        var c=phase*travel-WIDTH;
+        var d=Math.min(Math.abs(u-c), Math.abs(u-(c-travel)), Math.abs(u-(c+travel)))/WIDTH;
+        return Math.exp(-d*d);
+      }
 
       function frameDraw(ts){
         if (!running) return;
         if (!t0) t0=ts;
-        var sec=(ts-t0)/1000;
-        var cyc=((ts-t0)%TOTAL)/SWEEP;
-        var center = cyc<=1 ? cyc*travel-WIDTH : 99;   // off-canvas during the gap
+        var since=ts-t0, sec=since/1000;
+        var introT=Math.min(1, since/INTRO);
         boost+=(target-boost)*0.08;
         var A=amp*(1+boost*0.8);
         var glow=isClean()?'255,255,255':'150,255,180';
         var ov=cell+0.8;
+        var phase=(sec*1000%SWEEP)/SWEEP, phase2=(phase+0.5)%1;
 
         ctx.clearRect(0,0,W,H);
         for (var i=0;i<P.length;i++){
           var p=P[i];
-          var dd=(p.u-center)/WIDTH;
-          var inten=Math.exp(-dd*dd);
-          // gentle, coherent breathing ripple (always alive)
           var rx=Math.sin(sec*1.1 + p.hy*0.04)*0.9;
           var ry=Math.cos(sec*0.9 + p.hx*0.045)*0.9;
-          // disintegration lift within the travelling crest
+
+          if (introT < 1){
+            // dramatic assemble-from-scatter on load
+            var local=Math.min(1, Math.max(0, (introT - p.u*0.25)/0.75));
+            var e=easeOutCubic(local);
+            var ix=p.ix+(p.hx-p.ix)*e + rx, iy=p.iy+(p.hy-p.iy)*e + ry;
+            ctx.globalAlpha=0.08+0.92*e;
+            ctx.fillStyle=p.color;
+            ctx.fillRect(ix,iy,ov,ov);
+            continue;
+          }
+
+          var inten=Math.max(wInten(p.u,phase), wInten(p.u,phase2));
           var lift=inten*A*p.sp*(1+0.25*Math.sin(sec*2.2+p.ph));
           var x=p.hx + p.dx*lift + rx + inten*4*Math.sin(sec*3+p.ph);
           var y=p.hy + p.dy*lift + ry;
@@ -2845,18 +2863,12 @@
 
       function play(){ if (!running && ready){ running=true; t0=0; raf=requestAnimationFrame(frameDraw); } }
       function stop(){ running=false; if (raf){ cancelAnimationFrame(raf); raf=0; } }
-
-      function startFX(){
-        if (!ready && !build()) return;     // fall back to the crisp <img>
-        frame.classList.add('fx-on');
-        play();
-      }
+      function startFX(){ if (!ready && !build()) return; frame.classList.add('fx-on'); play(); }
 
       if (window.matchMedia('(pointer: fine)').matches){
         frame.addEventListener('mouseenter', function(){ target=1; });
         frame.addEventListener('mouseleave', function(){ target=0; });
       }
-
       var visible=true;
       function sync(){ if (visible && !document.hidden && ready) play(); else stop(); }
       if ('IntersectionObserver' in window){
@@ -2876,7 +2888,6 @@
       if (img.complete && img.naturalWidth) startFX();
       else img.addEventListener('load', startFX);
     }
-
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
   })();
