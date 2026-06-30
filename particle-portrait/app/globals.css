@@ -1,0 +1,26 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: #05070a;
+  color: #e8ffe8;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+.demo-wrap {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 35%, rgba(0,255,65,0.06), transparent 70%),
+    #05070a;
+}
+
+.demo-caption {
+  text-align: center;
+  opacity: 0.55;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+}
