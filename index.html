@@ -2983,9 +2983,20 @@
         uniforms.uTime.value = t;
         uniforms.uFocal.value = renderer.domElement.height / (2 * Math.tan(50 * Math.PI / 360));
         if (t0 === null) t0 = t;
-        const dur = reduce ? 0.6 : 2.4;
-        const p = Math.min(1, (t - t0) / dur);
-        uniforms.uAssembly.value = 1 - Math.pow(1 - p, 3);
+        const elapsed = t - t0;
+        // intro: scattered cloud assembles into the sharp portrait
+        const introDur = reduce ? 0.6 : 2.4;
+        const introEase = 1 - Math.pow(1 - Math.min(1, elapsed / introDur), 3);
+        // automatic "breathing" cycle: stays SHARP, then dissolves, on a loop
+        let disp = 0;
+        if (!reduce) {
+          const CYCLE = 9.0;                 // seconds per net→dissolve→net loop
+          const ph = (Math.max(0, elapsed - introDur) % CYCLE) / CYCLE;
+          // sharp for the first ~55% of the cycle, smooth dissolve for the rest
+          disp = ph < 0.55 ? 0.0 : Math.sin(((ph - 0.55) / 0.45) * Math.PI);
+        }
+        uniforms.uAssembly.value = introEase * (1.0 - 0.72 * disp);  // 1 = net, dips to a loose cloud
+        uniforms.uIdleAmp.value  = reduce ? 0.0 : (0.03 + 0.34 * disp);
         tctx.globalCompositeOperation = 'source-over';
         tctx.fillStyle = 'rgba(0,0,0,0.07)'; tctx.fillRect(0,0,TS,TS);
         trailTex.needsUpdate = true;
