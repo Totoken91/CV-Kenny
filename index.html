@@ -348,6 +348,9 @@
     }
     .crt-frame.fx-on .crt-particles { display: block; }
     .crt-frame.fx-on img { opacity: 0; }
+    /* dark backdrop so the additive particles glow (both themes) */
+    .crt-frame.fx-on { background: #05070a; }
+    .crt-webgl { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 
 
     @keyframes scanline-move {
@@ -2745,153 +2748,276 @@
     </div>
   </div>
 
-  <!-- ── PORTRAIT DISINTEGRATION WAVE (standalone, self-contained) ── -->
-  <script>
+
+
+  <!-- ── PORTRAIT PARTICLES (three.js / WebGL2) ── -->
+  <script type="module">
+  import * as THREE from '/vendor/three.module.min.js';
+
   (function(){
-    function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
-    function init(){
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var frame  = document.querySelector('#hero .crt-frame') || document.querySelector('.crt-frame');
-      var img    = frame && frame.querySelector('img');
-      if (!frame || !img || reduce) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const frame  = document.querySelector('#hero .crt-frame') || document.querySelector('.crt-frame');
+    const img    = frame && frame.querySelector('img');
+    if (!frame || !img) return;
 
-      var canvas = document.createElement('canvas');
-      canvas.className = 'crt-particles';
-      frame.appendChild(canvas);
-      var ctx = canvas.getContext('2d');
-      if (!ctx) return;
+    const PLANE = 6.0, DEPTH = 1.0, THRESH = 34;
 
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var W=0, H=0, cell=0, ch=0, cols=0, rows=0, amp=0;
-      var P=[], ready=false;
-
-      function isClean(){ return document.body.classList.contains('clean-mode'); }
-      function colorOf(p){
-        if (isClean()) return 'rgb('+p.r+','+p.g+','+p.b+')';
-        var l=(0.299*p.r+0.587*p.g+0.114*p.b)*0.9;
-        return 'rgb('+((l*0.22)|0)+','+(Math.min(255,l*1.08)|0)+','+((l*0.30)|0)+')';
-      }
-      function recolor(){ for (var i=0;i<P.length;i++) P[i].color=colorOf(P[i]); }
-
-      function build(){
-        var rect=frame.getBoundingClientRect();
-        W=Math.max(1,Math.round(rect.width)); H=Math.max(1,Math.round(rect.height));
-        if (W<8||H<8) return false;
-        canvas.width=W*dpr; canvas.height=H*dpr;
-        canvas.style.width=W+'px'; canvas.style.height=H+'px';
-        ctx.setTransform(dpr,0,0,dpr,0,0);
-        amp=Math.max(W,H)*0.26;
-
-        var off=document.createElement('canvas'); off.width=W; off.height=H;
-        var octx=off.getContext('2d');
-        var nw=img.naturalWidth||W, nh=img.naturalHeight||H;
-        var sc=Math.max(W/nw,H/nh);
-        octx.drawImage(img,(W-nw*sc)/2,0,nw*sc,nh*sc);
-        var data; try{ data=octx.getImageData(0,0,W,H).data; }catch(e){ return false; }
-
-        cols=Math.max(28,Math.min(60,Math.round(W/5)));
-        cell=W/cols; rows=Math.max(1,Math.round(H/cell)); ch=H/rows;
-        P=[];
-        for (var r=0;r<rows;r++) for (var c=0;c<cols;c++){
-          var sx=Math.min(W-1,(c*cell+cell/2)|0), sy=Math.min(H-1,(r*ch+ch/2)|0);
-          var k=(sy*W+sx)*4;
-          var th=-Math.PI/2+(Math.random()-0.5)*1.6;
-          var ang=Math.random()*6.283, dist=(0.55+Math.random()*0.9)*Math.max(W,H);
-          P.push({
-            hx:c*cell, hy:r*ch, r:data[k], g:data[k+1], b:data[k+2], color:'#000',
-            u: 0.5*(c/cols)+0.5*(r/rows) + (Math.random()-0.5)*0.04,
-            dx:Math.cos(th), dy:Math.sin(th), ph:Math.random()*6.283, sp:0.7+Math.random()*0.7,
-            ix:c*cell+Math.cos(ang)*dist, iy:r*ch+Math.sin(ang)*dist
-          });
-        }
-        recolor(); ready=true; return true;
-      }
-
-      var WIDTH=0.13, SWEEP=4500, travel=1+WIDTH*2, INTRO=1500;
-      var boost=0, target=0, t0=0, raf=0, running=false;
-
-      function wInten(u, phase){
-        var c=phase*travel-WIDTH;
-        var d=Math.min(Math.abs(u-c), Math.abs(u-(c-travel)), Math.abs(u-(c+travel)))/WIDTH;
-        return Math.exp(-d*d);
-      }
-
-      function frameDraw(ts){
-        if (!running) return;
-        if (!t0) t0=ts;
-        var since=ts-t0, sec=since/1000;
-        var introT=Math.min(1, since/INTRO);
-        boost+=(target-boost)*0.08;
-        var A=amp*(1+boost*0.8);
-        var glow=isClean()?'255,255,255':'150,255,180';
-        var ov=cell+0.8;
-        var phase=(sec*1000%SWEEP)/SWEEP, phase2=(phase+0.5)%1;
-
-        ctx.clearRect(0,0,W,H);
-        for (var i=0;i<P.length;i++){
-          var p=P[i];
-          var rx=Math.sin(sec*1.1 + p.hy*0.04)*0.9;
-          var ry=Math.cos(sec*0.9 + p.hx*0.045)*0.9;
-
-          if (introT < 1){
-            // dramatic assemble-from-scatter on load
-            var local=Math.min(1, Math.max(0, (introT - p.u*0.25)/0.75));
-            var e=easeOutCubic(local);
-            var ix=p.ix+(p.hx-p.ix)*e + rx, iy=p.iy+(p.hy-p.iy)*e + ry;
-            ctx.globalAlpha=0.08+0.92*e;
-            ctx.fillStyle=p.color;
-            ctx.fillRect(ix,iy,ov,ov);
-            continue;
-          }
-
-          var inten=Math.max(wInten(p.u,phase), wInten(p.u,phase2));
-          var lift=inten*A*p.sp*(1+0.25*Math.sin(sec*2.2+p.ph));
-          var x=p.hx + p.dx*lift + rx + inten*4*Math.sin(sec*3+p.ph);
-          var y=p.hy + p.dy*lift + ry;
-          ctx.globalAlpha=1 - inten*0.12;
-          ctx.fillStyle=p.color;
-          ctx.fillRect(x,y,ov,ov);
-          if (inten>0.5){
-            ctx.globalAlpha=(inten-0.5)*1.3;
-            ctx.fillStyle='rgba('+glow+',1)';
-            ctx.fillRect(x+ov*0.25, y+ov*0.25, ov*0.5, ov*0.5);
-          }
-        }
-        ctx.globalAlpha=1;
-        raf=requestAnimationFrame(frameDraw);
-      }
-
-      function play(){ if (!running && ready){ running=true; t0=0; raf=requestAnimationFrame(frameDraw); } }
-      function stop(){ running=false; if (raf){ cancelAnimationFrame(raf); raf=0; } }
-      function startFX(){ if (!ready && !build()) return; frame.classList.add('fx-on'); play(); }
-
-      if (window.matchMedia('(pointer: fine)').matches){
-        frame.addEventListener('mouseenter', function(){ target=1; });
-        frame.addEventListener('mouseleave', function(){ target=0; });
-      }
-      var visible=true;
-      function sync(){ if (visible && !document.hidden && ready) play(); else stop(); }
-      if ('IntersectionObserver' in window){
-        new IntersectionObserver(function(es){ visible=es[0].isIntersecting; sync(); }, {threshold:0.05}).observe(frame);
-      }
-      document.addEventListener('visibilitychange', sync);
-      if ('MutationObserver' in window){
-        new MutationObserver(function(){ if (ready) recolor(); })
-          .observe(document.body, { attributes:true, attributeFilter:['class'] });
-      }
-      var rt;
-      window.addEventListener('resize', function(){
-        clearTimeout(rt);
-        rt=setTimeout(function(){ var w=running; stop(); ready=false; if (build() && w) play(); }, 250);
-      });
-
-      if (img.complete && img.naturalWidth) startFX();
-      else img.addEventListener('load', startFX);
+    const NOISE = `
+    vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
+    vec4 mod289(vec4 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
+    vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+    float snoise(vec3 v){
+      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i  = floor(v + dot(v, C.yyy));
+      vec3 x0 = v - i + dot(i, C.xxx);
+      vec3 g = step(x0.yzx, x0.xyz);
+      vec3 l = 1.0 - g;
+      vec3 i1 = min(g.xyz, l.zxy);
+      vec3 i2 = max(g.xyz, l.zxy);
+      vec3 x1 = x0 - i1 + C.xxx;
+      vec3 x2 = x0 - i2 + C.yyy;
+      vec3 x3 = x0 - D.yyy;
+      i = mod289(i);
+      vec4 p = permute(permute(permute(
+                i.z + vec4(0.0, i1.z, i2.z, 1.0))
+              + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+              + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+      float n_ = 0.142857142857;
+      vec3 ns = n_ * D.wyz - D.xzx;
+      vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+      vec4 x_ = floor(j * ns.z);
+      vec4 y_ = floor(j - 7.0 * x_);
+      vec4 x = x_ * ns.x + ns.yyyy;
+      vec4 y = y_ * ns.x + ns.yyyy;
+      vec4 h = 1.0 - abs(x) - abs(y);
+      vec4 b0 = vec4(x.xy, y.xy);
+      vec4 b1 = vec4(x.zw, y.zw);
+      vec4 s0 = floor(b0)*2.0 + 1.0;
+      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 sh = -step(h, vec4(0.0));
+      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+      vec3 p0 = vec3(a0.xy, h.x);
+      vec3 p1 = vec3(a0.zw, h.y);
+      vec3 p2 = vec3(a1.xy, h.z);
+      vec3 p3 = vec3(a1.zw, h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+      vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+      m = m * m;
+      return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
     }
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
+    vec3 snoiseVec3(vec3 x){
+      return vec3(
+        snoise(x),
+        snoise(vec3(x.y - 19.1, x.z + 33.4, x.x + 47.2)),
+        snoise(vec3(x.z + 74.2, x.x - 124.5, x.y + 99.4))
+      );
+    }
+    vec3 curlNoise(vec3 p){
+      const float e = 0.1;
+      vec3 dx = vec3(e,0.0,0.0), dy = vec3(0.0,e,0.0), dz = vec3(0.0,0.0,e);
+      vec3 p_x0 = snoiseVec3(p - dx), p_x1 = snoiseVec3(p + dx);
+      vec3 p_y0 = snoiseVec3(p - dy), p_y1 = snoiseVec3(p + dy);
+      vec3 p_z0 = snoiseVec3(p - dz), p_z1 = snoiseVec3(p + dz);
+      float x = (p_y1.z - p_y0.z) - (p_z1.y - p_z0.y);
+      float y = (p_z1.x - p_z0.x) - (p_x1.z - p_x0.z);
+      float z = (p_x1.y - p_x0.y) - (p_y1.x - p_y0.x);
+      return normalize(vec3(x,y,z) / (2.0*e));
+    }`;
+
+    const VERT = NOISE + `
+    uniform float uTime, uAssembly, uIdleAmp, uScatter, uSize, uFocal, uReduced, uPointerStrength;
+    uniform vec2  uPointer;
+    uniform sampler2D uTouch;
+    attribute vec3 aColor;
+    attribute vec3 aRandom;
+    attribute vec2 aUV;
+    varying vec3  vColor;
+    varying float vLum;
+    void main(){
+      vColor = aColor;
+      vLum = dot(aColor, vec3(0.299, 0.587, 0.114));
+      vec3 origin = position;
+      float reduced = uReduced;
+      vec3 scattered = origin + aRandom * uScatter;
+      vec3 pos = mix(scattered, origin, clamp(uAssembly, 0.0, 1.0));
+      float idle = uIdleAmp * (1.0 - reduced * 0.92);
+      vec3 drift = curlNoise(origin * 1.4 + vec3(0.0, 0.0, uTime * 0.18)) * idle;
+      pos += drift;
+      float breathe = sin(uTime * 0.8 + aRandom.x * 6.2831853);
+      pos.z += breathe * idle * 0.5;
+      float trail = texture2D(uTouch, aUV).r;
+      vec2 away = pos.xy - uPointer;
+      float d = max(length(away), 0.0001);
+      pos.xy += (away / d) * trail * uPointerStrength * (1.0 - reduced * 0.85);
+      pos.z += trail * uPointerStrength * 0.25 * (1.0 - reduced);
+      vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+      float size = uSize * (0.5 + 0.9 * vLum) * (0.85 + 0.3 * (breathe * 0.5 + 0.5));
+      size *= 1.0 + trail * 0.8;
+      gl_PointSize = max(1.0, size * uFocal / -mvPosition.z);
+    }`;
+
+    const FRAG = `
+    uniform float uOpacity;
+    varying vec3  vColor;
+    varying float vLum;
+    void main(){
+      vec2 c = gl_PointCoord - 0.5;
+      float dist = length(c);
+      float alpha = smoothstep(0.5, 0.08, dist);
+      if (alpha <= 0.001) discard;
+      vec3 col = vColor + vColor * vLum * 0.35;
+      gl_FragColor = vec4(col, alpha * uOpacity);
+    }`;
+
+    function start(){
+      let W = frame.clientWidth, H = frame.clientHeight;
+      if (W < 8 || H < 8){ W = 200; H = 220; }
+
+      // ── sample the portrait into particle attributes ──
+      const nw = img.naturalWidth || 600, nh = img.naturalHeight || 575;
+      const aspect = nw / nh;
+      const coarse = matchMedia('(pointer: coarse)').matches;
+      const target = reduce ? 12000 : (coarse ? 22000 : 45000);
+      let sh = Math.max(48, Math.min(420, Math.round(Math.sqrt((target / 0.55) / aspect))));
+      let sw = Math.round(sh * aspect);
+      const oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
+      const octx = oc.getContext('2d', { willReadFrequently: true });
+      octx.drawImage(img, 0, 0, sw, sh);
+      let data;
+      try { data = octx.getImageData(0, 0, sw, sh).data; } catch (e) { return false; }
+
+      let n = 0;
+      for (let i = 0; i < data.length; i += 4) if (data[i] > THRESH) n++;
+      if (n < 50) return false;
+      const positions = new Float32Array(n*3), colors = new Float32Array(n*3),
+            randoms = new Float32Array(n*3), uvs = new Float32Array(n*2);
+      let k = 0;
+      for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++){
+        const idx = (y*sw + x)*4; const r = data[idx];
+        if (r <= THRESH) continue;
+        const g = data[idx+1], b = data[idx+2];
+        const u = x/(sw-1), v = y/(sh-1);
+        const lum = (0.299*r + 0.587*g + 0.114*b)/255;
+        positions[k*3] = (u-0.5)*PLANE*aspect; positions[k*3+1] = (0.5-v)*PLANE; positions[k*3+2] = (lum-0.5)*DEPTH;
+        colors[k*3] = r/255; colors[k*3+1] = g/255; colors[k*3+2] = b/255;
+        randoms[k*3] = Math.random()*2-1; randoms[k*3+1] = Math.random()*2-1; randoms[k*3+2] = Math.random()*2-1;
+        uvs[k*2] = u; uvs[k*2+1] = v; k++;
+      }
+
+      // ── renderer ──
+      let renderer;
+      try { renderer = new THREE.WebGLRenderer({ antialias:false, alpha:true, powerPreference:'high-performance' }); }
+      catch (e) { return false; }
+      if (!renderer || !renderer.getContext()) return false;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setSize(W, H, false);
+      const cv = renderer.domElement;
+      cv.className = 'crt-webgl';
+      cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+      frame.appendChild(cv);
+      frame.classList.add('fx-on');           // hides the crisp <img>
+      frame.style.touchAction = 'none';
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, W/H, 0.1, 100);
+      camera.position.z = 6.5;
+
+      // pointer-trail texture (decays each frame → elastic return)
+      const TS = 256;
+      const tcv = document.createElement('canvas'); tcv.width = TS; tcv.height = TS;
+      const tctx = tcv.getContext('2d'); tctx.fillStyle = '#000'; tctx.fillRect(0,0,TS,TS);
+      const trailTex = new THREE.CanvasTexture(tcv);
+      trailTex.flipY = false; trailTex.minFilter = THREE.LinearFilter; trailTex.magFilter = THREE.LinearFilter;
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('aColor',  new THREE.BufferAttribute(colors, 3));
+      geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
+      geo.setAttribute('aUV',     new THREE.BufferAttribute(uvs, 2));
+      geo.computeBoundingSphere();
+
+      const uniforms = {
+        uTime:{value:0}, uAssembly:{value:0}, uIdleAmp:{value:0.14}, uScatter:{value:3.0},
+        uSize:{value:0.032}, uFocal:{value:500}, uReduced:{value:reduce?1:0},
+        uPointer:{value:new THREE.Vector2(999,999)}, uPointerStrength:{value:0.9},
+        uTouch:{value:trailTex}, uOpacity:{value:1.0},
+      };
+      const mat = new THREE.ShaderMaterial({
+        vertexShader:VERT, fragmentShader:FRAG, uniforms,
+        transparent:true, depthWrite:false, depthTest:true, blending:THREE.AdditiveBlending,
+      });
+      const points = new THREE.Points(geo, mat); points.frustumCulled = false; scene.add(points);
+
+      // ── pointer (mouse + touch) → stamp trail at image UV ──
+      function stamp(u, v){
+        const x = u*TS, y = v*TS, rad = Math.max(3, 0.12*TS);
+        const grad = tctx.createRadialGradient(x,y,0, x,y,rad);
+        grad.addColorStop(0,'rgba(255,255,255,0.95)'); grad.addColorStop(1,'rgba(255,255,255,0)');
+        tctx.globalCompositeOperation = 'lighter'; tctx.fillStyle = grad;
+        tctx.beginPath(); tctx.arc(x,y,rad,0,6.2832); tctx.fill();
+        tctx.globalCompositeOperation = 'source-over'; trailTex.needsUpdate = true;
+      }
+      function onMove(e){
+        const rect = cv.getBoundingClientRect();
+        const cx = e.clientX, cy = e.clientY;
+        const u = (cx-rect.left)/rect.width, v = (cy-rect.top)/rect.height;
+        if (u < 0 || u > 1 || v < 0 || v > 1) return;
+        uniforms.uPointer.value.set((u-0.5)*PLANE*aspect, (0.5-v)*PLANE);
+        stamp(u, v);
+      }
+      frame.addEventListener('pointermove', onMove, { passive:true });
+      frame.addEventListener('pointerdown', onMove, { passive:true });
+
+      // ── render loop with offscreen pause ──
+      const clock = new THREE.Clock();
+      let raf = 0, t0 = null;
+      function loop(){
+        if (!visible){ raf = 0; return; }
+        raf = requestAnimationFrame(loop);
+        const t = clock.getElapsedTime();
+        uniforms.uTime.value = t;
+        uniforms.uFocal.value = renderer.domElement.height / (2 * Math.tan(50 * Math.PI / 360));
+        if (t0 === null) t0 = t;
+        const dur = reduce ? 0.6 : 2.4;
+        const p = Math.min(1, (t - t0) / dur);
+        uniforms.uAssembly.value = 1 - Math.pow(1 - p, 3);
+        tctx.globalCompositeOperation = 'source-over';
+        tctx.fillStyle = 'rgba(0,0,0,0.07)'; tctx.fillRect(0,0,TS,TS);
+        trailTex.needsUpdate = true;
+        renderer.render(scene, camera);
+      }
+
+      let visible = true;
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver((es)=>{ visible = es[0].isIntersecting; if (visible && !raf) loop(); }, { threshold:0.05 }).observe(frame);
+      }
+      let rt;
+      window.addEventListener('resize', ()=>{
+        clearTimeout(rt);
+        rt = setTimeout(()=>{
+          W = frame.clientWidth || W; H = frame.clientHeight || H;
+          renderer.setSize(W, H, false); camera.aspect = W/H; camera.updateProjectionMatrix();
+        }, 200);
+      });
+      document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && visible && !raf) loop(); });
+
+      loop();
+      return true;
+    }
+
+    function boot(){
+      let ok = false;
+      try { ok = start(); } catch (e) { ok = false; }
+      if (ok === false) frame.classList.remove('fx-on'); // fall back to the crisp <img>
+    }
+    if (img.complete && img.naturalWidth) boot();
+    else img.addEventListener('load', boot, { once:true });
   })();
   </script>
-
 </body>
 </html>
