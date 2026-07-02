@@ -3,12 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kenny Desaintfuscien — Technicien support IT</title>
-  <meta name="description" content="CV de Kenny Desaintfuscien — Technicien support IT chez Econocom. Support IT, infrastructure réseau, projets digitaux." />
-  <meta property="og:title" content="Kenny Desaintfuscien — Technicien support IT" />
-  <meta property="og:description" content="CV de Kenny Desaintfuscien — Technicien support IT chez Econocom. Support IT, infrastructure réseau, projets digitaux." />
-  <meta property="og:type" content="website" />
+  <title>Kenny Desaintfuscien — Technicien Support IT N1/N2 · Île-de-France</title>
+  <meta name="description" content="Technicien support IT (N1/N2) chez Econocom en environnement sensible — 5 000+ tickets résolus, Active Directory, déploiement Windows, 7 projets web en ligne. Île-de-France (91). CV téléchargeable." />
+  <meta property="og:title" content="Kenny Desaintfuscien — Technicien Support IT N1/N2" />
+  <meta property="og:description" content="5 000+ tickets résolus en environnement sensible. Active Directory, Windows, ticketing. Autodidacte, fiable, disponible en Île-de-France." />
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content="https://kenny.quest/" />
+  <meta property="og:image" content="https://kenny.quest/android-chrome-512x512.png" />
+  <link rel="canonical" href="https://kenny.quest/" />
   <meta name="robots" content="index, follow" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Kenny Desaintfuscien",
+    "jobTitle": "Technicien Support IT (N1/N2)",
+    "worksFor": { "@type": "Organization", "name": "Econocom" },
+    "address": { "@type": "PostalAddress", "addressRegion": "Île-de-France", "postalCode": "91", "addressCountry": "FR" },
+    "email": "mailto:kennydsf91@gmail.com",
+    "url": "https://kenny.quest",
+    "sameAs": ["https://www.linkedin.com/in/kenny-desaintfuscien-41a3451a4"],
+    "knowsAbout": ["Support informatique N1/N2", "Active Directory", "Déploiement Windows", "Ticketing", "Windows Server", "PowerShell"],
+    "knowsLanguage": ["fr", "en"]
+  }
+  </script>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -219,7 +237,7 @@
       margin: 0 auto;
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 220px;
+      grid-template-columns: 1fr 270px;
       gap: 3rem;
       align-items: center;
       position: relative;
@@ -229,8 +247,8 @@
 
     /* ── CRT PHOTO ── */
     .hero-photo-wrap {
-      width: 200px;
-      height: 220px;
+      width: 250px;
+      height: 275px;
       position: relative;
       opacity: 0;
       animation: fadeInUp 1s 0.4s forwards;
@@ -385,10 +403,11 @@
       .hero-firstname { font-size: clamp(2.2rem, 11vw, 3rem); }
       .hero-lastname { font-size: clamp(1.7rem, 8.5vw, 2.4rem); }
       .hero-title { order: 3; margin-top: 0; }
+      .hero-facts { order: 3; justify-content: center; margin-top: 0; }
       .hero-photo-wrap {
         order: 4;
-        width: 210px;
-        height: 240px;
+        width: 240px;
+        height: 264px;
         align-self: center;
         margin: 0.25rem 0;
       }
@@ -453,10 +472,33 @@
       animation: fadeInUp 0.8s 0.9s forwards;
     }
 
+    .hero-facts {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 1.2rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s 0.8s forwards;
+    }
+    .fact-chip {
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .fact-chip.fact-hot {
+      border-color: var(--green);
+      color: var(--green);
+      text-shadow: 0 0 12px var(--green-glow);
+    }
+
     .hero-cta {
       display: flex;
       gap: 1rem;
-      margin-top: 3rem;
+      margin-top: 2.2rem;
       opacity: 0;
       animation: fadeInUp 0.8s 1.1s forwards;
     }
@@ -486,6 +528,14 @@
     }
     .btn:hover { color: var(--bg); text-shadow: none; }
     .btn:hover::before { transform: translateX(0); }
+    .btn-primary {
+      background: var(--green);
+      color: var(--bg);
+      font-weight: 700;
+      border-color: var(--green);
+    }
+    .btn-primary::before { background: var(--white); }
+    .btn-primary:hover { color: var(--bg); }
     .btn-ghost {
       border-color: var(--muted);
       color: var(--muted);
@@ -1376,13 +1426,18 @@
         <span class="hero-lastname glitch" data-text="Desaintfuscien"><span class="accent">Desaintfuscien</span></span>
       </h1>
       <p class="hero-title">Technicien support IT — Econocom<span class="blink">█</span></p>
+      <div class="hero-facts">
+        <span class="fact-chip fact-hot">● Ouvert aux opportunités</span>
+        <span class="fact-chip">Île-de-France (91)</span>
+        <span class="fact-chip">Anglais courant</span>
+      </div>
       <p class="hero-manifesto">
-        Passionné par l'innovation et les solutions digitales, je crée de la valeur en résolvant des problèmes concrets avec efficacité — en environnement IT comme en relation client.
+        <strong>5 000+ tickets résolus</strong> en environnement sensible chez Econocom. Support N1/N2, Active Directory, déploiement Windows — et 7 projets web construits en autodidacte. Fiable sous pression, formé sur le terrain.
       </p>
       <div class="hero-cta">
-        <a href="#projects" class="btn">Voir les projets</a>
-        <a href="#contact" class="btn btn-ghost">Me contacter</a>
-        <a href="#" class="btn btn-ghost" id="dl-cv">Télécharger CV</a>
+        <a href="#" class="btn btn-primary" id="dl-cv">⬇ Télécharger le CV</a>
+        <a href="#contact" class="btn">Me contacter</a>
+        <a href="#projects" class="btn btn-ghost">Voir les projets</a>
       </div>
       </div><!-- /hero-text -->
 
@@ -1412,7 +1467,7 @@
       <div class="stat-grid reveal">
         <div class="stat-item">
           <span class="stat-number">1 an</span>
-          <span class="stat-label">McDonald's → IT</span>
+          <span class="stat-label">Reconversion réussie</span>
         </div>
         <div class="stat-item">
           <span class="stat-number">5000+</span>
@@ -1664,7 +1719,7 @@
   <section id="contact">
     <p class="section-label reveal-scale">// 06</p>
     <h2 class="section-title reveal-scale">Contact</h2>
-    <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto;">Disponible pour des opportunités en IT, alternance ou missions.</p>
+    <p class="reveal" style="color:var(--muted); max-width:520px; margin:0 auto;">Vous recrutez en support IT / helpdesk en Île-de-France ? Réponse sous 24 h.</p>
     <div class="contact-terminal reveal-scale">
       <div class="contact-terminal-bar"><span>guest@kenny — bash</span><span>×</span></div>
       <div class="contact-terminal-body" id="contact-term-body">
@@ -1676,7 +1731,9 @@
       </div>
     </div>
     <div class="contact-links reveal" style="margin-top:1.5rem;">
+      <a href="mailto:kennydsf91@gmail.com" class="contact-link">✉ kennydsf91@gmail.com</a>
       <a href="https://www.linkedin.com/in/kenny-desaintfuscien-41a3451a4" target="_blank" class="contact-link">⌥ LinkedIn</a>
+      <a href="#" class="contact-link" onclick="var b=document.getElementById('dl-cv');if(b)b.click();return false;">⬇ CV PDF</a>
     </div>
   </section>
 
@@ -2750,7 +2807,7 @@
 
 
 
-  <!-- ── PORTRAIT PARTICLES (three.js / WebGL2) ── -->
+  <!-- ── PORTRAIT PARTICLES v2 — morph photo/texte, parallaxe 3D, onde de choc ── -->
   <script type="module">
   import * as THREE from '/vendor/three.module.min.js';
 
@@ -2758,9 +2815,10 @@
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const frame  = document.querySelector('#hero .crt-frame') || document.querySelector('.crt-frame');
     const img    = frame && frame.querySelector('img');
+    const status = document.querySelector('.crt-status');
     if (!frame || !img) return;
 
-    const PLANE = 6.0, DEPTH = 1.0, THRESH = 34;
+    const PLANE = 6.0, DEPTH = 1.15, THRESH = 34;
 
     const NOISE = `
     vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
@@ -2830,72 +2888,103 @@
 
     const VERT = NOISE + `
     uniform float uTime, uAssembly, uIdleAmp, uScatter, uSize, uFocal, uReduced, uPointerStrength;
-    uniform vec2  uPointer;
+    uniform float uMorph, uShockT;
+    uniform vec2  uShockC, uPointer;
+    uniform vec3  uAccent;
     uniform sampler2D uTouch;
     attribute vec3 aColor;
     attribute vec3 aRandom;
     attribute vec2 aUV;
+    attribute vec3 aText;
     varying vec3  vColor;
-    varying float vLum;
     void main(){
-      vColor = aColor;
-      vLum = dot(aColor, vec3(0.299, 0.587, 0.114));
-      vec3 origin = position;
-      float reduced = uReduced;
-      vec3 scattered = origin + aRandom * uScatter;
-      vec3 pos = mix(scattered, origin, clamp(uAssembly, 0.0, 1.0));
-      float idle = uIdleAmp * (1.0 - reduced * 0.92);
-      vec3 drift = curlNoise(origin * 1.4 + vec3(0.0, 0.0, uTime * 0.18)) * idle;
-      pos += drift;
-      float breathe = sin(uTime * 0.8 + aRandom.x * 6.2831853);
-      pos.z += breathe * idle * 0.5;
+      float rnd = aRandom.x*0.5 + 0.5;
+      /* staggered per-particle morph: leading edge sweeps through the cloud */
+      float m = smoothstep(0.0, 1.0, clamp(uMorph*1.35 - rnd*0.35, 0.0, 1.0));
+      vec3 target = mix(position, aText, m);
+      float lum = dot(aColor, vec3(0.299, 0.587, 0.114));
+      vColor = mix(aColor + aColor*lum*0.35, uAccent*(0.65 + 0.6*rnd), m);
+
+      vec3 scattered = target + aRandom * uScatter;
+      vec3 pos = mix(scattered, target, clamp(uAssembly, 0.0, 1.0));
+
+      /* vortex flight while morphing between photo and text */
+      float turb = sin(3.14159265*m);
+      pos += curlNoise(position*1.8 + vec3(0.0, 0.0, uTime*0.35)) * turb * 1.15;
+
+      /* gentle idle drift + breathing so the face stays alive but readable */
+      float idle = uIdleAmp * (1.0 - uReduced*0.92);
+      pos += curlNoise(position*1.4 + vec3(0.0, 0.0, uTime*0.18)) * idle;
+      float breathe = sin(uTime*0.8 + aRandom.x*6.2831853);
+      pos.z += breathe*idle*0.5;
+
+      /* click/tap shockwave: expanding ring, damped */
+      if (uShockT < 3.0){
+        vec2 d2 = pos.xy - uShockC;
+        float r = length(d2);
+        float ring = exp(-pow((r - uShockT*7.0)/0.55, 2.0)) * exp(-uShockT*1.6);
+        pos.xy += (d2/max(r, 0.001)) * ring * 1.15;
+        pos.z  += ring * 0.6;
+      }
+
+      /* pointer trail repulsion (mouse + touch) */
       float trail = texture2D(uTouch, aUV).r;
       vec2 away = pos.xy - uPointer;
-      float d = max(length(away), 0.0001);
-      pos.xy += (away / d) * trail * uPointerStrength * (1.0 - reduced * 0.85);
-      pos.z += trail * uPointerStrength * 0.25 * (1.0 - reduced);
-      vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-      gl_Position = projectionMatrix * mvPosition;
-      float size = uSize * (0.5 + 0.9 * vLum) * (0.85 + 0.3 * (breathe * 0.5 + 0.5));
-      size *= 1.0 + trail * 0.8;
-      gl_PointSize = max(1.0, size * uFocal / -mvPosition.z);
+      float dd = max(length(away), 0.0001);
+      pos.xy += (away/dd) * trail * uPointerStrength * (1.0 - uReduced*0.85);
+      pos.z  += trail * uPointerStrength * 0.25 * (1.0 - uReduced);
+
+      vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+      gl_Position = projectionMatrix * mv;
+      float size = uSize * (0.5 + 0.9*lum) * (0.85 + 0.3*(breathe*0.5 + 0.5));
+      size *= 1.0 + trail*0.8 + m*0.45 + turb*0.5;
+      gl_PointSize = max(1.0, size * uFocal / -mv.z);
     }`;
 
     const FRAG = `
+    precision highp float;
     uniform float uOpacity;
-    varying vec3  vColor;
-    varying float vLum;
+    varying vec3 vColor;
     void main(){
       vec2 c = gl_PointCoord - 0.5;
-      float dist = length(c);
-      float alpha = smoothstep(0.5, 0.08, dist);
-      if (alpha <= 0.001) discard;
-      vec3 col = vColor + vColor * vLum * 0.35;
-      gl_FragColor = vec4(col, alpha * uOpacity);
+      float a = smoothstep(0.5, 0.08, length(c));
+      if (a <= 0.001) discard;
+      gl_FragColor = vec4(vColor, a*uOpacity);
     }`;
 
-    function start(){
-      let W = frame.clientWidth, H = frame.clientHeight;
-      if (W < 8 || H < 8){ W = 200; H = 220; }
+    /* messages écrits en particules entre deux apparitions du visage */
+    const TEXTS = [['KENNY'], ['SUPPORT', 'IT'], ['5000+', 'TICKETS']];
 
-      // ── sample the portrait into particle attributes ──
+    function setStatus(txt){
+      if (status && status.firstChild) status.firstChild.nodeValue = txt + ' ';
+    }
+    function accentColor(){
+      const v = getComputedStyle(document.body).getPropertyValue('--green').trim();
+      try { return new THREE.Color(v || '#00ff41'); } catch(e){ return new THREE.Color('#00ff41'); }
+    }
+
+    function start(){
+      let W = frame.clientWidth  || 250;
+      let H = frame.clientHeight || 275;
       const nw = img.naturalWidth || 600, nh = img.naturalHeight || 575;
       const aspect = nw / nh;
       const coarse = matchMedia('(pointer: coarse)').matches;
-      const target = reduce ? 12000 : (coarse ? 22000 : 45000);
-      let sh = Math.max(48, Math.min(420, Math.round(Math.sqrt((target / 0.55) / aspect))));
+      const target = reduce ? 12000 : (coarse ? 24000 : 48000);
+
+      /* ── photo → particules ── */
+      let sh = Math.max(48, Math.min(440, Math.round(Math.sqrt((target/0.55)/aspect))));
       let sw = Math.round(sh * aspect);
       const oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
       const octx = oc.getContext('2d', { willReadFrequently: true });
       octx.drawImage(img, 0, 0, sw, sh);
       let data;
-      try { data = octx.getImageData(0, 0, sw, sh).data; } catch (e) { return false; }
-
+      try { data = octx.getImageData(0, 0, sw, sh).data; } catch(e){ return false; }
       let n = 0;
       for (let i = 0; i < data.length; i += 4) if (data[i] > THRESH) n++;
       if (n < 50) return false;
       const positions = new Float32Array(n*3), colors = new Float32Array(n*3),
-            randoms = new Float32Array(n*3), uvs = new Float32Array(n*2);
+            randoms = new Float32Array(n*3), uvs = new Float32Array(n*2),
+            textPos = new Float32Array(n*3);
       let k = 0;
       for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++){
         const idx = (y*sw + x)*4; const r = data[idx];
@@ -2908,11 +2997,52 @@
         randoms[k*3] = Math.random()*2-1; randoms[k*3+1] = Math.random()*2-1; randoms[k*3+2] = Math.random()*2-1;
         uvs[k*2] = u; uvs[k*2+1] = v; k++;
       }
+      textPos.set(positions);   // avant le premier morph, cible = photo
 
-      // ── renderer ──
+      /* ── texte → cibles de particules ── */
+      function bakeText(lines){
+        const tw = 320, th = Math.max(64, Math.round(320 * (H/W)));
+        const c = document.createElement('canvas'); c.width = tw; c.height = th;
+        const x = c.getContext('2d');
+        x.fillStyle = '#000'; x.fillRect(0, 0, tw, th);
+        x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle';
+        let fs = 400;
+        for (const ln of lines){
+          x.font = '900 100px Syne, "Arial Black", sans-serif';
+          const w100 = Math.max(1, x.measureText(ln).width);
+          fs = Math.min(fs, 100 * (tw*0.88) / w100);
+        }
+        fs = Math.min(fs, (th*0.78) / lines.length);
+        x.font = '900 ' + Math.floor(fs) + 'px Syne, "Arial Black", sans-serif';
+        const lh = fs*1.12, y0 = th/2 - lh*(lines.length-1)/2;
+        lines.forEach((ln, i) => x.fillText(ln, tw/2, y0 + i*lh));
+        const d = x.getImageData(0, 0, tw, th).data;
+        const pts = [];
+        for (let yy = 0; yy < th; yy++) for (let xx = 0; xx < tw; xx++){
+          if (d[(yy*tw + xx)*4] > 120){
+            pts.push(((xx/(tw-1)) - 0.5)*PLANE*aspect, (0.5 - yy/(th-1))*PLANE, 0);
+          }
+        }
+        return pts;
+      }
+      function loadTextTargets(lines){
+        const pts = bakeText(lines);
+        const T = pts.length/3;
+        if (T < 30) return false;
+        for (let i = 0; i < n; i++){
+          const j = (i*7919) % T;   // scramble: les voisins photo volent vers des lettres différentes
+          textPos[i*3]   = pts[j*3]   + (Math.random()-0.5)*0.05;
+          textPos[i*3+1] = pts[j*3+1] + (Math.random()-0.5)*0.05;
+          textPos[i*3+2] = (Math.random()-0.5)*0.12;
+        }
+        geo.attributes.aText.needsUpdate = true;
+        return true;
+      }
+
+      /* ── renderer ── */
       let renderer;
       try { renderer = new THREE.WebGLRenderer({ antialias:false, alpha:true, powerPreference:'high-performance' }); }
-      catch (e) { return false; }
+      catch(e){ return false; }
       if (!renderer || !renderer.getContext()) return false;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.setSize(W, H, false);
@@ -2920,17 +3050,16 @@
       cv.className = 'crt-webgl';
       cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;';
       frame.appendChild(cv);
-      frame.classList.add('fx-on');           // hides the crisp <img>
+      frame.classList.add('fx-on');
       frame.style.touchAction = 'none';
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(50, W/H, 0.1, 100);
       camera.position.z = 6.5;
 
-      // pointer-trail texture (decays each frame → elastic return)
       const TS = 256;
       const tcv = document.createElement('canvas'); tcv.width = TS; tcv.height = TS;
-      const tctx = tcv.getContext('2d'); tctx.fillStyle = '#000'; tctx.fillRect(0,0,TS,TS);
+      const tctx = tcv.getContext('2d'); tctx.fillStyle = '#000'; tctx.fillRect(0, 0, TS, TS);
       const trailTex = new THREE.CanvasTexture(tcv);
       trailTex.flipY = false; trailTex.minFilter = THREE.LinearFilter; trailTex.magFilter = THREE.LinearFilter;
 
@@ -2939,83 +3068,131 @@
       geo.setAttribute('aColor',  new THREE.BufferAttribute(colors, 3));
       geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
       geo.setAttribute('aUV',     new THREE.BufferAttribute(uvs, 2));
+      geo.setAttribute('aText',   new THREE.BufferAttribute(textPos, 3).setUsage(THREE.DynamicDrawUsage));
       geo.computeBoundingSphere();
 
       const uniforms = {
-        uTime:{value:0}, uAssembly:{value:0}, uIdleAmp:{value:0.14}, uScatter:{value:3.0},
-        uSize:{value:0.032}, uFocal:{value:500}, uReduced:{value:reduce?1:0},
+        uTime:{value:0}, uAssembly:{value:0}, uIdleAmp:{value:0.045}, uScatter:{value:3.2},
+        uSize:{value:0.03}, uFocal:{value:500}, uReduced:{value:reduce?1:0},
         uPointer:{value:new THREE.Vector2(999,999)}, uPointerStrength:{value:0.9},
         uTouch:{value:trailTex}, uOpacity:{value:1.0},
+        uMorph:{value:0}, uShockT:{value:99}, uShockC:{value:new THREE.Vector2(0,0)},
+        uAccent:{value:accentColor()},
       };
       const mat = new THREE.ShaderMaterial({
         vertexShader:VERT, fragmentShader:FRAG, uniforms,
         transparent:true, depthWrite:false, depthTest:true, blending:THREE.AdditiveBlending,
       });
-      const points = new THREE.Points(geo, mat); points.frustumCulled = false; scene.add(points);
+      const points = new THREE.Points(geo, mat);
+      points.frustumCulled = false;
+      scene.add(points);
 
-      // ── pointer (mouse + touch) → stamp trail at image UV ──
+      /* ── pointeur : traînée + parallaxe + onde de choc ── */
+      let tiltX = 0, tiltY = 0, tiltTX = 0, tiltTY = 0;
       function stamp(u, v){
         const x = u*TS, y = v*TS, rad = Math.max(3, 0.12*TS);
-        const grad = tctx.createRadialGradient(x,y,0, x,y,rad);
-        grad.addColorStop(0,'rgba(255,255,255,0.95)'); grad.addColorStop(1,'rgba(255,255,255,0)');
+        const grad = tctx.createRadialGradient(x, y, 0, x, y, rad);
+        grad.addColorStop(0, 'rgba(255,255,255,0.95)'); grad.addColorStop(1, 'rgba(255,255,255,0)');
         tctx.globalCompositeOperation = 'lighter'; tctx.fillStyle = grad;
-        tctx.beginPath(); tctx.arc(x,y,rad,0,6.2832); tctx.fill();
+        tctx.beginPath(); tctx.arc(x, y, rad, 0, 6.2832); tctx.fill();
         tctx.globalCompositeOperation = 'source-over'; trailTex.needsUpdate = true;
       }
-      function onMove(e){
+      function uvFromEvent(e){
         const rect = cv.getBoundingClientRect();
-        const cx = e.clientX, cy = e.clientY;
-        const u = (cx-rect.left)/rect.width, v = (cy-rect.top)/rect.height;
+        return [(e.clientX - rect.left)/rect.width, (e.clientY - rect.top)/rect.height];
+      }
+      frame.addEventListener('pointermove', (e) => {
+        const [u, v] = uvFromEvent(e);
         if (u < 0 || u > 1 || v < 0 || v > 1) return;
         uniforms.uPointer.value.set((u-0.5)*PLANE*aspect, (0.5-v)*PLANE);
         stamp(u, v);
-      }
-      frame.addEventListener('pointermove', onMove, { passive:true });
-      frame.addEventListener('pointerdown', onMove, { passive:true });
+        if (!coarse){ tiltTX = (v-0.5)*0.45; tiltTY = (u-0.5)*0.55; }
+      }, { passive:true });
+      frame.addEventListener('pointerleave', () => { tiltTX = 0; tiltTY = 0; }, { passive:true });
+      let shockStart = -99;
+      frame.addEventListener('pointerdown', (e) => {
+        const [u, v] = uvFromEvent(e);
+        uniforms.uShockC.value.set((u-0.5)*PLANE*aspect, (0.5-v)*PLANE);
+        shockStart = clock.getElapsedTime();
+        stamp(u, v);
+      }, { passive:true });
 
-      // ── render loop with offscreen pause ──
+      /* thème clair/CRT : accent recalculé à la volée */
+      if ('MutationObserver' in window){
+        new MutationObserver(() => { uniforms.uAccent.value = accentColor(); })
+          .observe(document.body, { attributes:true, attributeFilter:['class'] });
+      }
+
+      /* ── machine à états : INTRO → VISAGE → vortex → TEXTE → vortex → VISAGE… ── */
+      const INTRO = 2.4, HOLD = 6.0, TOTXT = 1.5, TXT = 2.8, TOPIC = 1.5;
+      let phase = 'intro', phaseStart = 0, textIdx = 0, textReady = false;
+      const easeIO = (t) => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
+
       const clock = new THREE.Clock();
-      let raf = 0, t0 = null;
+      let raf = 0, visible = true;
+
       function loop(){
         if (!visible){ raf = 0; return; }
         raf = requestAnimationFrame(loop);
         const t = clock.getElapsedTime();
         uniforms.uTime.value = t;
-        uniforms.uFocal.value = renderer.domElement.height / (2 * Math.tan(50 * Math.PI / 360));
-        if (t0 === null) t0 = t;
-        const elapsed = t - t0;
-        // intro: scattered cloud assembles into the sharp portrait
-        const introDur = reduce ? 0.6 : 2.4;
-        const introEase = 1 - Math.pow(1 - Math.min(1, elapsed / introDur), 3);
-        // automatic "breathing" cycle: stays SHARP, then dissolves, on a loop
-        let disp = 0;
-        if (!reduce) {
-          const CYCLE = 9.0;                 // seconds per net→dissolve→net loop
-          const ph = (Math.max(0, elapsed - introDur) % CYCLE) / CYCLE;
-          // sharp for the first ~55% of the cycle, smooth dissolve for the rest
-          disp = ph < 0.55 ? 0.0 : Math.sin(((ph - 0.55) / 0.45) * Math.PI);
+        uniforms.uFocal.value = renderer.domElement.height / (2 * Math.tan(50*Math.PI/360));
+        uniforms.uShockT.value = shockStart < 0 ? 99 : (t - shockStart);
+
+        /* parallaxe 3D : le nuage s'incline vers le pointeur */
+        tiltX += (tiltTX - tiltX)*0.07;
+        tiltY += (tiltTY - tiltY)*0.07;
+        points.rotation.x = tiltX;
+        points.rotation.y = tiltY;
+
+        const el = t - phaseStart;
+        if (phase === 'intro'){
+          uniforms.uAssembly.value = 1 - Math.pow(1 - Math.min(1, el/INTRO), 3);
+          if (el >= INTRO){ phase = 'hold'; phaseStart = t; uniforms.uAssembly.value = 1; setStatus('SIGNAL LOCKED'); }
+        } else if (phase === 'hold'){
+          uniforms.uMorph.value = 0;
+          uniforms.uIdleAmp.value = 0.045;
+          if (!reduce && el >= HOLD){
+            textReady = loadTextTargets(TEXTS[textIdx]);
+            if (textReady){ phase = 'totxt'; phaseStart = t; setStatus('ENCODING ▸▸'); }
+            else { phaseStart = t; }
+          }
+        } else if (phase === 'totxt'){
+          uniforms.uMorph.value = easeIO(Math.min(1, el/TOTXT));
+          if (el >= TOTXT){ phase = 'txt'; phaseStart = t; setStatus('TX: ' + TEXTS[textIdx].join(' ')); }
+        } else if (phase === 'txt'){
+          uniforms.uMorph.value = 1;
+          uniforms.uIdleAmp.value = 0.028;
+          if (el >= TXT){ phase = 'topic'; phaseStart = t; setStatus('◂◂ DECODING'); }
+        } else if (phase === 'topic'){
+          uniforms.uMorph.value = 1 - easeIO(Math.min(1, el/TOPIC));
+          if (el >= TOPIC){
+            phase = 'hold'; phaseStart = t;
+            textIdx = (textIdx + 1) % TEXTS.length;
+            setStatus('SIGNAL LOCKED');
+          }
         }
-        uniforms.uAssembly.value = introEase * (1.0 - 0.72 * disp);  // 1 = net, dips to a loose cloud
-        uniforms.uIdleAmp.value  = reduce ? 0.0 : (0.03 + 0.34 * disp);
+
+        /* la traînée du pointeur s'estompe → retour élastique */
         tctx.globalCompositeOperation = 'source-over';
-        tctx.fillStyle = 'rgba(0,0,0,0.07)'; tctx.fillRect(0,0,TS,TS);
+        tctx.fillStyle = 'rgba(0,0,0,0.07)'; tctx.fillRect(0, 0, TS, TS);
         trailTex.needsUpdate = true;
+
         renderer.render(scene, camera);
       }
 
-      let visible = true;
       if ('IntersectionObserver' in window){
-        new IntersectionObserver((es)=>{ visible = es[0].isIntersecting; if (visible && !raf) loop(); }, { threshold:0.05 }).observe(frame);
+        new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible && !raf) loop(); }, { threshold:0.05 }).observe(frame);
       }
+      document.addEventListener('visibilitychange', () => { if (!document.hidden && visible && !raf) loop(); });
       let rt;
-      window.addEventListener('resize', ()=>{
+      window.addEventListener('resize', () => {
         clearTimeout(rt);
-        rt = setTimeout(()=>{
+        rt = setTimeout(() => {
           W = frame.clientWidth || W; H = frame.clientHeight || H;
           renderer.setSize(W, H, false); camera.aspect = W/H; camera.updateProjectionMatrix();
         }, 200);
       });
-      document.addEventListener('visibilitychange', ()=>{ if (!document.hidden && visible && !raf) loop(); });
 
       loop();
       return true;
@@ -3023,8 +3200,8 @@
 
     function boot(){
       let ok = false;
-      try { ok = start(); } catch (e) { ok = false; }
-      if (ok === false) frame.classList.remove('fx-on'); // fall back to the crisp <img>
+      try { ok = start(); } catch(e){ ok = false; }
+      if (ok === false) frame.classList.remove('fx-on');
     }
     if (img.complete && img.naturalWidth) boot();
     else img.addEventListener('load', boot, { once:true });
