@@ -364,11 +364,10 @@
       pointer-events: none;
       display: none;
     }
-    .crt-frame.fx-on .crt-particles { display: block; }
     .crt-frame.fx-on img { opacity: 0; }
-    /* dark backdrop so the additive particles glow (both themes) */
-    .crt-frame.fx-on { background: #05070a; }
-    .crt-webgl { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    /* GPU hero: l'ancien fond 2D disparaît, les particules WebGL prennent tout le hero */
+    #hero.gpu-on #particle-canvas { display: none; }
+    #hero.gpu-on .crt-frame { background: transparent; }
 
 
     @keyframes scanline-move {
@@ -2807,18 +2806,19 @@
 
 
 
-  <!-- ── PORTRAIT PARTICLES v2 — morph photo/texte, parallaxe 3D, onde de choc ── -->
+  <!-- ── PORTRAIT PARTICLES v3 — plein écran: le visage s'échappe du cadre ── -->
   <script type="module">
   import * as THREE from '/vendor/three.module.min.js';
 
   (function(){
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const frame  = document.querySelector('#hero .crt-frame') || document.querySelector('.crt-frame');
+    const hero   = document.getElementById('hero');
+    const frame  = document.querySelector('#hero .crt-frame');
     const img    = frame && frame.querySelector('img');
     const status = document.querySelector('.crt-status');
-    if (!frame || !img) return;
+    if (!hero || !frame || !img) return;
 
-    const PLANE = 6.0, DEPTH = 1.15, THRESH = 34;
+    const THRESH = 34, FOV = 50, CAMZ = 10;
 
     const NOISE = `
     vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
@@ -2887,310 +2887,350 @@
     }`;
 
     const VERT = NOISE + `
-    uniform float uTime, uAssembly, uIdleAmp, uScatter, uSize, uFocal, uReduced, uPointerStrength;
-    uniform float uMorph, uShockT;
-    uniform vec2  uShockC, uPointer;
+    uniform float uTime, uAssembly, uMorph, uIdleAmp, uScatter, uSize, uFocal, uReduced;
+    uniform float uShockT, uPtrAng, uPtrR, uDepth;
+    uniform vec2  uShockC, uPointer, uFaceC, uFaceS, uHeroS;
     uniform vec3  uAccent;
-    uniform sampler2D uTouch;
+    attribute vec3 aPix;      /* u, v (photo), luminance */
     attribute vec3 aColor;
     attribute vec3 aRandom;
-    attribute vec2 aUV;
-    attribute vec3 aText;
+    attribute vec2 aText;     /* cible texte, normalisée -1..1 sur tout le hero */
     varying vec3  vColor;
+    varying float vGlow;
     void main(){
-      float rnd = aRandom.x*0.5 + 0.5;
-      /* staggered per-particle morph: leading edge sweeps through the cloud */
+      float rnd  = aRandom.x*0.5 + 0.5;
+      float rnd2 = aRandom.y*0.5 + 0.5;
+
+      /* cible visage: placée dans le cadre photo (coordonnées monde du hero) */
+      vec3 facePos = vec3(
+        uFaceC + vec2((aPix.x - 0.5)*uFaceS.x, (0.5 - aPix.y)*uFaceS.y),
+        (aPix.z - 0.5)*uDepth
+      );
+      /* cible texte: GÉANT, sur toute la largeur du hero */
+      vec3 textPos = vec3(aText * uHeroS * 0.5, aRandom.z*0.25);
+
       float m = smoothstep(0.0, 1.0, clamp(uMorph*1.35 - rnd*0.35, 0.0, 1.0));
-      vec3 target = mix(position, aText, m);
-      float lum = dot(aColor, vec3(0.299, 0.587, 0.114));
-      vColor = mix(aColor + aColor*lum*0.35, uAccent*(0.65 + 0.6*rnd), m);
+      vec3 target = mix(facePos, textPos, m);
 
+      float lum = aPix.z;
+      float flight = sin(3.14159265*m);
+      vColor = mix(aColor + aColor*lum*0.35, uAccent*(0.75 + 0.6*rnd), max(m, flight));
+      vGlow  = max(flight, m*0.35);
+
+      /* assemblage: les particules affluent depuis tout l'écran */
+      float ae = smoothstep(0.0, 1.0, clamp(uAssembly*1.45 - rnd2*0.45, 0.0, 1.0));
       vec3 scattered = target + aRandom * uScatter;
-      vec3 pos = mix(scattered, target, clamp(uAssembly, 0.0, 1.0));
+      vec3 pos = mix(scattered, target, ae);
 
-      /* vortex flight while morphing between photo and text */
-      float turb = sin(3.14159265*m);
-      pos += curlNoise(position*1.8 + vec3(0.0, 0.0, uTime*0.35)) * turb * 1.15;
+      /* vol en vortex pendant les morphs — à l'échelle de l'écran */
+      pos += curlNoise(target*0.55 + vec3(0.0, 0.0, uTime*0.32)) * flight * 3.2;
 
-      /* gentle idle drift + breathing so the face stays alive but readable */
+      /* dérive/respiration au repos */
       float idle = uIdleAmp * (1.0 - uReduced*0.92);
-      pos += curlNoise(position*1.4 + vec3(0.0, 0.0, uTime*0.18)) * idle;
+      pos += curlNoise(facePos*1.3 + vec3(0.0, 0.0, uTime*0.18)) * idle;
       float breathe = sin(uTime*0.8 + aRandom.x*6.2831853);
       pos.z += breathe*idle*0.5;
 
-      /* click/tap shockwave: expanding ring, damped */
+      /* LE VORTEX SOURIS: l'espace se tord autour du pointeur */
+      vec2 dp = pos.xy - uPointer;
+      float r2 = dot(dp, dp);
+      float ang = uPtrAng * exp(-r2/(uPtrR*uPtrR));
+      float ca = cos(ang), sa = sin(ang);
+      pos.xy = uPointer + vec2(dp.x*ca - dp.y*sa, dp.x*sa + dp.y*ca);
+      pos.z += ang*0.35;
+      vGlow += abs(ang)*0.55;
+
+      /* onde de choc au clic — traverse tout le hero */
       if (uShockT < 3.0){
         vec2 d2 = pos.xy - uShockC;
         float r = length(d2);
-        float ring = exp(-pow((r - uShockT*7.0)/0.55, 2.0)) * exp(-uShockT*1.6);
-        pos.xy += (d2/max(r, 0.001)) * ring * 1.15;
-        pos.z  += ring * 0.6;
+        float ring = exp(-pow((r - uShockT*13.0)/0.9, 2.0)) * exp(-uShockT*1.5);
+        pos.xy += (d2/max(r, 0.001)) * ring * 1.6;
+        pos.z  += ring * 0.8;
+        vGlow  += ring*0.8;
       }
-
-      /* pointer trail repulsion (mouse + touch) */
-      float trail = texture2D(uTouch, aUV).r;
-      vec2 away = pos.xy - uPointer;
-      float dd = max(length(away), 0.0001);
-      pos.xy += (away/dd) * trail * uPointerStrength * (1.0 - uReduced*0.85);
-      pos.z  += trail * uPointerStrength * 0.25 * (1.0 - uReduced);
 
       vec4 mv = modelViewMatrix * vec4(pos, 1.0);
       gl_Position = projectionMatrix * mv;
-      float size = uSize * (0.5 + 0.9*lum) * (0.85 + 0.3*(breathe*0.5 + 0.5));
-      size *= 1.0 + trail*0.8 + m*0.45 + turb*0.5;
+      float size = uSize * (0.55 + 0.9*lum) * (0.85 + 0.3*(breathe*0.5 + 0.5));
+      size *= 1.0 + m*0.5 + flight*0.9 + vGlow*0.4;
       gl_PointSize = max(1.0, size * uFocal / -mv.z);
     }`;
 
     const FRAG = `
     precision highp float;
-    uniform float uOpacity;
-    varying vec3 vColor;
+    uniform float uOpacity, uLight;
+    uniform vec3  uAccent;
+    varying vec3  vColor;
+    varying float vGlow;
     void main(){
       vec2 c = gl_PointCoord - 0.5;
-      float a = smoothstep(0.5, 0.08, length(c));
+      float d = length(c);
+      float a = smoothstep(0.5, 0.08, d);
       if (a <= 0.001) discard;
-      gl_FragColor = vec4(vColor, a*uOpacity);
+      vec3 col = vColor * mix(1.0 + vGlow*0.9, 0.82, uLight);
+      /* coeur chaud: blanc en CRT, accent profond en clair */
+      vec3 core = mix(vec3(1.0), uAccent*0.45, uLight);
+      col += core * vGlow * smoothstep(0.25, 0.0, d) * 0.6;
+      float alpha = a * uOpacity * mix(1.0, 1.25, uLight);
+      gl_FragColor = vec4(col, alpha);
     }`;
 
-    /* messages écrits en particules entre deux apparitions du visage */
     const TEXTS = [['KENNY'], ['SUPPORT', 'IT'], ['5000+', 'TICKETS']];
-
-    function setStatus(txt){
-      if (status && status.firstChild) status.firstChild.nodeValue = txt + ' ';
-    }
+    const setStatus = (t) => { if (status && status.firstChild) status.firstChild.nodeValue = t + ' '; };
+    const isClean = () => document.body.classList.contains('clean-mode');
     function accentColor(){
       const v = getComputedStyle(document.body).getPropertyValue('--green').trim();
       try { return new THREE.Color(v || '#00ff41'); } catch(e){ return new THREE.Color('#00ff41'); }
     }
 
     function start(){
-      let W = frame.clientWidth  || 250;
-      let H = frame.clientHeight || 275;
-      const nw = img.naturalWidth || 600, nh = img.naturalHeight || 575;
-      const aspect = nw / nh;
-      const coarse = matchMedia('(pointer: coarse)').matches;
-      const target = reduce ? 12000 : (coarse ? 24000 : 48000);
+      /* ── monde = tout le hero ── */
+      let HW = hero.clientWidth || innerWidth, HH = hero.clientHeight || innerHeight;
+      const worldH = 2 * CAMZ * Math.tan(FOV*Math.PI/360);
+      let worldW = worldH * HW/HH;
 
-      /* ── photo → particules ── */
-      let sh = Math.max(48, Math.min(440, Math.round(Math.sqrt((target/0.55)/aspect))));
-      let sw = Math.round(sh * aspect);
+      const nw = img.naturalWidth || 600, nh = img.naturalHeight || 575;
+      const iAspect = nw/nh;
+      const coarse = matchMedia('(pointer: coarse)').matches;
+      const target = reduce ? 15000 : (coarse ? 30000 : 60000);
+
+      /* photo → attributs (uv+lum normalisés: le placement se fait au shader) */
+      let sh = Math.max(48, Math.min(480, Math.round(Math.sqrt((target/0.55)/iAspect))));
+      let sw = Math.round(sh*iAspect);
       const oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
-      const octx = oc.getContext('2d', { willReadFrequently: true });
+      const octx = oc.getContext('2d', { willReadFrequently:true });
       octx.drawImage(img, 0, 0, sw, sh);
       let data;
       try { data = octx.getImageData(0, 0, sw, sh).data; } catch(e){ return false; }
       let n = 0;
       for (let i = 0; i < data.length; i += 4) if (data[i] > THRESH) n++;
       if (n < 50) return false;
-      const positions = new Float32Array(n*3), colors = new Float32Array(n*3),
-            randoms = new Float32Array(n*3), uvs = new Float32Array(n*2),
-            textPos = new Float32Array(n*3);
+      const pix = new Float32Array(n*3), colors = new Float32Array(n*3),
+            randoms = new Float32Array(n*3), text = new Float32Array(n*2);
       let k = 0;
       for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++){
         const idx = (y*sw + x)*4; const r = data[idx];
         if (r <= THRESH) continue;
         const g = data[idx+1], b = data[idx+2];
-        const u = x/(sw-1), v = y/(sh-1);
-        const lum = (0.299*r + 0.587*g + 0.114*b)/255;
-        positions[k*3] = (u-0.5)*PLANE*aspect; positions[k*3+1] = (0.5-v)*PLANE; positions[k*3+2] = (lum-0.5)*DEPTH;
+        pix[k*3] = x/(sw-1); pix[k*3+1] = y/(sh-1);
+        pix[k*3+2] = (0.299*r + 0.587*g + 0.114*b)/255;
         colors[k*3] = r/255; colors[k*3+1] = g/255; colors[k*3+2] = b/255;
         randoms[k*3] = Math.random()*2-1; randoms[k*3+1] = Math.random()*2-1; randoms[k*3+2] = Math.random()*2-1;
-        uvs[k*2] = u; uvs[k*2+1] = v; k++;
+        k++;
       }
-      textPos.set(positions);   // avant le premier morph, cible = photo
 
-      /* ── texte → cibles de particules ── */
+      /* texte → cibles normalisées sur TOUT le hero */
       function bakeText(lines){
-        const tw = 320, th = Math.max(64, Math.round(320 * (H/W)));
+        const tw = 512, th = Math.max(96, Math.round(512*HH/HW));
         const c = document.createElement('canvas'); c.width = tw; c.height = th;
         const x = c.getContext('2d');
         x.fillStyle = '#000'; x.fillRect(0, 0, tw, th);
         x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle';
-        let fs = 400;
+        let fs = 800;
         for (const ln of lines){
           x.font = '900 100px Syne, "Arial Black", sans-serif';
-          const w100 = Math.max(1, x.measureText(ln).width);
-          fs = Math.min(fs, 100 * (tw*0.88) / w100);
+          fs = Math.min(fs, 100*(tw*0.92)/Math.max(1, x.measureText(ln).width));
         }
-        fs = Math.min(fs, (th*0.78) / lines.length);
+        fs = Math.min(fs, (th*0.8)/lines.length);
         x.font = '900 ' + Math.floor(fs) + 'px Syne, "Arial Black", sans-serif';
-        const lh = fs*1.12, y0 = th/2 - lh*(lines.length-1)/2;
+        const lh = fs*1.08, y0 = th/2 - lh*(lines.length-1)/2;
         lines.forEach((ln, i) => x.fillText(ln, tw/2, y0 + i*lh));
         const d = x.getImageData(0, 0, tw, th).data;
         const pts = [];
         for (let yy = 0; yy < th; yy++) for (let xx = 0; xx < tw; xx++){
-          if (d[(yy*tw + xx)*4] > 120){
-            pts.push(((xx/(tw-1)) - 0.5)*PLANE*aspect, (0.5 - yy/(th-1))*PLANE, 0);
-          }
+          if (d[(yy*tw + xx)*4] > 120) pts.push((xx/(tw-1) - 0.5)*2, (0.5 - yy/(th-1))*2);
         }
         return pts;
       }
       function loadTextTargets(lines){
         const pts = bakeText(lines);
-        const T = pts.length/3;
+        const T = pts.length/2;
         if (T < 30) return false;
         for (let i = 0; i < n; i++){
-          const j = (i*7919) % T;   // scramble: les voisins photo volent vers des lettres différentes
-          textPos[i*3]   = pts[j*3]   + (Math.random()-0.5)*0.05;
-          textPos[i*3+1] = pts[j*3+1] + (Math.random()-0.5)*0.05;
-          textPos[i*3+2] = (Math.random()-0.5)*0.12;
+          const j = (i*7919) % T;
+          text[i*2]   = pts[j*2]   + (Math.random()-0.5)*0.008;
+          text[i*2+1] = pts[j*2+1] + (Math.random()-0.5)*0.008;
         }
         geo.attributes.aText.needsUpdate = true;
         return true;
       }
 
-      /* ── renderer ── */
+      /* renderer plein hero */
       let renderer;
       try { renderer = new THREE.WebGLRenderer({ antialias:false, alpha:true, powerPreference:'high-performance' }); }
       catch(e){ return false; }
       if (!renderer || !renderer.getContext()) return false;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-      renderer.setSize(W, H, false);
+      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.25 : 1.5));
+      renderer.setSize(HW, HH, false);
       const cv = renderer.domElement;
-      cv.className = 'crt-webgl';
+      cv.id = 'gpu-hero';
       cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;';
-      frame.appendChild(cv);
+      hero.insertBefore(cv, hero.firstChild);
+      hero.classList.add('gpu-on');      /* cache l'ancien canvas 2D + la photo */
       frame.classList.add('fx-on');
-      frame.style.touchAction = 'none';
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(50, W/H, 0.1, 100);
-      camera.position.z = 6.5;
-
-      const TS = 256;
-      const tcv = document.createElement('canvas'); tcv.width = TS; tcv.height = TS;
-      const tctx = tcv.getContext('2d'); tctx.fillStyle = '#000'; tctx.fillRect(0, 0, TS, TS);
-      const trailTex = new THREE.CanvasTexture(tcv);
-      trailTex.flipY = false; trailTex.minFilter = THREE.LinearFilter; trailTex.magFilter = THREE.LinearFilter;
+      const camera = new THREE.PerspectiveCamera(FOV, HW/HH, 0.1, 100);
+      camera.position.z = CAMZ;
 
       const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n*3), 3)); /* requis par three, non utilisé */
+      geo.setAttribute('aPix',    new THREE.BufferAttribute(pix, 3));
       geo.setAttribute('aColor',  new THREE.BufferAttribute(colors, 3));
       geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
-      geo.setAttribute('aUV',     new THREE.BufferAttribute(uvs, 2));
-      geo.setAttribute('aText',   new THREE.BufferAttribute(textPos, 3).setUsage(THREE.DynamicDrawUsage));
-      geo.computeBoundingSphere();
+      geo.setAttribute('aText',   new THREE.BufferAttribute(text, 2).setUsage(THREE.DynamicDrawUsage));
+      geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0,0,0), 50);
+
+      /* position du cadre photo → coordonnées monde */
+      function faceRect(){
+        const hr = hero.getBoundingClientRect(), fr = frame.getBoundingClientRect();
+        const cx = (fr.left + fr.width/2  - hr.left)/hr.width;
+        const cy = (fr.top  + fr.height/2 - hr.top )/hr.height;
+        const frW = (fr.width/hr.width)*worldW * 0.94;
+        const frH = (fr.height/hr.height)*worldH * 0.94;
+        const w = Math.min(frW, frH*iAspect);      /* contain: le visage reste dans le cadre */
+        return { c:[(cx-0.5)*worldW, (0.5-cy)*worldH], s:[w, w/iAspect] };
+      }
+      const fr0 = faceRect();
 
       const uniforms = {
-        uTime:{value:0}, uAssembly:{value:0}, uIdleAmp:{value:0.045}, uScatter:{value:3.2},
-        uSize:{value:0.03}, uFocal:{value:500}, uReduced:{value:reduce?1:0},
-        uPointer:{value:new THREE.Vector2(999,999)}, uPointerStrength:{value:0.9},
-        uTouch:{value:trailTex}, uOpacity:{value:1.0},
-        uMorph:{value:0}, uShockT:{value:99}, uShockC:{value:new THREE.Vector2(0,0)},
-        uAccent:{value:accentColor()},
+        uTime:{value:0}, uAssembly:{value:0}, uMorph:{value:0},
+        uIdleAmp:{value:0.05}, uScatter:{value:worldW*0.55},
+        uSize:{value:0.022}, uFocal:{value:800}, uReduced:{value:reduce?1:0},
+        uShockT:{value:99}, uShockC:{value:new THREE.Vector2(0,0)},
+        uPointer:{value:new THREE.Vector2(999,999)}, uPtrAng:{value:0}, uPtrR:{value:worldH*0.22},
+        uFaceC:{value:new THREE.Vector2(fr0.c[0], fr0.c[1])},
+        uFaceS:{value:new THREE.Vector2(fr0.s[0], fr0.s[1])},
+        uHeroS:{value:new THREE.Vector2(worldW, worldH)},
+        uDepth:{value:1.2}, uAccent:{value:accentColor()},
+        uOpacity:{value:1.0}, uLight:{value:isClean()?1:0},
       };
       const mat = new THREE.ShaderMaterial({
         vertexShader:VERT, fragmentShader:FRAG, uniforms,
-        transparent:true, depthWrite:false, depthTest:true, blending:THREE.AdditiveBlending,
+        transparent:true, depthWrite:false, depthTest:false,
+        blending: isClean() ? THREE.NormalBlending : THREE.AdditiveBlending,
       });
       const points = new THREE.Points(geo, mat);
       points.frustumCulled = false;
       scene.add(points);
 
-      /* ── pointeur : traînée + parallaxe + onde de choc ── */
-      let tiltX = 0, tiltY = 0, tiltTX = 0, tiltTY = 0;
-      function stamp(u, v){
-        const x = u*TS, y = v*TS, rad = Math.max(3, 0.12*TS);
-        const grad = tctx.createRadialGradient(x, y, 0, x, y, rad);
-        grad.addColorStop(0, 'rgba(255,255,255,0.95)'); grad.addColorStop(1, 'rgba(255,255,255,0)');
-        tctx.globalCompositeOperation = 'lighter'; tctx.fillStyle = grad;
-        tctx.beginPath(); tctx.arc(x, y, rad, 0, 6.2832); tctx.fill();
-        tctx.globalCompositeOperation = 'source-over'; trailTex.needsUpdate = true;
+      /* pointeur sur TOUT le hero: vortex + parallaxe + shock */
+      let ptrTargetAng = 0, tiltTX = 0, tiltTY = 0, tiltX = 0, tiltY = 0;
+      function worldXY(e){
+        const hr = hero.getBoundingClientRect();
+        const u = (e.clientX - hr.left)/hr.width, v = (e.clientY - hr.top)/hr.height;
+        return [(u-0.5)*worldW, (0.5-v)*worldH, u, v];
       }
-      function uvFromEvent(e){
-        const rect = cv.getBoundingClientRect();
-        return [(e.clientX - rect.left)/rect.width, (e.clientY - rect.top)/rect.height];
-      }
-      frame.addEventListener('pointermove', (e) => {
-        const [u, v] = uvFromEvent(e);
-        if (u < 0 || u > 1 || v < 0 || v > 1) return;
-        uniforms.uPointer.value.set((u-0.5)*PLANE*aspect, (0.5-v)*PLANE);
-        stamp(u, v);
-        if (!coarse){ tiltTX = (v-0.5)*0.45; tiltTY = (u-0.5)*0.55; }
+      hero.addEventListener('pointermove', (e) => {
+        const [wx, wy, u, v] = worldXY(e);
+        uniforms.uPointer.value.set(wx, wy);
+        ptrTargetAng = 1.15;
+        if (!coarse){ tiltTX = (v-0.5)*0.10; tiltTY = (u-0.5)*0.14; }
       }, { passive:true });
-      frame.addEventListener('pointerleave', () => { tiltTX = 0; tiltTY = 0; }, { passive:true });
+      hero.addEventListener('pointerleave', () => { ptrTargetAng = 0; tiltTX = 0; tiltTY = 0; }, { passive:true });
       let shockStart = -99;
-      frame.addEventListener('pointerdown', (e) => {
-        const [u, v] = uvFromEvent(e);
-        uniforms.uShockC.value.set((u-0.5)*PLANE*aspect, (0.5-v)*PLANE);
+      hero.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('a, button, input, .nav-links, nav')) return;  /* ne pas voler les clics UI */
+        const [wx, wy] = worldXY(e);
+        uniforms.uShockC.value.set(wx, wy);
         shockStart = clock.getElapsedTime();
-        stamp(u, v);
       }, { passive:true });
 
-      /* thème clair/CRT : accent recalculé à la volée */
       if ('MutationObserver' in window){
-        new MutationObserver(() => { uniforms.uAccent.value = accentColor(); })
-          .observe(document.body, { attributes:true, attributeFilter:['class'] });
+        new MutationObserver(() => {
+          uniforms.uAccent.value = accentColor();
+          uniforms.uLight.value = isClean() ? 1 : 0;
+          mat.blending = isClean() ? THREE.NormalBlending : THREE.AdditiveBlending;
+          mat.needsUpdate = true;
+        }).observe(document.body, { attributes:true, attributeFilter:['class'] });
       }
 
-      /* ── machine à états : INTRO → VISAGE → vortex → TEXTE → vortex → VISAGE… ── */
-      const INTRO = 2.4, HOLD = 6.0, TOTXT = 1.5, TXT = 2.8, TOPIC = 1.5;
-      let phase = 'intro', phaseStart = 0, textIdx = 0, textReady = false;
+      /* takeover: on estompe le contenu du hero pendant les phases texte */
+      const fadeEls = ['.hero-prompt', '.hero-name', '.hero-title', '.hero-facts', '.hero-manifesto', '.hero-cta']
+        .map((q) => hero.querySelector(q)).filter(Boolean);
+      let fadeArmed = false;
+      function setTakeover(on){
+        if (!fadeArmed){
+          fadeEls.forEach((el) => {
+            el.style.animation = 'none'; el.style.opacity = '1';
+            el.style.transition = 'opacity 0.65s ease';
+          });
+          fadeArmed = true;
+        }
+        fadeEls.forEach((el) => { el.style.opacity = on ? '0.07' : '1'; });
+      }
+
+      /* machine à états */
+      const INTRO = 3.0, HOLD = 6.0, TOTXT = 1.7, TXT = 3.0, TOPIC = 1.7;
+      let phase = 'intro', phaseStart = 0, textIdx = 0;
       const easeIO = (t) => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
 
       const clock = new THREE.Clock();
-      let raf = 0, visible = true;
+      let raf = 0, visible = true, emaDt = 16, downgraded = false, lastT = 0;
 
       function loop(){
         if (!visible){ raf = 0; return; }
         raf = requestAnimationFrame(loop);
         const t = clock.getElapsedTime();
+        const dt = Math.min(100, (t - lastT)*1000); lastT = t;
+        emaDt = emaDt*0.95 + dt*0.05;
         uniforms.uTime.value = t;
-        uniforms.uFocal.value = renderer.domElement.height / (2 * Math.tan(50*Math.PI/360));
+        uniforms.uFocal.value = renderer.domElement.height / (2*Math.tan(FOV*Math.PI/360));
         uniforms.uShockT.value = shockStart < 0 ? 99 : (t - shockStart);
+        uniforms.uPtrAng.value += (ptrTargetAng - uniforms.uPtrAng.value)*0.06;
 
-        /* parallaxe 3D : le nuage s'incline vers le pointeur */
-        tiltX += (tiltTX - tiltX)*0.07;
-        tiltY += (tiltTY - tiltY)*0.07;
-        points.rotation.x = tiltX;
-        points.rotation.y = tiltY;
+        tiltX += (tiltTX - tiltX)*0.05; tiltY += (tiltTY - tiltY)*0.05;
+        points.rotation.x = tiltX; points.rotation.y = tiltY;
 
         const el = t - phaseStart;
         if (phase === 'intro'){
           uniforms.uAssembly.value = 1 - Math.pow(1 - Math.min(1, el/INTRO), 3);
           if (el >= INTRO){ phase = 'hold'; phaseStart = t; uniforms.uAssembly.value = 1; setStatus('SIGNAL LOCKED'); }
         } else if (phase === 'hold'){
-          uniforms.uMorph.value = 0;
-          uniforms.uIdleAmp.value = 0.045;
+          uniforms.uMorph.value = 0; uniforms.uIdleAmp.value = 0.05;
           if (!reduce && el >= HOLD){
-            textReady = loadTextTargets(TEXTS[textIdx]);
-            if (textReady){ phase = 'totxt'; phaseStart = t; setStatus('ENCODING ▸▸'); }
-            else { phaseStart = t; }
+            if (loadTextTargets(TEXTS[textIdx])){ phase = 'totxt'; phaseStart = t; setStatus('ENCODING ▸▸'); setTakeover(true); }
+            else phaseStart = t;
           }
         } else if (phase === 'totxt'){
           uniforms.uMorph.value = easeIO(Math.min(1, el/TOTXT));
           if (el >= TOTXT){ phase = 'txt'; phaseStart = t; setStatus('TX: ' + TEXTS[textIdx].join(' ')); }
         } else if (phase === 'txt'){
-          uniforms.uMorph.value = 1;
-          uniforms.uIdleAmp.value = 0.028;
+          uniforms.uMorph.value = 1; uniforms.uIdleAmp.value = 0.03;
           if (el >= TXT){ phase = 'topic'; phaseStart = t; setStatus('◂◂ DECODING'); }
         } else if (phase === 'topic'){
           uniforms.uMorph.value = 1 - easeIO(Math.min(1, el/TOPIC));
-          if (el >= TOPIC){
-            phase = 'hold'; phaseStart = t;
-            textIdx = (textIdx + 1) % TEXTS.length;
-            setStatus('SIGNAL LOCKED');
-          }
+          if (el >= TOPIC){ phase = 'hold'; phaseStart = t; textIdx = (textIdx+1)%TEXTS.length; setStatus('SIGNAL LOCKED'); }
+          if (el >= TOPIC*0.5) setTakeover(false);   /* le contenu revient pendant la reformation */
         }
 
-        /* la traînée du pointeur s'estompe → retour élastique */
-        tctx.globalCompositeOperation = 'source-over';
-        tctx.fillStyle = 'rgba(0,0,0,0.07)'; tctx.fillRect(0, 0, TS, TS);
-        trailTex.needsUpdate = true;
+        /* auto-qualité: si ça rame, on réduit la résolution de rendu */
+        if (!downgraded && t > 5 && emaDt > 26){
+          downgraded = true;
+          renderer.setPixelRatio(1);
+        }
 
         renderer.render(scene, camera);
       }
 
       if ('IntersectionObserver' in window){
-        new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible && !raf) loop(); }, { threshold:0.05 }).observe(frame);
+        new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible && !raf){ lastT = clock.getElapsedTime(); loop(); } }, { threshold:0.03 }).observe(hero);
       }
-      document.addEventListener('visibilitychange', () => { if (!document.hidden && visible && !raf) loop(); });
+      document.addEventListener('visibilitychange', () => { if (!document.hidden && visible && !raf){ lastT = clock.getElapsedTime(); loop(); } });
       let rt;
       window.addEventListener('resize', () => {
         clearTimeout(rt);
         rt = setTimeout(() => {
-          W = frame.clientWidth || W; H = frame.clientHeight || H;
-          renderer.setSize(W, H, false); camera.aspect = W/H; camera.updateProjectionMatrix();
+          HW = hero.clientWidth || HW; HH = hero.clientHeight || HH;
+          worldW = worldH * HW/HH;
+          renderer.setSize(HW, HH, false);
+          camera.aspect = HW/HH; camera.updateProjectionMatrix();
+          uniforms.uHeroS.value.set(worldW, worldH);
+          uniforms.uScatter.value = worldW*0.55;
+          const fr = faceRect();
+          uniforms.uFaceC.value.set(fr.c[0], fr.c[1]);
+          uniforms.uFaceS.value.set(fr.s[0], fr.s[1]);
         }, 200);
       });
 
@@ -3201,7 +3241,7 @@
     function boot(){
       let ok = false;
       try { ok = start(); } catch(e){ ok = false; }
-      if (ok === false) frame.classList.remove('fx-on');
+      if (ok === false){ frame.classList.remove('fx-on'); hero.classList.remove('gpu-on'); }
     }
     if (img.complete && img.naturalWidth) boot();
     else img.addEventListener('load', boot, { once:true });
