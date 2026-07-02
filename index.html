@@ -2888,7 +2888,7 @@
 
     const VERT = NOISE + `
     uniform float uTime, uAssembly, uMorph, uIdleAmp, uScatter, uSize, uFocal, uReduced;
-    uniform float uShockT, uPtrAng, uPtrR, uDepth;
+    uniform float uShockT, uPtrAng, uPtrR, uDepth, uLightV;
     uniform vec2  uShockC, uPointer, uFaceC, uFaceS, uHeroS;
     uniform vec3  uAccent;
     attribute vec3 aPix;      /* u, v (photo), luminance */
@@ -2914,7 +2914,9 @@
 
       float lum = aPix.z;
       float flight = sin(3.14159265*m);
-      vColor = mix(aColor + aColor*lum*0.35, uAccent*(0.75 + 0.6*rnd), max(m, flight));
+      /* en mode CRT (uLight=0), les tons sombres (afro) reçoivent une lueur phosphore */
+      vec3 base = aColor + aColor*lum*0.35 + uAccent*(1.0 - lum)*0.16*(1.0 - uLightV);
+      vColor = mix(base, uAccent*(0.75 + 0.6*rnd), max(m, flight));
       vGlow  = max(flight, m*0.35);
 
       /* assemblage: les particules affluent depuis tout l'écran */
@@ -2931,10 +2933,13 @@
       float breathe = sin(uTime*0.8 + aRandom.x*6.2831853);
       pos.z += breathe*idle*0.5;
 
-      /* LE VORTEX SOURIS: l'espace se tord autour du pointeur */
+      /* LE VORTEX SOURIS: l'espace se tord autour du pointeur.
+         Le visage posé reste ferme (léger frémissement), le vortex
+         complet ne s'applique qu'aux particules en vol / en texte. */
+      float faceness = (1.0 - m) * ae * (1.0 - flight);
       vec2 dp = pos.xy - uPointer;
       float r2 = dot(dp, dp);
-      float ang = uPtrAng * exp(-r2/(uPtrR*uPtrR));
+      float ang = uPtrAng * exp(-r2/(uPtrR*uPtrR)) * mix(1.0, 0.10, faceness);
       float ca = cos(ang), sa = sin(ang);
       pos.xy = uPointer + vec2(dp.x*ca - dp.y*sa, dp.x*sa + dp.y*ca);
       pos.z += ang*0.35;
@@ -2995,30 +3000,68 @@
       const coarse = matchMedia('(pointer: coarse)').matches;
       const target = reduce ? 15000 : (coarse ? 30000 : 60000);
 
-      /* photo → attributs (uv+lum normalisés: le placement se fait au shader) */
-      let sh = Math.max(48, Math.min(480, Math.round(Math.sqrt((target/0.55)/iAspect))));
+      /* photo → particules, AVEC détourage du fond: seul le sujet reste.
+         Le fond est appris sur les bords haut/gauche/droit de l'image
+         (jamais le bas: c'est le buste), pixels sombres exclus du modèle
+         (cheveux). On garde donc: afro + visage + épaules. */
+      let sh = Math.max(64, Math.min(520, Math.round(Math.sqrt((target/0.40)/iAspect))));
       let sw = Math.round(sh*iAspect);
       const oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
       const octx = oc.getContext('2d', { willReadFrequently:true });
       octx.drawImage(img, 0, 0, sw, sh);
       let data;
       try { data = octx.getImageData(0, 0, sw, sh).data; } catch(e){ return false; }
-      let n = 0;
-      for (let i = 0; i < data.length; i += 4) if (data[i] > THRESH) n++;
-      if (n < 50) return false;
-      const pix = new Float32Array(n*3), colors = new Float32Array(n*3),
-            randoms = new Float32Array(n*3), text = new Float32Array(n*2);
+
+      /* modèle de fond: couleurs des bords (quantifiées, claires uniquement) */
+      const ring = Math.max(2, Math.round(sw*0.05));
+      const bgMap = new Map();
+      function feed(x, y){
+        const i = (y*sw + x)*4, r = data[i], g = data[i+1], b = data[i+2];
+        const lum = 0.299*r + 0.587*g + 0.114*b;
+        if (lum < 80) return;                       /* jamais les tons sombres (cheveux) */
+        const key = ((r>>4)<<8) | ((g>>4)<<4) | (b>>4);
+        const e = bgMap.get(key);
+        if (e){ e.n++; e.r+=r; e.g+=g; e.b+=b; } else bgMap.set(key, {n:1, r, g, b});
+      }
+      for (let y = 0; y < ring; y++) for (let x = 0; x < sw; x++) feed(x, y);
+      const sideH = Math.round(sh*0.62);
+      for (let y = 0; y < sideH; y++) for (let x = 0; x < ring; x++){ feed(x, y); feed(sw-1-x, y); }
+      const bgC = [];
+      bgMap.forEach((e) => { if (e.n >= 6) bgC.push([e.r/e.n, e.g/e.n, e.b/e.n]); });
+      const TH2 = 42*42;
+      function isBg(r, g, b){
+        for (let i = 0; i < bgC.length; i++){
+          const dr = r-bgC[i][0], dg = g-bgC[i][1], db = b-bgC[i][2];
+          if (dr*dr + dg*dg + db*db < TH2) return true;
+        }
+        return false;
+      }
+
+      /* première passe: compter les pixels sujet */
+      let subj = 0;
+      for (let i = 0; i < data.length; i += 4){
+        if (!isBg(data[i], data[i+1], data[i+2])) subj++;
+      }
+      if (subj < 200) return false;
+      const keepP = Math.min(1, target/subj);       /* densité adaptée au budget */
+      const nMax = Math.min(subj, Math.ceil(target*1.05));
+      const pix = new Float32Array(nMax*3), colors = new Float32Array(nMax*3),
+            randoms = new Float32Array(nMax*3);
       let k = 0;
-      for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++){
-        const idx = (y*sw + x)*4; const r = data[idx];
-        if (r <= THRESH) continue;
-        const g = data[idx+1], b = data[idx+2];
+      for (let y = 0; y < sh && k < nMax; y++) for (let x = 0; x < sw && k < nMax; x++){
+        const idx = (y*sw + x)*4;
+        const r = data[idx], g = data[idx+1], b = data[idx+2];
+        if (isBg(r, g, b)) continue;
+        if (Math.random() > keepP) continue;
         pix[k*3] = x/(sw-1); pix[k*3+1] = y/(sh-1);
         pix[k*3+2] = (0.299*r + 0.587*g + 0.114*b)/255;
         colors[k*3] = r/255; colors[k*3+1] = g/255; colors[k*3+2] = b/255;
         randoms[k*3] = Math.random()*2-1; randoms[k*3+1] = Math.random()*2-1; randoms[k*3+2] = Math.random()*2-1;
         k++;
       }
+      const n = k;
+      if (n < 200) return false;
+      const text = new Float32Array(n*2);
 
       /* texte → cibles normalisées sur TOUT le hero */
       function bakeText(lines){
@@ -3076,9 +3119,9 @@
 
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n*3), 3)); /* requis par three, non utilisé */
-      geo.setAttribute('aPix',    new THREE.BufferAttribute(pix, 3));
-      geo.setAttribute('aColor',  new THREE.BufferAttribute(colors, 3));
-      geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
+      geo.setAttribute('aPix',    new THREE.BufferAttribute(pix.subarray(0, n*3), 3));
+      geo.setAttribute('aColor',  new THREE.BufferAttribute(colors.subarray(0, n*3), 3));
+      geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms.subarray(0, n*3), 3));
       geo.setAttribute('aText',   new THREE.BufferAttribute(text, 2).setUsage(THREE.DynamicDrawUsage));
       geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0,0,0), 50);
 
@@ -3096,15 +3139,15 @@
 
       const uniforms = {
         uTime:{value:0}, uAssembly:{value:0}, uMorph:{value:0},
-        uIdleAmp:{value:0.05}, uScatter:{value:worldW*0.55},
-        uSize:{value:0.022}, uFocal:{value:800}, uReduced:{value:reduce?1:0},
+        uIdleAmp:{value:0.035}, uScatter:{value:worldW*0.55},
+        uSize:{value:0.026}, uFocal:{value:800}, uReduced:{value:reduce?1:0},
         uShockT:{value:99}, uShockC:{value:new THREE.Vector2(0,0)},
         uPointer:{value:new THREE.Vector2(999,999)}, uPtrAng:{value:0}, uPtrR:{value:worldH*0.22},
         uFaceC:{value:new THREE.Vector2(fr0.c[0], fr0.c[1])},
         uFaceS:{value:new THREE.Vector2(fr0.s[0], fr0.s[1])},
         uHeroS:{value:new THREE.Vector2(worldW, worldH)},
         uDepth:{value:1.2}, uAccent:{value:accentColor()},
-        uOpacity:{value:1.0}, uLight:{value:isClean()?1:0},
+        uOpacity:{value:1.0}, uLight:{value:isClean()?1:0}, uLightV:{value:isClean()?1:0},
       };
       const mat = new THREE.ShaderMaterial({
         vertexShader:VERT, fragmentShader:FRAG, uniforms,
@@ -3126,7 +3169,7 @@
         const [wx, wy, u, v] = worldXY(e);
         uniforms.uPointer.value.set(wx, wy);
         ptrTargetAng = 1.15;
-        if (!coarse){ tiltTX = (v-0.5)*0.10; tiltTY = (u-0.5)*0.14; }
+        if (!coarse){ tiltTX = (v-0.5)*0.045; tiltTY = (u-0.5)*0.06; }
       }, { passive:true });
       hero.addEventListener('pointerleave', () => { ptrTargetAng = 0; tiltTX = 0; tiltTY = 0; }, { passive:true });
       let shockStart = -99;
@@ -3141,6 +3184,7 @@
         new MutationObserver(() => {
           uniforms.uAccent.value = accentColor();
           uniforms.uLight.value = isClean() ? 1 : 0;
+          uniforms.uLightV.value = isClean() ? 1 : 0;
           mat.blending = isClean() ? THREE.NormalBlending : THREE.AdditiveBlending;
           mat.needsUpdate = true;
         }).observe(document.body, { attributes:true, attributeFilter:['class'] });
@@ -3188,7 +3232,7 @@
           uniforms.uAssembly.value = 1 - Math.pow(1 - Math.min(1, el/INTRO), 3);
           if (el >= INTRO){ phase = 'hold'; phaseStart = t; uniforms.uAssembly.value = 1; setStatus('SIGNAL LOCKED'); }
         } else if (phase === 'hold'){
-          uniforms.uMorph.value = 0; uniforms.uIdleAmp.value = 0.05;
+          uniforms.uMorph.value = 0; uniforms.uIdleAmp.value = 0.035;
           if (!reduce && el >= HOLD){
             if (loadTextTargets(TEXTS[textIdx])){ phase = 'totxt'; phaseStart = t; setStatus('ENCODING ▸▸'); setTakeover(true); }
             else phaseStart = t;
