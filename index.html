@@ -2915,7 +2915,9 @@
       float lum = aPix.z;
       float flight = sin(3.14159265*m);
       /* en mode CRT (uLight=0), les tons sombres (afro) reçoivent une lueur phosphore */
-      vec3 base = aColor + aColor*lum*0.35 + uAccent*(1.0 - lum)*0.16*(1.0 - uLightV);
+      /* mode clair: les hautes lumières sont foncées (rendu encre lisible sur blanc) */
+      vec3 base = aColor + aColor*lum*0.35 - aColor*lum*0.38*uLightV
+                + uAccent*(1.0 - lum)*0.16*(1.0 - uLightV);
       vColor = mix(base, uAccent*(0.75 + 0.6*rnd), max(m, flight));
       vGlow  = max(flight, m*0.35);
 
@@ -2982,6 +2984,10 @@
     }`;
 
     const TEXTS = [['KENNY'], ['SUPPORT', 'IT'], ['5000+', 'TICKETS']];
+    /* matte de détourage pré-calculée (GrabCut hors-ligne): blanc = sujet */
+    const MATTE_SRC = 'data:image/png;base64,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';
+    const matteImg = new Image();
+    matteImg.src = MATTE_SRC;
     const setStatus = (t) => { if (status && status.firstChild) status.firstChild.nodeValue = t + ' '; };
     const isClean = () => document.body.classList.contains('clean-mode');
     function accentColor(){
@@ -3012,36 +3018,14 @@
       let data;
       try { data = octx.getImageData(0, 0, sw, sh).data; } catch(e){ return false; }
 
-      /* modèle de fond: couleurs des bords (quantifiées, claires uniquement) */
-      const ring = Math.max(2, Math.round(sw*0.05));
-      const bgMap = new Map();
-      function feed(x, y){
-        const i = (y*sw + x)*4, r = data[i], g = data[i+1], b = data[i+2];
-        const lum = 0.299*r + 0.587*g + 0.114*b;
-        if (lum < 80) return;                       /* jamais les tons sombres (cheveux) */
-        const key = ((r>>4)<<8) | ((g>>4)<<4) | (b>>4);
-        const e = bgMap.get(key);
-        if (e){ e.n++; e.r+=r; e.g+=g; e.b+=b; } else bgMap.set(key, {n:1, r, g, b});
-      }
-      for (let y = 0; y < ring; y++) for (let x = 0; x < sw; x++) feed(x, y);
-      const sideH = Math.round(sh*0.62);
-      for (let y = 0; y < sideH; y++) for (let x = 0; x < ring; x++){ feed(x, y); feed(sw-1-x, y); }
-      const bgC = [];
-      bgMap.forEach((e) => { if (e.n >= 6) bgC.push([e.r/e.n, e.g/e.n, e.b/e.n]); });
-      const TH2 = 42*42;
-      function isBg(r, g, b){
-        for (let i = 0; i < bgC.length; i++){
-          const dr = r-bgC[i][0], dg = g-bgC[i][1], db = b-bgC[i][2];
-          if (dr*dr + dg*dg + db*db < TH2) return true;
-        }
-        return false;
-      }
-
-      /* première passe: compter les pixels sujet */
+      /* détourage: matte pré-calculée (GrabCut hors-ligne, embarquée) */
+      const mc = document.createElement('canvas'); mc.width = sw; mc.height = sh;
+      const mctx = mc.getContext('2d');
+      mctx.drawImage(matteImg, 0, 0, sw, sh);
+      let mdata;
+      try { mdata = mctx.getImageData(0, 0, sw, sh).data; } catch(e){ return false; }
       let subj = 0;
-      for (let i = 0; i < data.length; i += 4){
-        if (!isBg(data[i], data[i+1], data[i+2])) subj++;
-      }
+      for (let i = 0; i < sw*sh; i++) if (mdata[i*4] > 110) subj++;
       if (subj < 200) return false;
       const keepP = Math.min(1, target/subj);       /* densité adaptée au budget */
       const nMax = Math.min(subj, Math.ceil(target*1.05));
@@ -3049,9 +3033,9 @@
             randoms = new Float32Array(nMax*3);
       let k = 0;
       for (let y = 0; y < sh && k < nMax; y++) for (let x = 0; x < sw && k < nMax; x++){
+        if (mdata[(y*sw + x)*4] <= 110) continue;
         const idx = (y*sw + x)*4;
         const r = data[idx], g = data[idx+1], b = data[idx+2];
-        if (isBg(r, g, b)) continue;
         if (Math.random() > keepP) continue;
         pix[k*3] = x/(sw-1); pix[k*3+1] = y/(sh-1);
         pix[k*3+2] = (0.299*r + 0.587*g + 0.114*b)/255;
@@ -3061,6 +3045,22 @@
       }
       const n = k;
       if (n < 200) return false;
+      /* zoom sujet: remap uv sur la bounding-box du buste -> il remplit le cadre */
+      let mnU = 1, mxU = 0, mnV = 1, mxV = 0;
+      for (let i = 0; i < n; i++){
+        const u = pix[i*3], v = pix[i*3+1];
+        if (u < mnU) mnU = u; if (u > mxU) mxU = u;
+        if (v < mnV) mnV = v; if (v > mxV) mxV = v;
+      }
+      const mrg = 0.03;
+      mnU = Math.max(0, mnU-mrg); mxU = Math.min(1, mxU+mrg);
+      mnV = Math.max(0, mnV-mrg); mxV = Math.min(1, mxV+mrg);
+      const spanU = Math.max(0.05, mxU-mnU), spanV = Math.max(0.05, mxV-mnV);
+      for (let i = 0; i < n; i++){
+        pix[i*3]   = (pix[i*3]   - mnU)/spanU;
+        pix[i*3+1] = (pix[i*3+1] - mnV)/spanV;
+      }
+      const subjAspect = (spanU*sw)/(spanV*sh);   /* aspect réel du buste */
       const text = new Float32Array(n*2);
 
       /* texte → cibles normalisées sur TOUT le hero */
@@ -3130,10 +3130,10 @@
         const hr = hero.getBoundingClientRect(), fr = frame.getBoundingClientRect();
         const cx = (fr.left + fr.width/2  - hr.left)/hr.width;
         const cy = (fr.top  + fr.height/2 - hr.top )/hr.height;
-        const frW = (fr.width/hr.width)*worldW * 0.94;
-        const frH = (fr.height/hr.height)*worldH * 0.94;
-        const w = Math.min(frW, frH*iAspect);      /* contain: le visage reste dans le cadre */
-        return { c:[(cx-0.5)*worldW, (0.5-cy)*worldH], s:[w, w/iAspect] };
+        const frW = (fr.width/hr.width)*worldW * 0.96;
+        const frH = (fr.height/hr.height)*worldH * 0.96;
+        const w = Math.min(frW, frH*subjAspect);   /* contain sur le buste zoomé */
+        return { c:[(cx-0.5)*worldW, (0.5-cy)*worldH], s:[w, w/subjAspect] };
       }
       const fr0 = faceRect();
 
@@ -3146,7 +3146,7 @@
         uFaceC:{value:new THREE.Vector2(fr0.c[0], fr0.c[1])},
         uFaceS:{value:new THREE.Vector2(fr0.s[0], fr0.s[1])},
         uHeroS:{value:new THREE.Vector2(worldW, worldH)},
-        uDepth:{value:1.2}, uAccent:{value:accentColor()},
+        uDepth:{value:0.55}, uAccent:{value:accentColor()},
         uOpacity:{value:1.0}, uLight:{value:isClean()?1:0}, uLightV:{value:isClean()?1:0},
       };
       const mat = new THREE.ShaderMaterial({
@@ -3287,8 +3287,10 @@
       try { ok = start(); } catch(e){ ok = false; }
       if (ok === false){ frame.classList.remove('fx-on'); hero.classList.remove('gpu-on'); }
     }
-    if (img.complete && img.naturalWidth) boot();
-    else img.addEventListener('load', boot, { once:true });
+    const ready = (el) => (el.complete && el.naturalWidth)
+      ? Promise.resolve()
+      : new Promise((r) => { el.addEventListener('load', r, { once:true }); el.addEventListener('error', r, { once:true }); });
+    Promise.all([ready(img), ready(matteImg)]).then(boot);
   })();
   </script>
 </body>
