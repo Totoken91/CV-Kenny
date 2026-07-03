@@ -1324,7 +1324,7 @@
       transition: transform 0.15s ease-out;
     }
 
-    /* ── PRINT CV (one-page) ──────────────────────────── */
+    /* ── PRINT CV — design éditorial une page ─────────── */
     #cv-print { display:none; }
     @media print {
       body > *:not(#cv-print) { display:none !important; }
@@ -1333,47 +1333,90 @@
     }
     #cv-print {
       width:210mm;min-height:297mm;max-height:297mm;overflow:hidden;
-      font-family:'Segoe UI',Arial,sans-serif;font-size:9pt;line-height:1.45;color:#222;background:#fff;
-      display:none;margin:0 auto;
-      -webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;
+      font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+      font-size:9.5pt;line-height:1.55;color:#111827;background:#fff;
+      margin:0 auto;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact;
     }
-    #cv-print * { box-sizing:border-box; }
-    .cv-wrap { display:flex;height:297mm; }
-    /* LEFT SIDEBAR */
-    .cv-side { width:72mm;background:#1a1f2e;color:#fff;padding:12mm 6mm 8mm;display:flex;flex-direction:column;gap:5mm;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact; }
-    .cv-photo { width:48mm;height:48mm;border-radius:50%;object-fit:cover;object-position:center top;border:2.5px solid #4a9fff;margin:0 auto 2mm;display:block; }
-    .cv-side h3 { font-size:8.5pt;color:#6ab4ff;text-transform:uppercase;letter-spacing:0.12em;margin:0 0 2.5mm;padding-bottom:1.5mm;border-bottom:0.5px solid rgba(255,255,255,0.2); }
-    .cv-side p, .cv-side li { font-size:8pt;color:#fff;line-height:1.55;margin:0; }
-    .cv-side a { color:#6ab4ff;text-decoration:none; }
-    .cv-side ul { list-style:none;padding:0;margin:0; }
-    .cv-side ul li { padding:1.2mm 0;font-size:8pt; }
-    .cv-skill-row { display:flex;justify-content:space-between;align-items:center;font-size:7.8pt;margin-bottom:2mm; }
-    .cv-skill-row span:first-child { color:#fff; }
-    .cv-skill-dots { display:flex;gap:1.5mm; }
-    .cv-skill-dot { width:2.2mm;height:2.2mm;border-radius:50%;background:rgba(255,255,255,0.18);display:inline-block;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
-    .cv-skill-dot.filled { background:#6ab4ff;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
-    .cv-lang-row { display:flex;justify-content:space-between;font-size:8pt;margin-bottom:1.5mm; }
-    .cv-lang-row span:first-child { color:#fff; }
-    .cv-lang-row span:last-child { color:rgba(255,255,255,0.85);font-size:7.5pt; }
-    /* RIGHT MAIN */
-    .cv-main { flex:1;padding:10mm 8mm 8mm;display:flex;flex-direction:column;gap:4.5mm; }
-    .cv-header h1 { font-size:20pt;font-weight:800;color:#1a1f2e;margin:0;line-height:1.1; }
-    .cv-header h2 { font-size:10pt;font-weight:400;color:#444;margin:1.5mm 0 0; }
-    .cv-header p { font-size:8.5pt;color:#222;margin:2.5mm 0 0;line-height:1.5; }
-    .cv-section h3 { font-size:9pt;color:#1a1f2e;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 2mm;padding-bottom:1.5mm;border-bottom:1px solid #ddd; }
-    .cv-exp-item { margin-bottom:4mm; }
-    .cv-exp-date { font-size:7.5pt;color:#555;margin:0; }
-    .cv-exp-role { font-size:9pt;font-weight:700;color:#1a1f2e;margin:0.3mm 0 0; }
-    .cv-exp-company { font-size:8pt;color:#4a8fd4;margin:0; }
-    .cv-exp-bullets { margin:1.5mm 0 0;padding-left:3.5mm;font-size:7.8pt;color:#333;line-height:1.5; }
-    .cv-exp-bullets li { margin-bottom:0.8mm; }
-    .cv-proj-row { display:flex;gap:3mm;margin-bottom:2mm; }
-    .cv-proj-name { font-size:8pt;font-weight:700;color:#1a1f2e;min-width:28mm; }
-    .cv-proj-desc { font-size:7.5pt;color:#333;flex:1; }
-    .cv-edu-item { margin-bottom:3mm; }
-    .cv-edu-item strong { font-size:8.5pt;color:#1a1f2e; }
-    .cv-edu-item em { font-size:7.5pt;color:#4a8fd4;font-style:normal; }
-    .cv-edu-item small { font-size:7pt;color:#555;display:block;margin-top:0.5mm; }
+    #cv-print * { box-sizing:border-box;margin:0;padding:0; }
+    .cvx { padding:15mm 15mm 11mm;height:297mm;display:flex;flex-direction:column; }
+
+    /* header */
+    .cvx-head { display:flex;justify-content:space-between;align-items:flex-start;gap:8mm; }
+    .cvx-id h1 {
+      font-family:'Syne','Helvetica Neue',Arial,sans-serif;
+      font-size:30pt;font-weight:800;letter-spacing:-0.02em;line-height:1.04;color:#111827;
+    }
+    .cvx-id h1 span { color:#1d4ed8; }
+    .cvx-role { font-size:12.5pt;font-weight:700;color:#1d4ed8;margin-top:2.2mm;letter-spacing:0.01em; }
+    .cvx-pitch { font-size:10pt;color:#374151;margin-top:3.5mm;max-width:124mm;line-height:1.62; }
+    .cvx-photo { width:30mm;height:30mm;object-fit:cover;object-position:center top;border-radius:2.5mm;flex-shrink:0; }
+
+    /* coordonnées en ligne */
+    .cvx-contact { display:flex;flex-wrap:wrap;gap:2.4mm 8mm;margin-top:7mm;font-size:9.4pt;color:#374151; }
+    .cvx-contact b { color:#111827;font-weight:600; }
+
+    /* barre de stats */
+    .cvx-stats {
+      display:flex;margin:8mm 0 11mm;border-top:0.5mm solid #111827;border-bottom:0.2mm solid #e5e7eb;
+    }
+    .cvx-stat { flex:1;padding:5.2mm 0 4.8mm; }
+    .cvx-stat + .cvx-stat { border-left:0.2mm solid #e5e7eb;padding-left:6mm; }
+    .cvx-stat b { display:block;font-family:'Syne',Arial,sans-serif;font-size:18pt;font-weight:800;color:#111827;line-height:1; }
+    .cvx-stat span { display:block;font-size:8.2pt;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-top:1.8mm; }
+
+    /* corps deux colonnes */
+    .cvx-body { display:flex;gap:9mm;flex:1;min-height:0; }
+    .cvx-mainc { flex:1;min-width:0; }
+    .cvx-rail { width:58mm;flex-shrink:0;border-left:0.2mm solid #e5e7eb;padding-left:7mm; }
+
+    .cvx-sec { margin-bottom:12mm; }
+    .cvx-sec > h3 {
+      font-size:9pt;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:0.16em;
+      margin-bottom:5mm;display:flex;align-items:center;gap:2.4mm;
+    }
+    .cvx-sec > h3::before { content:'';width:3.2mm;height:0.8mm;background:#1d4ed8;display:inline-block; }
+
+    /* expérience */
+    .cvx-xp { margin-bottom:9.5mm; }
+    .cvx-xp-top { display:flex;justify-content:space-between;align-items:baseline;gap:4mm; }
+    .cvx-xp-role { font-size:11.5pt;font-weight:700;color:#111827; }
+    .cvx-xp-date { font-size:8.4pt;color:#6b7280;white-space:nowrap; }
+    .cvx-xp-co { font-size:9.2pt;color:#1d4ed8;font-weight:600;margin-top:0.8mm; }
+    .cvx-xp ul { list-style:none;margin-top:2.4mm; }
+    .cvx-xp li { font-size:9.8pt;color:#374151;padding-left:4.4mm;position:relative;margin-bottom:2.6mm;line-height:1.6; }
+    .cvx-xp li::before { content:'—';position:absolute;left:0;color:#9ca3af; }
+
+    /* projets */
+    .cvx-prj { display:grid;grid-template-columns:1fr 1fr;gap:4.6mm 8mm; }
+    .cvx-prj-item { font-size:9.4pt;color:#374151;line-height:1.55; }
+    .cvx-prj-item b { color:#111827;font-weight:700; }
+    .cvx-prj-item i { font-style:normal;color:#6b7280;font-size:8pt; }
+
+    /* rail: compétences en chips */
+    .cvx-chipgrp { margin-bottom:7mm; }
+    .cvx-chipgrp p { font-size:8.2pt;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2.6mm; }
+    .cvx-chips { display:flex;flex-wrap:wrap;gap:2.2mm; }
+    .cvx-chip {
+      font-size:9pt;color:#111827;border:0.25mm solid #d1d5db;border-radius:1.6mm;
+      padding:1.4mm 3mm;white-space:nowrap;
+    }
+    .cvx-chip.hot { border-color:#1d4ed8;color:#1d4ed8;font-weight:600; }
+
+    .cvx-rail-item { margin-bottom:6mm; }
+    .cvx-rail-item b { display:block;font-size:9.8pt;color:#111827;font-weight:700; }
+    .cvx-rail-item span { display:block;font-size:9pt;color:#6b7280;margin-top:0.8mm;line-height:1.55; }
+    .cvx-lang { display:flex;justify-content:space-between;font-size:9.6pt;color:#111827;margin-bottom:2.2mm; }
+    .cvx-lang span { color:#6b7280; }
+
+    /* poste recherché */
+    .cvx-seek { display:flex;gap:8mm; }
+    .cvx-seek-item { flex:1; }
+    .cvx-seek-item b { display:block;font-size:8.2pt;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:1.2mm; }
+    .cvx-seek-item span { font-size:9.2pt;color:#111827;line-height:1.5; }
+
+    /* pied */
+    .cvx-foot { margin-top:auto;padding-top:3.5mm;border-top:0.2mm solid #e5e7eb;display:flex;justify-content:space-between;font-size:7.6pt;color:#9ca3af; }
   </style>
 </head>
 <body>
@@ -2712,95 +2755,155 @@
 
   <!-- ── CV PRINT (hidden, shown only on print) ── -->
   <div id="cv-print">
-    <div class="cv-wrap">
-      <div class="cv-side">
-        <img class="cv-photo" id="cv-photo" src="" alt="Kenny Desaintfuscien" />
-        <div>
-          <h3>Contact</h3>
-          <ul>
-            <li>kennydsf91@gmail.com</li>
-            <li>Île-de-France (91)</li>
-            <li>linkedin.com/in/kenny-desaintfuscien-41a3451a4</li>
-            <li>kenny.quest</li>
-          </ul>
+    <div class="cvx">
+
+      <div class="cvx-head">
+        <div class="cvx-id">
+          <h1>Kenny<br/>Desaintfuscien<span>.</span></h1>
+          <p class="cvx-role">Technicien Support IT · N1/N2</p>
+          <p class="cvx-pitch">Plus de 5 000 tickets résolus en environnement sensible chez Econocom. Reconversion réussie en un an, formation continue en administration système (Active Directory, Windows Server). Fiable sous pression, autonome, orienté résolution.</p>
         </div>
-        <div>
-          <h3>Support</h3>
-          <div class="cv-skill-row"><span>Support N1/N2</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span></span></div>
-          <div class="cv-skill-row"><span>Déploiement Windows</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span></span></div>
-          <div class="cv-skill-row"><span>Ticketing</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span></span></div>
-          <div class="cv-skill-row"><span>Chiffrement</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span></span></div>
+        <img class="cvx-photo" id="cv-photo" src="" alt="Kenny Desaintfuscien" />
+      </div>
+
+      <div class="cvx-contact">
+        <span><b>Email</b> kennydsf91@gmail.com</span>
+        <span><b>Web</b> kenny.quest</span>
+        <span><b>LinkedIn</b> kenny-desaintfuscien-41a3451a4</span>
+        <span><b>Localisation</b> Île-de-France (91)</span>
+      </div>
+
+      <div class="cvx-stats">
+        <div class="cvx-stat"><b>5 000+</b><span>tickets résolus</span></div>
+        <div class="cvx-stat"><b>7</b><span>projets web en ligne</span></div>
+        <div class="cvx-stat"><b>1 an</b><span>reconversion → IT</span></div>
+        <div class="cvx-stat"><b>2</b><span>outils internes adoptés — Econocom</span></div>
+      </div>
+
+      <div class="cvx-body">
+        <div class="cvx-mainc">
+
+          <div class="cvx-sec">
+            <h3>Expérience</h3>
+            <div class="cvx-xp">
+              <div class="cvx-xp-top">
+                <span class="cvx-xp-role">Technicien Support IT</span>
+                <span class="cvx-xp-date">Avr. 2025 — aujourd'hui</span>
+              </div>
+              <p class="cvx-xp-co">Econocom · site client en milieu sensible</p>
+              <ul>
+                <li>Traitement de plus de 5 000 tickets N1/N2 en environnement contrôlé</li>
+                <li>Déploiement et configuration de postes Windows, logiciel de chiffrement</li>
+                <li>Gestion des comptes et des droits via Active Directory</li>
+                <li>Prise en charge des escalades et incidents complexes</li>
+                <li>Maintenance préventive et curative du parc informatique</li>
+              </ul>
+            </div>
+            <div class="cvx-xp">
+              <div class="cvx-xp-top">
+                <span class="cvx-xp-role">Manager</span>
+                <span class="cvx-xp-date">Sep. 2023 — Avr. 2024</span>
+              </div>
+              <p class="cvx-xp-co">McDonald's · Les Ulis</p>
+              <ul>
+                <li>Encadrement d'une équipe de 10+ personnes en flux tendu</li>
+                <li>Formation, plannings, gestion des imprévus sous pression</li>
+              </ul>
+            </div>
+            <div class="cvx-xp">
+              <div class="cvx-xp-top">
+                <span class="cvx-xp-role">Équipier polyvalent</span>
+                <span class="cvx-xp-date">Fév. 2023 — Sep. 2023</span>
+              </div>
+              <p class="cvx-xp-co">McDonald's · Les Ulis</p>
+              <ul>
+                <li>Relation client en caisse et en salle, environnement exigeant et rythmé</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="cvx-sec">
+            <h3>Projets personnels en ligne</h3>
+            <div class="cvx-prj">
+              <div class="cvx-prj-item"><b>KV2</b> — gestion des comptes utilisateurs (usage interne Econocom)</div>
+              <div class="cvx-prj-item"><b>STOCKV2</b> — suivi du matériel IT entrées/sorties (usage interne)</div>
+              <div class="cvx-prj-item"><b>SYS://ADMIN</b> — plateforme de formation sysadmin <i>sysops.cool</i></div>
+              <div class="cvx-prj-item"><b>Lettre Magique</b> — SaaS de courriers assistés par IA <i>lettre-magique.com</i></div>
+              <div class="cvx-prj-item"><b>Deviso</b> — logiciel de devis pour freelances <i>deviso.app</i></div>
+              <div class="cvx-prj-item"><b>kenny.quest</b> — portfolio interactif WebGL <i>kenny.quest</i></div>
+              <div class="cvx-prj-item"><b>The Vapor Channel</b> — plateforme musicale vaporwave <i>lm-justice.com</i></div>
+            </div>
+          </div>
+
+          <div class="cvx-sec">
+            <h3>Poste recherché</h3>
+            <div class="cvx-seek">
+              <div class="cvx-seek-item"><b>Fonction</b><span>Technicien support / helpdesk N1-N2, évolution vers l'administration système</span></div>
+              <div class="cvx-seek-item"><b>Zone</b><span>Île-de-France (91) · sur site ou hybride</span></div>
+              <div class="cvx-seek-item"><b>Disponibilité</b><span>à discuter · réponse sous 24h</span></div>
+            </div>
+          </div>
+
         </div>
-        <div>
-          <h3>Système</h3>
-          <div class="cv-skill-row"><span>Active Directory</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span></span></div>
-          <div class="cv-skill-row"><span>Windows Server</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span></span></div>
-          <div class="cv-skill-row"><span>PowerShell</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span></span></div>
-          <div class="cv-skill-row"><span>Linux</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span></span></div>
-        </div>
-        <div>
-          <h3>Réseau</h3>
-          <div class="cv-skill-row"><span>TCP/IP, DNS, DHCP</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span></span></div>
-          <div class="cv-skill-row"><span>Diagnostic réseau</span><span class="cv-skill-dots"><span class="cv-skill-dot filled"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span><span class="cv-skill-dot"></span></span></div>
-        </div>
-        <div>
-          <h3>Langues</h3>
-          <div class="cv-lang-row"><span>Français</span><span>Natif</span></div>
-          <div class="cv-lang-row"><span>Anglais</span><span>Courant</span></div>
+
+        <div class="cvx-rail">
+
+          <div class="cvx-sec">
+            <h3>Compétences</h3>
+            <div class="cvx-chipgrp">
+              <p>Confirmé — quotidien</p>
+              <div class="cvx-chips">
+                <span class="cvx-chip hot">Support N1/N2</span>
+                <span class="cvx-chip hot">Ticketing</span>
+                <span class="cvx-chip hot">Déploiement Windows</span>
+                <span class="cvx-chip hot">Active Directory</span>
+                <span class="cvx-chip hot">Chiffrement</span>
+              </div>
+            </div>
+            <div class="cvx-chipgrp">
+              <p>En formation active</p>
+              <div class="cvx-chips">
+                <span class="cvx-chip">Windows Server</span>
+                <span class="cvx-chip">PowerShell</span>
+                <span class="cvx-chip">Linux</span>
+                <span class="cvx-chip">TCP/IP · DNS · DHCP</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cvx-sec">
+            <h3>Formation</h3>
+            <div class="cvx-rail-item">
+              <b>Auto-formation continue</b>
+              <span>Microsoft Learn · labos virtuels Windows Server / AD — depuis 2024</span>
+            </div>
+            <div class="cvx-rail-item">
+              <b>Bac Pro Communication Visuelle</b>
+              <span>Lycée l'Initiative · 2016 — 2019</span>
+            </div>
+          </div>
+
+          <div class="cvx-sec">
+            <h3>Langues</h3>
+            <div class="cvx-lang">Français <span>natif</span></div>
+            <div class="cvx-lang">Anglais <span>courant, technique</span></div>
+          </div>
+
+          <div class="cvx-sec">
+            <h3>Atouts</h3>
+            <div class="cvx-rail-item"><b>Milieu sensible</b><span>habitué aux procédures strictes et à la confidentialité</span></div>
+            <div class="cvx-rail-item"><b>Sang-froid</b><span>gestion d'incidents et de volumes élevés sous pression</span></div>
+            <div class="cvx-rail-item"><b>Autodidacte</b><span>monte en compétence vite, preuve par les projets livrés</span></div>
+          </div>
+
         </div>
       </div>
-      <div class="cv-main">
-        <div class="cv-header">
-          <h1>Kenny Desaintfuscien</h1>
-          <h2>Technicien support IT — Econocom</h2>
-          <p>Technicien IT autodidacte en environnement sensible. Passé d'équipier McDonald's à Technicien support IT en un an. Plus de 5 000 tickets traités, 6 projets en ligne, formation continue en administration système.</p>
-        </div>
-        <div class="cv-section">
-          <h3>Expérience</h3>
-          <div class="cv-exp-item">
-            <p class="cv-exp-date">Avr. 2025 — Présent</p>
-            <p class="cv-exp-role">Technicien support IT</p>
-            <p class="cv-exp-company">Econocom — Milieu sensible</p>
-            <ul class="cv-exp-bullets">
-              <li>Traitement de 5 000+ tickets (N1/N2) en environnement contrôlé</li>
-              <li>Déploiement et configuration de postes Windows</li>
-              <li>Gestion des comptes utilisateurs via Active Directory</li>
-              <li>Prise en charge des escalades et incidents complexes</li>
-              <li>Maintenance préventive et curative du parc informatique</li>
-            </ul>
-          </div>
-          <div class="cv-exp-item">
-            <p class="cv-exp-date">Sep 2023 — Avr 2024 · 8 mois</p>
-            <p class="cv-exp-role">Manager</p>
-            <p class="cv-exp-company">McDonald's — Les Ulis</p>
-            <ul class="cv-exp-bullets">
-              <li>Management d'une équipe de 10+ personnes en flux tendu</li>
-              <li>Formation, planning et suivi des performances</li>
-            </ul>
-          </div>
-        </div>
-        <div class="cv-section">
-          <h3>Projets</h3>
-          <div class="cv-proj-row"><span class="cv-proj-name">KV2</span><span class="cv-proj-desc">Outil interne de gestion des comptes utilisateurs — Econocom</span></div>
-          <div class="cv-proj-row"><span class="cv-proj-name">STOCKV2</span><span class="cv-proj-desc">Suivi des entrées/sorties de matériel IT — Econocom</span></div>
-          <div class="cv-proj-row"><span class="cv-proj-name">SYS://ADMIN</span><span class="cv-proj-desc">Plateforme de formation sysadmin — sysops.cool</span></div>
-          <div class="cv-proj-row"><span class="cv-proj-name">Lettre Magique</span><span class="cv-proj-desc">SaaS génération de courriers IA — lettre-magique.com</span></div>
-          <div class="cv-proj-row"><span class="cv-proj-name">kenny.quest</span><span class="cv-proj-desc">Portfolio personnel HTML/CSS/JS — kenny.quest</span></div>
-          <div class="cv-proj-row"><span class="cv-proj-name">Deviso</span><span class="cv-proj-desc">Logiciel de devis pour freelances — deviso.app</span></div>
-          <div class="cv-proj-row"><span class="cv-proj-name">The Vapor Channel</span><span class="cv-proj-desc">Plateforme musicale vaporwave — lm-justice.com</span></div>
-        </div>
-        <div class="cv-section">
-          <h3>Formation</h3>
-          <div class="cv-edu-item">
-            <strong>Auto-formation continue</strong> — <em>Microsoft Learn · Ressources IT en ligne</em>
-            <small>Labos virtuels Windows Server et Active Directory. Depuis 2024.</small>
-          </div>
-          <div class="cv-edu-item">
-            <strong>Baccalauréat Professionnel</strong> — <em>Lycée l'Initiative</em>
-            <small>Communication Visuelle Plurimédia. 2016 — 2019.</small>
-          </div>
-        </div>
+
+      <div class="cvx-foot">
+        <span>Kenny Desaintfuscien — Technicien Support IT</span>
+        <span>kenny.quest · kennydsf91@gmail.com</span>
       </div>
+
     </div>
   </div>
 
