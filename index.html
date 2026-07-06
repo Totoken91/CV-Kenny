@@ -1324,7 +1324,7 @@
       transition: transform 0.15s ease-out;
     }
 
-    /* ── PRINT CV — bandeau nuit + rail gris, sans dépendance webfont ── */
+    /* ── PRINT CV — terminal CRT, la vibe du site sur papier ── */
     #cv-print { display:none; }
     @media print {
       body > *:not(#cv-print) { display:none !important; }
@@ -1332,79 +1332,146 @@
       @page { margin:0; size:A4; }
     }
     #cv-print {
-      width:210mm;height:297mm;overflow:hidden;
-      font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
-      font-size:10.5pt;line-height:1.55;color:#0f172a;background:#fff;
-      margin:0 auto;
-      -webkit-print-color-adjust:exact;print-color-adjust:exact;
+      width:210mm;height:297mm;overflow:hidden;background:#050a05;color:#e8ffe8;
+      font-family:'Share Tech Mono','Courier New',Courier,monospace;font-size:9.5pt;line-height:1.5;
+      margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact;
     }
     #cv-print * { box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
-    .cvx { height:297mm;display:flex;flex-direction:column; }
 
-    /* bandeau d'en-tête bleu nuit */
-    .cvx-band { background:#0f172a;color:#fff;padding:16mm 14mm 11mm; }
-    .cvx-band-row { display:flex;justify-content:space-between;align-items:flex-start;gap:10mm; }
-    .cvx-id h1 { font-size:31pt;font-weight:800;letter-spacing:-0.015em;line-height:1.08;color:#fff; }
-    .cvx-id h1 span { color:#60a5fa; }
-    .cvx-role { font-size:13.5pt;font-weight:700;color:#93c5fd;margin-top:2.8mm; }
-    .cvx-pitch { font-size:10.4pt;color:#cbd5e1;margin-top:4mm;max-width:128mm;line-height:1.65; }
-    .cvx-photo { width:35mm;height:35mm;object-fit:cover;object-position:center top;border-radius:2mm;border:0.8mm solid rgba(255,255,255,0.9);flex-shrink:0; }
-    .cvx-contact { display:flex;flex-wrap:wrap;gap:2.4mm 11mm;margin-top:7mm;padding-top:5mm;border-top:0.2mm solid rgba(255,255,255,0.22);font-size:9.8pt;color:#e2e8f0; }
-    .cvx-contact b { color:#93c5fd;font-weight:600;margin-right:2mm; }
-
-    /* barre de stats */
-    .cvx-stats { display:flex;background:#fff;border-bottom:0.2mm solid #e2e8f0; }
-    .cvx-stat { flex:1;padding:7mm 0 6.2mm;text-align:center; }
-    .cvx-stat + .cvx-stat { border-left:0.2mm solid #e2e8f0; }
-    .cvx-stat b { display:block;font-size:19pt;font-weight:800;color:#0f172a;line-height:1; }
-    .cvx-stat span { display:block;font-size:8.4pt;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-top:2mm; }
-
-    /* corps: principale + rail gris pleine hauteur */
-    .cvx-body { display:flex;flex:1;min-height:0; }
-    .cvx-mainc { flex:1;min-width:0;padding:11mm 10mm 9mm 14mm; }
-    .cvx-rail { width:66mm;flex-shrink:0;background:#f1f5f9;padding:11mm 10mm 10mm 8mm; }
-    .cvx-rail .cvx-sec { margin-bottom:12mm; }
-
-    .cvx-sec { margin-bottom:15mm; }
-    .cvx-sec > h3 {
-      font-size:9.4pt;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:0.15em;
-      margin-bottom:5mm;display:flex;align-items:center;gap:2.4mm;
+    .cvt { position:relative;height:297mm;padding:7mm;display:flex;flex-direction:column; }
+    /* grille de fond + scanlines, comme le hero du site */
+    .cvt::before {
+      content:'';position:absolute;inset:7mm;z-index:0;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(0,255,65,0.05) 0.3mm, transparent 0.3mm),
+        linear-gradient(90deg, rgba(0,255,65,0.05) 0.3mm, transparent 0.3mm);
+      background-size:14mm 14mm;
     }
-    .cvx-sec > h3::before { content:'';width:4.5mm;height:1.1mm;background:#2563eb;display:inline-block;border-radius:0.5mm; }
+    .cvt::after {
+      content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+      background:repeating-linear-gradient(0deg, transparent, transparent 1.1mm, rgba(0,0,0,0.16) 1.1mm, rgba(0,0,0,0.16) 1.4mm);
+    }
+    .cvt-win { position:relative;z-index:1;flex:1;display:flex;flex-direction:column;border:0.5mm solid #00e53c;min-height:0; }
+
+    /* barre de fenêtre terminal */
+    .cvt-bar {
+      display:flex;align-items:center;gap:2.4mm;background:#0c140c;
+      border-bottom:0.5mm solid #00e53c;padding:2.4mm 4mm;
+    }
+    .cvt-dot { width:2.6mm;height:2.6mm;border-radius:50%; }
+    .cvt-dot.r { background:#ff5f56; } .cvt-dot.y { background:#ffbd2e; } .cvt-dot.g { background:#27c93f; }
+    .cvt-bar span { font-size:8.4pt;color:#9ccc9c;letter-spacing:0.04em;margin-left:2mm; }
+    .cvt-bar b { margin-left:auto;font-size:8.4pt;color:#00e53c;font-weight:400; }
+
+    .cvt-session { flex:1;padding:6.5mm 6.5mm 0;display:flex;flex-direction:column;min-height:0; }
+    .cvt-prompt { font-size:9pt;color:#00e53c;margin-bottom:3.5mm; }
+    .cvt-prompt .u { color:#ffb700; }
+    .cvt-prompt .ok { color:#9ccc9c; }
+
+    /* en-tête identité */
+    .cvt-head { display:flex;gap:7mm;align-items:flex-start; }
+    .cvt-head-l { flex:1;min-width:0; }
+    .cvt-name {
+      font-size:29pt;line-height:1.02;color:#00ff41;letter-spacing:0.01em;font-weight:400;
+      text-shadow:0 0 2.2mm rgba(0,255,65,0.6);text-transform:uppercase;
+    }
+    .cvt-name .cur { color:#00ff41;animation:none; }
+    .cvt-role { display:inline-block;background:#00e53c;color:#050a05;font-size:10.5pt;font-weight:700;padding:1.6mm 3mm;margin-top:3.2mm;letter-spacing:0.05em; }
+    .cvt-pitch { font-size:9.8pt;color:#c9e8c9;margin-top:4mm;max-width:116mm;line-height:1.65; }
+    .cvt-pitch b { color:#ffb700;font-weight:400; }
+
+    /* photo cadre CRT avec coins, comme le site */
+    .cvt-photo-wrap { position:relative;width:38mm;height:42mm;flex-shrink:0; }
+    .cvt-photo { width:100%;height:100%;object-fit:cover;object-position:center top;border:0.6mm solid #00e53c;filter:contrast(1.05); }
+    .cvt-corner { position:absolute;width:4mm;height:4mm;border-color:#ffb700;border-style:solid; }
+    .cvt-corner.tl { top:-1.2mm;left:-1.2mm;border-width:0.6mm 0 0 0.6mm; }
+    .cvt-corner.tr { top:-1.2mm;right:-1.2mm;border-width:0.6mm 0.6mm 0 0; }
+    .cvt-corner.bl { bottom:-1.2mm;left:-1.2mm;border-width:0 0 0.6mm 0.6mm; }
+    .cvt-corner.br { bottom:-1.2mm;right:-1.2mm;border-width:0 0.6mm 0.6mm 0; }
+    .cvt-signal { position:absolute;left:0;right:0;bottom:-5mm;text-align:center;font-size:7.4pt;color:#00e53c;letter-spacing:0.18em; }
+
+    /* contacts */
+    .cvt-contact {
+      display:flex;flex-wrap:wrap;gap:1.6mm 6.5mm;margin-top:5.5mm;padding:2.4mm 0;
+      border-top:0.35mm solid rgba(0,229,60,0.55);border-bottom:0.35mm solid rgba(0,229,60,0.55);
+      font-size:8.6pt;color:#e8ffe8;
+    }
+    .cvt-contact span::before { content:'▸ ';color:#ffb700; }
+
+    /* stats */
+    .cvt-stats { display:flex;margin-top:4mm;border:0.4mm solid #00e53c; }
+    .cvt-stat { flex:1;padding:4.2mm 0 3.8mm;text-align:center; }
+    .cvt-stat + .cvt-stat { border-left:0.4mm solid rgba(0,229,60,0.55); }
+    .cvt-stat b { display:block;font-size:18pt;font-weight:400;color:#00ff41;line-height:1;text-shadow:0 0 1.8mm rgba(0,255,65,0.55); }
+    .cvt-stat span { display:block;font-size:7.2pt;color:#9ccc9c;text-transform:uppercase;letter-spacing:0.08em;margin-top:1.6mm; }
+
+    /* corps */
+    .cvt-body { display:flex;flex:1;min-height:0;margin-top:6.5mm;gap:6mm; }
+    .cvt-main { flex:1;min-width:0; }
+    .cvt-rail { width:60mm;flex-shrink:0;border-left:0.35mm solid rgba(0,229,60,0.55);padding-left:5.5mm; }
+
+    .cvt-sec { margin-bottom:8mm; }
+    .cvt-sec > h3 { font-size:9.6pt;color:#00e53c;letter-spacing:0.05em;margin-bottom:3.4mm;font-weight:400; }
+    .cvt-sec > h3 .n { color:#ffb700; }
 
     /* expérience */
-    .cvx-xp { margin-bottom:11mm; }
-    .cvx-xp-top { display:flex;justify-content:space-between;align-items:baseline;gap:4mm; }
-    .cvx-xp-role { font-size:12.5pt;font-weight:700;color:#0f172a; }
-    .cvx-xp-date { font-size:9pt;color:#64748b;white-space:nowrap;font-weight:600; }
-    .cvx-xp-co { font-size:10pt;color:#2563eb;font-weight:600;margin-top:0.8mm; }
-    .cvx-xp ul { list-style:none;margin-top:2.8mm; }
-    .cvx-xp li { font-size:10.6pt;color:#334155;padding-left:4.8mm;position:relative;margin-bottom:3.2mm;line-height:1.7; }
-    .cvx-xp li::before { content:'';position:absolute;left:0;top:2.4mm;width:1.7mm;height:1.7mm;border-radius:50%;background:#94a3b8; }
+    .cvt-xp { border-left:1mm solid #00e53c;padding-left:4mm;margin-bottom:7mm; }
+    .cvt-xp-top { display:flex;justify-content:space-between;align-items:baseline;gap:4mm; }
+    .cvt-xp-role { font-size:12pt;color:#fff;letter-spacing:0.01em; }
+    .cvt-xp-date { font-size:8.2pt;color:#ffb700;white-space:nowrap; }
+    .cvt-xp-co { font-size:8.6pt;color:#00e53c;margin-top:0.6mm; }
+    .cvt-xp ul { list-style:none;margin-top:2mm; }
+    .cvt-xp li { font-size:9.7pt;color:#d7f0d7;padding-left:4.4mm;position:relative;margin-bottom:2.1mm;line-height:1.55; }
+    .cvt-xp li::before { content:'>';position:absolute;left:0;color:#00e53c; }
 
     /* projets */
-    .cvx-prj { }
-    .cvx-prj-item { font-size:10.4pt;color:#334155;line-height:1.65;padding:3.2mm 0;border-bottom:0.2mm solid #eef2f7;display:flex;gap:3mm;align-items:baseline; }
-    .cvx-prj-item:last-child { border-bottom:none; }
-    .cvx-prj-item b { color:#0f172a;font-weight:700;min-width:34mm;flex-shrink:0; }
-    .cvx-prj-item i { font-style:normal;color:#94a3b8;font-size:8.8pt;margin-left:auto;white-space:nowrap;padding-left:3mm; }
+    .cvt-prj { display:grid;grid-template-columns:1fr 1fr;gap:3mm; }
+    .cvt-prj-card { border:0.35mm solid rgba(0,229,60,0.7);padding:3mm 3.2mm 2.7mm;background:rgba(0,229,60,0.045); }
+    .cvt-prj-card b { display:block;font-size:8.8pt;color:#00ff41;font-weight:400;letter-spacing:0.03em; }
+    .cvt-prj-card p { font-size:8.2pt;color:#c9e8c9;margin-top:0.7mm;line-height:1.45; }
+    .cvt-prj-card i { display:block;font-style:normal;font-size:7.4pt;color:#ffb700;margin-top:0.9mm; }
 
-    /* rail */
-    .cvx-skillgrp { margin-bottom:6mm; }
-    .cvx-skillgrp b { display:block;font-size:9pt;color:#2563eb;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2mm; }
-    .cvx-skillgrp p { font-size:10.4pt;color:#0f172a;line-height:1.85; }
-    .cvx-rail-item { margin-bottom:5.5mm; }
-    .cvx-rail-item b { display:block;font-size:10.4pt;color:#0f172a;font-weight:700; }
-    .cvx-rail-item span { display:block;font-size:9.6pt;color:#475569;margin-top:0.8mm;line-height:1.6; }
-    .cvx-lang { display:flex;justify-content:space-between;font-size:10.2pt;color:#0f172a;margin-bottom:2.4mm; }
-    .cvx-lang span { color:#64748b; }
+    /* barres de compétences, comme sur le site */
+    .cvt-skillgrp { margin-bottom:5.6mm; }
+    .cvt-skillgrp > b { display:block;font-size:7.8pt;color:#ffb700;letter-spacing:0.1em;margin-bottom:2.2mm;font-weight:400; }
+    .cvt-skill { margin-bottom:2.8mm; }
+    .cvt-skill-h { display:flex;justify-content:space-between;font-size:8.4pt;color:#e8ffe8;margin-bottom:0.9mm; }
+    .cvt-skill-h span:last-child { color:#9ccc9c; }
+    .cvt-track { height:1.7mm;background:#122412;border:0.2mm solid rgba(0,229,60,0.45); }
+    .cvt-fill { height:100%;background:#00e53c; }
 
-    .cvx-form { display:flex;gap:10mm; }
-    .cvx-form .cvx-rail-item { flex:1;margin-bottom:0; }
+    .cvt-lang { display:flex;justify-content:space-between;font-size:9.4pt;color:#e8ffe8;padding:1.4mm 0;border-bottom:0.2mm solid rgba(0,229,60,0.25); }
+    .cvt-lang:last-child { border-bottom:none; }
+    .cvt-lang span { color:#ffb700;font-size:8.2pt; }
 
-    /* pied */
-    .cvx-foot { padding:4.5mm 14mm;display:flex;justify-content:space-between;align-items:center;font-size:9pt;color:#e2e8f0;background:#0f172a; }
-    .cvx-foot b { color:#93c5fd;font-weight:700; }
+    .cvt-atout { margin-bottom:3.4mm; }
+    .cvt-atout b { display:block;font-size:9.2pt;color:#fff;font-weight:400; }
+    .cvt-atout span { display:block;font-size:8.2pt;color:#9ccc9c;margin-top:0.3mm;line-height:1.45; }
+
+    .cvt-form b { display:block;font-size:9.2pt;color:#fff;font-weight:400; }
+    .cvt-form span { display:block;font-size:8.2pt;color:#9ccc9c;margin-top:0.3mm;line-height:1.45; }
+    .cvt-form { margin-bottom:3.4mm; }
+
+    /* sortie de commande (poste recherché) */
+    .cvt-out { border:0.35mm solid rgba(0,229,60,0.7);background:rgba(0,229,60,0.045);padding:3.4mm 4mm; }
+    .cvt-out p { font-size:9.2pt;color:#d7f0d7;line-height:1.85;white-space:pre; }
+    .cvt-out .k { color:#00e53c; }
+    .cvt-out .badge { background:#00e53c;color:#050a05;font-weight:700;padding:0.6mm 2.4mm;letter-spacing:0.06em; }
+
+    /* system info façon neofetch */
+    .cvt-sys p { font-size:8.6pt;color:#d7f0d7;line-height:1.9;white-space:nowrap; }
+    .cvt-sys p span { display:inline-block;width:15mm;color:#ffb700; }
+    .cvt-sys p b { color:#00ff41;font-weight:400;text-shadow:0 0 1.4mm rgba(0,255,65,0.5); }
+
+    /* pied: ligne de commande finale */
+    .cvt-foot {
+      border-top:0.5mm solid #00e53c;background:#0c140c;padding:3.2mm 6mm;
+      display:flex;justify-content:space-between;align-items:center;font-size:9pt;
+    }
+    .cvt-foot .p { color:#00e53c; }
+    .cvt-foot .p .u { color:#ffb700; }
+    .cvt-foot .cur { display:inline-block;width:2.2mm;height:3.4mm;background:#00ff41;vertical-align:-0.5mm;margin-left:1mm; }
+    .cvt-foot .mail { color:#ffb700; }
   </style>
 </head>
 <body>
@@ -2743,144 +2810,173 @@
 
   <!-- ── CV PRINT (hidden, shown only on print) ── -->
   <div id="cv-print">
-    <div class="cvx">
+    <div class="cvt">
+      <div class="cvt-win">
 
-      <div class="cvx-band">
-        <div class="cvx-band-row">
-          <div class="cvx-id">
-            <h1>Kenny Desaintfuscien<span>.</span></h1>
-            <p class="cvx-role">Technicien Support IT · N1/N2</p>
-            <p class="cvx-pitch">Plus de 5 000 tickets résolus en environnement sensible chez Econocom. Reconversion réussie en un an, formation continue en administration système. Fiable sous pression, autonome, orienté résolution.</p>
-          </div>
-          <img class="cvx-photo" id="cv-photo" src="" alt="Kenny Desaintfuscien" />
-        </div>
-        <div class="cvx-contact">
-          <span><b>Email</b> kennydsf91@gmail.com</span>
-          <span><b>Web</b> kenny.quest</span>
-          <span><b>LinkedIn</b> kenny-desaintfuscien-41a3451a4</span>
-          <span><b>Zone</b> Île-de-France (91)</span>
-        </div>
-      </div>
-
-      <div class="cvx-stats">
-        <div class="cvx-stat"><b>5 000+</b><span>tickets résolus</span></div>
-        <div class="cvx-stat"><b>7</b><span>projets en ligne</span></div>
-        <div class="cvx-stat"><b>1 an</b><span>reconversion IT</span></div>
-        <div class="cvx-stat"><b>2</b><span>outils internes adoptés</span></div>
-      </div>
-
-      <div class="cvx-body">
-        <div class="cvx-mainc">
-
-          <div class="cvx-sec">
-            <h3>Expérience</h3>
-            <div class="cvx-xp">
-              <div class="cvx-xp-top">
-                <span class="cvx-xp-role">Technicien Support IT</span>
-                <span class="cvx-xp-date">Avr. 2025 — aujourd'hui</span>
-              </div>
-              <p class="cvx-xp-co">Econocom · site client en milieu sensible</p>
-              <ul>
-                <li>Traitement de plus de 5 000 tickets N1/N2 en environnement contrôlé</li>
-                <li>Déploiement et configuration de postes Windows, logiciel de chiffrement</li>
-                <li>Gestion des comptes et des droits via Active Directory</li>
-                <li>Prise en charge des escalades et incidents complexes</li>
-                <li>Maintenance préventive et curative du parc informatique</li>
-              </ul>
-            </div>
-            <div class="cvx-xp">
-              <div class="cvx-xp-top">
-                <span class="cvx-xp-role">Manager</span>
-                <span class="cvx-xp-date">Sep. 2023 — Avr. 2024</span>
-              </div>
-              <p class="cvx-xp-co">McDonald's · Les Ulis</p>
-              <ul>
-                <li>Encadrement d'une équipe de 10+ personnes en flux tendu</li>
-                <li>Formation, plannings, gestion des imprévus sous pression</li>
-              </ul>
-            </div>
-            <div class="cvx-xp">
-              <div class="cvx-xp-top">
-                <span class="cvx-xp-role">Équipier polyvalent</span>
-                <span class="cvx-xp-date">Fév. 2023 — Sep. 2023</span>
-              </div>
-              <p class="cvx-xp-co">McDonald's · Les Ulis</p>
-              <ul>
-                <li>Relation client en caisse et en salle, environnement exigeant et rythmé</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="cvx-sec">
-            <h3>Projets personnels en ligne</h3>
-            <div class="cvx-prj">
-              <div class="cvx-prj-item"><b>KV2</b> Gestion des comptes utilisateurs, adopté en interne <i>Econocom</i></div>
-              <div class="cvx-prj-item"><b>STOCKV2</b> Suivi du matériel IT entrées/sorties, usage interne <i>Econocom</i></div>
-              <div class="cvx-prj-item"><b>SYS://ADMIN</b> Plateforme de formation sysadmin <i>sysops.cool</i></div>
-              <div class="cvx-prj-item"><b>Lettre Magique</b> SaaS de courriers assistés par IA <i>lettre-magique.com</i></div>
-              <div class="cvx-prj-item"><b>Deviso</b> Logiciel de devis pour freelances <i>deviso.app</i></div>
-              <div class="cvx-prj-item"><b>kenny.quest</b> Portfolio interactif WebGL <i>kenny.quest</i></div>
-              <div class="cvx-prj-item"><b>The Vapor Channel</b> Plateforme musicale vaporwave <i>lm-justice.com</i></div>
-            </div>
-          </div>
-
-          <div class="cvx-sec">
-            <h3>Formation</h3>
-            <div class="cvx-form">
-              <div class="cvx-rail-item">
-                <b>Auto-formation continue</b>
-                <span>Microsoft Learn · labos virtuels Windows Server / Active Directory — depuis 2024</span>
-              </div>
-              <div class="cvx-rail-item">
-                <b>Bac Pro Communication Visuelle</b>
-                <span>Lycée l'Initiative · 2016 — 2019</span>
-              </div>
-            </div>
-          </div>
-
+        <div class="cvt-bar">
+          <span class="cvt-dot r"></span><span class="cvt-dot y"></span><span class="cvt-dot g"></span>
+          <span>kenny@quest: ~/cv</span>
+          <b>— 80×24 —</b>
         </div>
 
-        <div class="cvx-rail">
+        <div class="cvt-session">
 
-          <div class="cvx-sec">
-            <h3>Compétences</h3>
-            <div class="cvx-skillgrp">
-              <b>Confirmé · quotidien</b>
-              <p>Support N1/N2 · Ticketing · Déploiement Windows · Active Directory · Chiffrement · Maintenance de parc</p>
+          <p class="cvt-prompt"><span class="u">root@kenny</span>:~$ ./load_cv.sh <span class="ok">· · · IDENTITY VERIFIED [OK]</span></p>
+
+          <div class="cvt-head">
+            <div class="cvt-head-l">
+              <h1 class="cvt-name">Kenny<br/>Desaintfuscien<span class="cur">_</span></h1>
+              <span class="cvt-role">TECHNICIEN SUPPORT IT · N1/N2</span>
+              <p class="cvt-pitch"><b>5 000+ tickets résolus</b> en environnement sensible chez Econocom. Reconversion réussie en un an, formation continue en administration système. Fiable sous pression, autonome, orienté résolution.</p>
             </div>
-            <div class="cvx-skillgrp">
-              <b>En formation active</b>
-              <p>Windows Server · PowerShell · Linux · TCP/IP · DNS · DHCP</p>
+            <div class="cvt-photo-wrap">
+              <img class="cvt-photo" id="cv-photo" src="" alt="Kenny Desaintfuscien" />
+              <span class="cvt-corner tl"></span><span class="cvt-corner tr"></span>
+              <span class="cvt-corner bl"></span><span class="cvt-corner br"></span>
+              <span class="cvt-signal">SIGNAL LOCKED ▮</span>
             </div>
           </div>
 
-          <div class="cvx-sec">
-            <h3>Langues</h3>
-            <div class="cvx-lang">Français <span>natif</span></div>
-            <div class="cvx-lang">Anglais <span>courant, technique</span></div>
+          <div class="cvt-contact">
+            <span>kennydsf91@gmail.com</span>
+            <span>kenny.quest</span>
+            <span>in/kenny-desaintfuscien</span>
+            <span>Île-de-France (91)</span>
           </div>
 
-          <div class="cvx-sec">
-            <h3>Atouts</h3>
-            <div class="cvx-rail-item"><b>Milieu sensible</b><span>procédures strictes, confidentialité</span></div>
-            <div class="cvx-rail-item"><b>Sang-froid</b><span>incidents et volumes élevés sous pression</span></div>
-            <div class="cvx-rail-item"><b>Autodidacte</b><span>preuve par les projets livrés</span></div>
+          <div class="cvt-stats">
+            <div class="cvt-stat"><b>5000+</b><span>tickets résolus</span></div>
+            <div class="cvt-stat"><b>07</b><span>projets en ligne</span></div>
+            <div class="cvt-stat"><b>1 AN</b><span>reconversion IT</span></div>
+            <div class="cvt-stat"><b>02</b><span>outils adoptés</span></div>
           </div>
 
-          <div class="cvx-sec">
-            <h3>Poste recherché</h3>
-            <div class="cvx-rail-item"><b>Support / helpdesk N1-N2</b><span>évolution vers l'administration système</span></div>
-            <div class="cvx-rail-item"><b>Île-de-France (91)</b><span>sur site ou hybride · réponse sous 24h</span></div>
+          <div class="cvt-body">
+            <div class="cvt-main">
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 01 — EXPÉRIENCE</h3>
+                <div class="cvt-xp">
+                  <div class="cvt-xp-top">
+                    <span class="cvt-xp-role">Technicien Support IT</span>
+                    <span class="cvt-xp-date">2025.04 → auj.</span>
+                  </div>
+                  <p class="cvt-xp-co">Econocom · site client en milieu sensible</p>
+                  <ul>
+                    <li>Traitement de plus de 5 000 tickets N1/N2 en environnement contrôlé</li>
+                    <li>Déploiement et configuration de postes Windows, logiciel de chiffrement</li>
+                    <li>Gestion des comptes et des droits via Active Directory</li>
+                    <li>Prise en charge des escalades et incidents complexes</li>
+                    <li>Maintenance préventive et curative du parc informatique</li>
+                  </ul>
+                </div>
+                <div class="cvt-xp">
+                  <div class="cvt-xp-top">
+                    <span class="cvt-xp-role">Manager</span>
+                    <span class="cvt-xp-date">2023.09 → 2024.04</span>
+                  </div>
+                  <p class="cvt-xp-co">McDonald's · Les Ulis</p>
+                  <ul>
+                    <li>Encadrement d'une équipe de 10+ personnes en flux tendu</li>
+                    <li>Formation, plannings, gestion des imprévus sous pression</li>
+                  </ul>
+                </div>
+                <div class="cvt-xp">
+                  <div class="cvt-xp-top">
+                    <span class="cvt-xp-role">Équipier polyvalent</span>
+                    <span class="cvt-xp-date">2023.02 → 2023.09</span>
+                  </div>
+                  <p class="cvt-xp-co">McDonald's · Les Ulis</p>
+                  <ul>
+                    <li>Relation client en caisse et en salle, environnement exigeant et rythmé</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 02 — PROJETS <span class="n">·</span> conçus, codés, en ligne</h3>
+                <div class="cvt-prj">
+                  <div class="cvt-prj-card"><b>KV2</b><p>Gestion des comptes utilisateurs, adopté en interne</p><i>@ econocom</i></div>
+                  <div class="cvt-prj-card"><b>STOCKV2</b><p>Suivi du matériel IT entrées/sorties, usage interne</p><i>@ econocom</i></div>
+                  <div class="cvt-prj-card"><b>SYS://ADMIN</b><p>Plateforme de formation sysadmin</p><i>sysops.cool</i></div>
+                  <div class="cvt-prj-card"><b>LETTRE MAGIQUE</b><p>SaaS de courriers assistés par IA</p><i>lettre-magique.com</i></div>
+                  <div class="cvt-prj-card"><b>DEVISO</b><p>Logiciel de devis pour freelances</p><i>deviso.app</i></div>
+                  <div class="cvt-prj-card"><b>KENNY.QUEST</b><p>Portfolio interactif WebGL — ce CV en sort</p><i>kenny.quest</i></div>
+                </div>
+              </div>
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 07 — POSTE RECHERCHÉ</h3>
+                <div class="cvt-out">
+                  <p><span class="k">&gt; fonction</span> : support / helpdesk N1-N2 · évolution sysadmin</p>
+                  <p><span class="k">&gt; zone</span>     : Île-de-France (91) · sur site ou hybride</p>
+                  <p><span class="k">&gt; délai</span>    : réponse sous 24h</p>
+                  <p><span class="k">&gt; statut</span>   : <span class="badge">OUVERT AUX OPPORTUNITÉS</span></p>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="cvt-rail">
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 03 — COMPÉTENCES</h3>
+                <div class="cvt-skillgrp">
+                  <b>CONFIRMÉ · QUOTIDIEN</b>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Support N1/N2</span><span>92%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:92%"></div></div></div>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Ticketing &amp; priorisation</span><span>90%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:90%"></div></div></div>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Déploiement Windows</span><span>88%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:88%"></div></div></div>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Chiffrement</span><span>85%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:85%"></div></div></div>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Active Directory</span><span>80%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:80%"></div></div></div>
+                </div>
+                <div class="cvt-skillgrp">
+                  <b>EN FORMATION ACTIVE</b>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Windows Server</span><span>45%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:45%"></div></div></div>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>PowerShell</span><span>40%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:40%"></div></div></div>
+                  <div class="cvt-skill"><div class="cvt-skill-h"><span>Linux · TCP/IP · DNS</span><span>30%</span></div><div class="cvt-track"><div class="cvt-fill" style="width:30%"></div></div></div>
+                </div>
+              </div>
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 04 — FORMATION</h3>
+                <div class="cvt-form"><b>Auto-formation continue</b><span>Microsoft Learn · labos Windows Server / AD — depuis 2024</span></div>
+                <div class="cvt-form"><b>Bac Pro Comm. Visuelle</b><span>Lycée l'Initiative · 2016 — 2019</span></div>
+              </div>
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 05 — LANGUES</h3>
+                <div class="cvt-lang">Français <span>NATIF</span></div>
+                <div class="cvt-lang">Anglais <span>COURANT · TECH</span></div>
+              </div>
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 06 — ATOUTS</h3>
+                <div class="cvt-atout"><b>Milieu sensible</b><span>procédures strictes, confidentialité</span></div>
+                <div class="cvt-atout"><b>Sang-froid</b><span>volumes élevés, incidents, pression</span></div>
+                <div class="cvt-atout"><b>Autodidacte</b><span>preuve par les projets livrés</span></div>
+              </div>
+
+              <div class="cvt-sec">
+                <h3><span class="n">//</span> 08 — SYSTEM</h3>
+                <div class="cvt-sys">
+                  <p><span>os</span>kenny v26.07 — stable</p>
+                  <p><span>uptime</span>15 mois @ econocom</p>
+                  <p><span>charge</span>5000+ tickets · 0 burnout</p>
+                  <p><span>état</span><b>[ ONLINE ]</b></p>
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </div>
-      </div>
 
-      <div class="cvx-foot">
-        <span><b>Disponible</b> pour un poste support IT N1/N2 en Île-de-France</span>
-        <span>kennydsf91@gmail.com · kenny.quest</span>
-      </div>
+        <div class="cvt-foot">
+          <span class="p"><span class="u">root@kenny</span>:~$ hire --poste "support N1/N2" --zone IdF<span class="cur"></span></span>
+          <span class="mail">kennydsf91@gmail.com</span>
+        </div>
 
+      </div>
     </div>
   </div>
 
