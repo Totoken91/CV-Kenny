@@ -1321,6 +1321,78 @@
       transition: transform 0.15s ease-out;
     }
 
+    /* ── TICKET VIZ (5000 points) ─────────────────────── */
+    .ticket-viz {
+      margin-top: 3rem;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.5rem 1.5rem 1.2rem;
+      position: relative;
+    }
+    .ticket-viz-head {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.1rem;
+      flex-wrap: wrap;
+    }
+    .ticket-viz-count {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      color: var(--green);
+      line-height: 1;
+      min-width: 5.2ch;
+      font-variant-numeric: tabular-nums;
+    }
+    .ticket-viz-title {
+      font-size: 0.95rem;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .ticket-viz-sub {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .ticket-viz-replay {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.7rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .ticket-viz-replay:hover { color: var(--green); border-color: var(--green); }
+    #tv-canvas { display: block; width: 100%; height: 210px; }
+    .ticket-viz-axis {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .ticket-viz-caption {
+      margin-top: 0.9rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .ticket-viz-caption b { color: var(--green); font-weight: 400; }
+    @media (max-width: 768px) {
+      .ticket-viz { padding: 1.1rem 1rem 1rem; }
+      #tv-canvas { height: 150px; }
+      .ticket-viz-replay { display: none; }
+    }
+
     /* ── PRINT CV — terminal CRT, la vibe du site sur papier ── */
     #cv-print { display:none; }
     @media print {
@@ -1571,6 +1643,18 @@
           <span class="stat-label">Île-de-France</span>
         </div>
       </div>
+    </div>
+
+    <!-- ── VIZ: 5 000 tickets, point par point ── -->
+    <div class="ticket-viz reveal" id="ticket-viz">
+      <div class="ticket-viz-head">
+        <span class="ticket-viz-count" id="tv-count">0</span>
+        <span class="ticket-viz-title">tickets résolus<span class="ticket-viz-sub">avr. 2025 → aujourd'hui · 1 point = 1 ticket</span></span>
+        <button class="ticket-viz-replay" id="tv-replay" title="Rejouer">↻ replay</button>
+      </div>
+      <canvas id="tv-canvas" aria-label="Visualisation: 5000 tickets résolus, un point par ticket"></canvas>
+      <div class="ticket-viz-axis"><span>avr. 2025</span><span>aujourd'hui</span></div>
+      <p class="ticket-viz-caption">soit <b>≈ 15 tickets par jour ouvré</b> — un ticket résolu toutes les <b>~27 minutes</b>, pendant 15 mois, sans interruption.</p>
     </div>
   </section>
 
@@ -2993,6 +3077,129 @@
 
 
 
+  <!-- ── TICKET VIZ: 5000 tickets, un point chacun ── -->
+  <script>
+  (function(){
+    function init(){
+      var wrap   = document.getElementById('ticket-viz');
+      var canvas = document.getElementById('tv-canvas');
+      var count  = document.getElementById('tv-count');
+      var replay = document.getElementById('tv-replay');
+      if (!wrap || !canvas || !count) return;
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      var TOTAL = 5000, DUR = 5200;
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var pts = [], cols = 0, rows = 0, cell = 0, W = 0, H = 0, dpr = 1;
+
+      function themeColor(){
+        return getComputedStyle(document.body).getPropertyValue('--green').trim() || '#00ff41';
+      }
+      function hexToRgb(h){
+        h = h.replace('#','');
+        if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+        var n = parseInt(h, 16);
+        return [(n>>16)&255, (n>>8)&255, n&255];
+      }
+
+      /* grille: remplissage colonne par colonne = axe du temps -> droite */
+      function build(){
+        W = canvas.clientWidth; H = canvas.clientHeight;
+        if (W < 20 || H < 20) return false;
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        canvas.width = W*dpr; canvas.height = H*dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cols = Math.ceil(Math.sqrt(TOTAL * W / H));
+        rows = Math.ceil(TOTAL / cols);
+        cell = Math.min(W / cols, H / rows);
+        var ox = (W - cols*cell) / 2, oy = (H - rows*cell) / 2;
+        pts = new Array(TOTAL);
+        var i = 0;
+        for (var c = 0; c < cols && i < TOTAL; c++){
+          for (var r = 0; r < rows && i < TOTAL; r++){
+            pts[i++] = [ox + c*cell + cell*0.15, oy + r*cell + cell*0.15, 0.45 + Math.random()*0.55];
+          }
+        }
+        return true;
+      }
+
+      var drawn = 0, raf = 0, t0 = 0, done = false, rgb = hexToRgb(themeColor());
+      var easeIO = function(t){ return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2; };
+
+      function drawRange(from, to){
+        var s = Math.max(0.9, cell*0.7);
+        for (var i = from; i < to; i++){
+          var p = pts[i];
+          ctx.fillStyle = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+p[2].toFixed(2)+')';
+          ctx.fillRect(p[0], p[1], s, s);
+          /* jalon chaque millier: point plein + trait fin */
+          if ((i+1) % 1000 === 0){
+            ctx.fillStyle = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',1)';
+            ctx.fillRect(p[0]-1, p[1]-1, s+2, s+2);
+          }
+        }
+      }
+
+      function setCount(n){
+        count.textContent = n.toLocaleString('fr-FR');
+      }
+
+      function frame(ts){
+        if (!t0) t0 = ts;
+        var p = Math.min(1, (ts - t0) / DUR);
+        var target = Math.round(easeIO(p) * TOTAL);
+        if (target > drawn){ drawRange(drawn, target); drawn = target; setCount(drawn); }
+        if (p >= 1){ done = true; raf = 0; return; }
+        raf = requestAnimationFrame(frame);
+      }
+
+      function reset(){
+        if (raf){ cancelAnimationFrame(raf); raf = 0; }
+        ctx.clearRect(0, 0, W, H);
+        drawn = 0; t0 = 0; done = false;
+        setCount(0);
+      }
+      function play(){
+        if (!build()) return;
+        reset();
+        rgb = hexToRgb(themeColor());
+        if (reduce){ drawRange(0, TOTAL); drawn = TOTAL; setCount(TOTAL); done = true; return; }
+        raf = requestAnimationFrame(frame);
+      }
+      function finishNow(){
+        if (!pts.length && !build()) return;
+        if (raf){ cancelAnimationFrame(raf); raf = 0; }
+        ctx.clearRect(0, 0, W, H);
+        rgb = hexToRgb(themeColor());
+        drawRange(0, TOTAL); drawn = TOTAL; setCount(TOTAL); done = true;
+      }
+
+      /* démarre quand le bloc entre à l'écran, une fois */
+      var played = false;
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(function(es){
+          if (es[0].isIntersecting && !played){ played = true; play(); }
+        }, { threshold: 0.35 }).observe(wrap);
+      } else { played = true; play(); }
+
+      if (replay) replay.addEventListener('click', play);
+
+      /* thème: redessine l'état final avec la couleur du thème */
+      if ('MutationObserver' in window){
+        new MutationObserver(function(){ if (done) finishNow(); })
+          .observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      }
+      var rt;
+      addEventListener('resize', function(){
+        clearTimeout(rt);
+        rt = setTimeout(function(){ if (played){ if (done) finishNow(); else play(); } }, 200);
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
   <!-- ── PORTRAIT PARTICLES v3 — plein écran: le visage s'échappe du cadre ── -->
   <script type="module">
   import * as THREE from '/vendor/three.module.min.js';
